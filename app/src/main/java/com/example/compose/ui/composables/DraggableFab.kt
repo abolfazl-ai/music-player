@@ -76,8 +76,6 @@ fun DraggableFab(
                 .background(MaterialTheme.colors.background)
         )
 
-    //just testing
-
     BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
