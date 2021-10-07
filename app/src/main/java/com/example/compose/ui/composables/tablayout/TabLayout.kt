@@ -3,9 +3,7 @@ package com.example.compose.ui.composables.tablayout
 import androidx.compose.animation.*
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -20,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -31,16 +28,10 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.pointer.pointerInteropFilter
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.compose.ui.OptionItem
 import com.example.compose.ui.Screen
-import com.example.compose.ui.getScreenComposable
-import com.example.compose.viewmodel.MainViewModel
 import com.google.accompanist.pager.*
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -48,9 +39,9 @@ import kotlin.math.absoluteValue
 import kotlin.math.round
 import kotlin.math.sign
 
+/*@ExperimentalFoundationApi
 @ExperimentalComposeUiApi
 @ExperimentalAnimationApi
-@ExperimentalFoundationApi
 @OptIn(
     ExperimentalMaterialApi::class,
     ExperimentalPagerApi::class,
@@ -96,7 +87,7 @@ fun HomeTabLayout(
         pagerState = pagerState,
         fabExpanded = fabExpanded
     ) { fabExpanded = !fabExpanded }
-}
+}*/
 
 private val Float.transX
     get() = (coerceIn(-0.4f, 0.4f) - sign * (absoluteValue.coerceIn(0.6f, 1f) - 0.6f))
@@ -199,7 +190,7 @@ fun TabLayout(
             }
         }
 
-        Indicator(
+/*        Indicator(
             Modifier
                 .align(Alignment.BottomStart)
                 .padding(bottom = 10.dp)
@@ -210,9 +201,10 @@ fun TabLayout(
             options = screens[round(offset).toInt()].options,
             color = middleColorCalculator(screens.map { it.color }, offset = offset),
             alpha, fabExpanded, onFabExpand
-        )
+        )*/
     }
 }
+/*
 
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
@@ -285,6 +277,7 @@ fun Indicator(
         }
     }
 }
+*/
 
 
 fun Modifier.drawShadow(

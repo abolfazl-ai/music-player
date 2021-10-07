@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import com.example.compose.PlayerService
 import com.example.compose.ui.composables.DraggableFab
 import com.example.compose.ui.composables.screens.SongsScreen
-import com.example.compose.ui.composables.tablayout.HomeTabLayout
 import com.example.compose.ui.theme.ComposeTheme
 import com.example.compose.viewmodel.MainViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -48,9 +47,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             ComposeTheme {
 
-
-                var s by remember { mutableStateOf(false) }
-
                 BottomSheetScaffold(
                     sheetContent = { Spacer(Modifier.fillMaxSize()) },
                     drawerGesturesEnabled = true,
@@ -68,13 +64,7 @@ class MainActivity : ComponentActivity() {
                         SongsScreen(Modifier)
                         DraggableFab()
                     }
-/*                    if (s) FeatureThatRequiresCameraPermission(Modifier.padding(it), viewModel)
-                    LaunchedEffect(key1 = 0) {
-                        launch {
-                            delay(150)
-                            s = true
-                        }
-                    }*/
+                    FeatureThatRequiresCameraPermission(Modifier.padding(it), viewModel)
                 }
             }
         }
@@ -143,6 +133,10 @@ private fun FeatureThatRequiresCameraPermission(modifier: Modifier, viewModel: M
             }
         ) {
             LaunchedEffect(0) { viewModel.repository.scan() }
-            HomeTabLayout(modifier)
         }
     }
+
+@Composable
+fun Main() {
+
+}

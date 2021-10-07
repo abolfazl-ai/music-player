@@ -1,15 +1,11 @@
 package com.example.compose.ui.composables
 
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.*
@@ -24,14 +20,14 @@ import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.example.compose.ui.theme.Blue700
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.math.*
+import kotlin.math.hypot
+import kotlin.math.roundToInt
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
@@ -39,23 +35,21 @@ import kotlin.math.*
 fun DraggableFab(
     modifier: Modifier = Modifier,
     items: List<ImageVector> = listOf(
-        Icons.Rounded.Home,
+        Icons.Rounded.Shuffle,
+        Icons.Rounded.SortByAlpha,
         Icons.Rounded.GridView,
-        Icons.Rounded.TableView,
-        Icons.Rounded.Delete,
         Icons.Rounded.Settings,
     )
 ) {
 
-    var isInitialized by remember { mutableStateOf(false) }
     var expanded by remember { mutableStateOf(false) }
     var isExpanding by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
 
-    val backSize = remember { Animatable(56.dp, Dp.VectorConverter) }
     val rotation = remember { Animatable(0f) }
-    val alpha = animateFloatAsState(if (expanded) 0.7f else 0f)
+    val backgroundAlpha = animateFloatAsState(if (expanded) 0.7f else 0f)
+    val iconsAlpha = remember { Animatable(1f) }
     val offset = remember { Animatable(TwoDimFloat(0f, 0f), TwoDimFloat.VECTOR_CONVERTER) }
     val offsets = remember {
         ArrayList<Animatable<TwoDimFloat, AnimationVector2D>>().also {
@@ -72,7 +66,7 @@ fun DraggableFab(
             modifier = Modifier
                 .fillMaxSize()
                 .pointerInteropFilter { expanded = false; true }
-                .alpha(alpha.value)
+                .alpha(backgroundAlpha.value)
                 .background(MaterialTheme.colors.background)
         )
 
@@ -85,104 +79,65 @@ fun DraggableFab(
 
         with(LocalDensity.current) {
             LaunchedEffect(expanded) {
-                if (isInitialized) {
-                    if (expanded) {
-                        isExpanding = true
+                val spec = spring<Float>(Spring.DampingRatioMediumBouncy)
+                isExpanding = true
+                if (expanded) {
+                    iconsAlpha.snapTo(0f)
+                    offsets.reversed().forEachIndexed { index, anim ->
                         launch {
-                            offset.animateTo(
-                                TwoDimFloat((-maxWidth / 2 + 28.dp).toPx(), 0f),
-                                animationSpec = spring(0.65f)
+                            anim.animateTo(
+                                TwoDimFloat(0f, -(60 + index * 56).dp.toPx()),
+                                spring(Spring.DampingRatioMediumBouncy)
                             )
                         }
-                        offsets.forEach {
-                            launch {
-                                it.animateTo(
-                                    TwoDimFloat((-maxWidth / 2 + 25.dp).toPx(), 0f),
-                                    animationSpec = spring(0.65f)
-                                )
-                            }
-                        }
-                        delay(200)
-                        launch { backSize.animateTo(200.dp, animationSpec = spring(0.4f, 1000f)) }
-                        launch { rotation.animateTo(135f, animationSpec = spring(0.4f, 1000f)) }
+                    }
+                    launch { iconsAlpha.animateTo(1f) }
+                    launch { rotation.animateTo(135f, spec) }
+                } else {
+                    offsets.forEach {
                         launch {
-                            val angle = PI / items.lastIndex
-                            offsets.forEachIndexed { index, animatable ->
-                                launch {
-                                    animatable.animateTo(
-                                        TwoDimFloat(
-                                            animatable.value.v1 - (64 * cos(index * angle)).dp.toPx(),
-                                            animatable.value.v2 - (64 * sin(index * angle)).dp.toPx()
-                                        )
-                                    )
-                                }
-                            }
+                            it.animateTo(TwoDimFloat(0f, 0f))
                         }
-                    } else {
-                        offsets.forEach {
-                            launch {
-                                it.animateTo(
-                                    TwoDimFloat((-maxWidth / 2 + 25.dp).toPx(), 0f),
-                                    animationSpec = spring(0.65f)
-                                )
-                            }
-                        }
-                        launch { backSize.animateTo(56.dp) }
-                        launch { rotation.animateTo(0f) }
-                        delay(250)
-                        launch {
-                            offset.animateTo(
-                                TwoDimFloat(0f, 0f),
-                                animationSpec = spring(0.65f)
-                            )
-                        }
-                        offsets.forEach {
-                            launch {
-                                it.animateTo(
-                                    TwoDimFloat(0f, 0f),
-                                    animationSpec = spring(0.65f)
-                                )
-                            }
-                        }
+                    }
+                    launch {
+                        iconsAlpha.animateTo(0f, tween(75))
+                        delay(100)
+                        iconsAlpha.snapTo(1f)
                         isExpanding = false
                     }
-                } else isInitialized = true
+                    launch { rotation.animateTo(0f, spec) }
+                }
             }
         }
 
-        Surface(modifier = Modifier
-            .offset {
-                IntOffset(
-                    offset.value.v1.roundToInt() + ((backSize.value - 56.dp) / 2).roundToPx(),
-                    offset.value.v2.roundToInt() + ((backSize.value - 56.dp) / 2).roundToPx()
-                )
-            }
-            .size(backSize.value),
-            elevation = 4.dp,
-            shape = CircleShape,
-            border = BorderStroke(3.dp, Blue700)) {}
-
         offsets.reversed().forEachIndexed { index, anim ->
-            Surface(
+            FloatingActionButton(
                 modifier = Modifier
-                    .offset { IntOffset(anim.value.v1.roundToInt(), anim.value.v2.roundToInt()) }
-                    .size(if (isExpanding) 50.dp else 54.dp),
-                onClick = {}, shape = CircleShape,
-                color = if (isExpanding) Color.Transparent else Blue700,
-                contentColor = if (isExpanding) Blue700 else Color.White
+                    .padding(4.dp)
+                    .size(48.dp)
+                    .offset {
+                        IntOffset(
+                            anim.value.v1.roundToInt(),
+                            anim.value.v2.roundToInt()
+                        )
+                    }
+                    .alpha(iconsAlpha.value),
+                onClick = {},
+                backgroundColor = Blue700,
+                contentColor = Color.White,
+                elevation = FloatingActionButtonDefaults.elevation(2.dp, 4.dp)
             ) {
                 Icon(
-                    modifier = Modifier.padding(14.dp),
+                    modifier = Modifier.padding(12.dp),
                     imageVector = items[items.lastIndex - index],
                     contentDescription = null
                 )
             }
         }
 
-        Surface(
+        FloatingActionButton(
             modifier = Modifier
                 .offset { IntOffset(offset.value.v1.roundToInt(), offset.value.v2.roundToInt()) }
-                .size(56.dp)
                 .rotate(rotation.value)
                 .pointerInput(Unit) {
                     detectDragGestures(onDragEnd = {
@@ -234,12 +189,11 @@ fun DraggableFab(
                     }
                 },
             onClick = { if (offset.value.v2 == 0f) expanded = !expanded },
-            color = Blue700,
+            backgroundColor = Blue700,
             shape = CircleShape,
             contentColor = Color.White
         ) {
             Icon(
-                modifier = Modifier.padding(12.dp),
                 imageVector = Icons.Rounded.Add,
                 contentDescription = null
             )
