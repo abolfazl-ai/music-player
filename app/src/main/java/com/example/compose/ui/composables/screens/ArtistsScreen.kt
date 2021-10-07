@@ -49,6 +49,4 @@ fun ArtistsScreen(modifier: Modifier=Modifier, viewModel: MainViewModel = viewMo
             ) { if (selectList.isNotEmpty()) onSelect(index) }
         }
     }
-
-    DraggableFab()
 }

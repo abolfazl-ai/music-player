@@ -6,19 +6,21 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -26,12 +28,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.compose.PlayerService
+import com.example.compose.ui.composables.DraggableFab
 import com.example.compose.ui.composables.screens.*
 import com.example.compose.ui.theme.ComposeTheme
 import com.example.compose.viewmodel.MainViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionRequired
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 class MainActivity : ComponentActivity() {
 
@@ -132,53 +137,76 @@ private fun FeatureThatRequiresCameraPermission() =
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
-fun Main() {
+fun Main(viewModel: MainViewModel = viewModel()) {
+
     val navController = rememberNavController()
-    Scaffold(
-        backgroundColor = MaterialTheme.colors.background,
-        bottomBar = {
-            BottomNavigation {
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination
-                screens.forEach { screen ->
-                    BottomNavigationItem(
-                        icon = { Icon(screen.icon, contentDescription = null) },
-                        selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
-                        onClick = {
-                            navController.navigate(screen.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
-                    )
-                }
-            }
-        }
-    ) { innerPadding ->
+    var fabExpanded by remember { mutableStateOf(false) }
+    val backgroundAlpha by animateFloatAsState(targetValue = if (fabExpanded) 0.75f else 0f)
+
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
+
         BottomSheetScaffold(
-            modifier = Modifier.padding(innerPadding),
+            modifier = Modifier.padding(bottom = 56.dp),
+            backgroundColor = MaterialTheme.colors.background,
             topBar = {
-                TopAppBar(title = { Text(text = navController.currentBackStackEntryAsState().value?.destination?.route.toString())})
+                TopAppBar(title = { Text(text = navController.currentBackStackEntryAsState().value?.destination?.route.toString()) })
             },
             sheetContent = { Spacer(Modifier.fillMaxSize()) },
+            sheetElevation = 3.dp,
             sheetPeekHeight = 56.dp
         )
         {
-            NavHost(
-                navController,
-                startDestination = Screen.Home.route,
-                Modifier
-                    .padding(it)
-            ) {
-                composable(Screen.Home.route) { HomeScreen() }
-                composable(Screen.Songs.route) { SongsScreen() }
-                composable(Screen.Folders.route) { FoldersScreen() }
-                composable(Screen.Artists.route) { ArtistsScreen() }
-                composable(Screen.Albums.route) { AlbumsScreen() }
+            Box {
+                SwipeRefresh(
+                    state = rememberSwipeRefreshState(isRefreshing = viewModel.isRefreshing.collectAsState().value),
+                    onRefresh = { viewModel.refresh() }) {
+                    NavHost(
+                        modifier = Modifier.padding(it),
+                        navController = navController,
+                        startDestination = Screen.Home.route,
+                    ) {
+                        composable(Screen.Home.route) { HomeScreen() }
+                        composable(Screen.Songs.route) { SongsScreen() }
+                        composable(Screen.Folders.route) { FoldersScreen() }
+                        composable(Screen.Artists.route) { ArtistsScreen() }
+                        composable(Screen.Albums.route) { AlbumsScreen() }
+                    }
+                }
+
+                if (backgroundAlpha > 0)
+                    Spacer(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .pointerInteropFilter { fabExpanded = false; true }
+                            .alpha(backgroundAlpha)
+                            .background(MaterialTheme.colors.background)
+                    )
             }
         }
+
+        BottomNavigation {
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentDestination = navBackStackEntry?.destination
+            screens.forEach { screen ->
+                BottomNavigationItem(
+                    icon = { Icon(screen.icon, contentDescription = null) },
+                    selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                    onClick = {
+                        navController.navigate(screen.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                )
+            }
+        }
+
+        DraggableFab(
+            Modifier.padding(horizontal = 16.dp, vertical = 132.dp),
+            expanded = fabExpanded,
+            onExpand = { fabExpanded = it })
     }
 }

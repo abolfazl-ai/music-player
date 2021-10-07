@@ -14,7 +14,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
@@ -22,7 +21,6 @@ import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.example.compose.ui.theme.Blue700
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -39,16 +37,14 @@ fun DraggableFab(
         Icons.Rounded.SortByAlpha,
         Icons.Rounded.GridView,
         Icons.Rounded.Settings,
-    )
+    ),
+    expanded: Boolean = false,
+    onExpand: (expanded: Boolean) -> Unit = {}
 ) {
-
-    var expanded by remember { mutableStateOf(false) }
-    var isExpanding by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
 
     val rotation = remember { Animatable(0f) }
-    val backgroundAlpha = animateFloatAsState(if (expanded) 0.7f else 0f)
     val iconsAlpha = remember { Animatable(1f) }
     val offset = remember { Animatable(TwoDimFloat(0f, 0f), TwoDimFloat.VECTOR_CONVERTER) }
     val offsets = remember {
@@ -61,26 +57,14 @@ fun DraggableFab(
 
     var job: Job? = remember { null }
 
-    if (isExpanding)
-        Spacer(
-            modifier = Modifier
-                .fillMaxSize()
-                .pointerInteropFilter { expanded = false; true }
-                .alpha(backgroundAlpha.value)
-                .background(MaterialTheme.colors.background)
-        )
-
     BoxWithConstraints(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.BottomEnd
     ) {
 
         with(LocalDensity.current) {
             LaunchedEffect(expanded) {
                 val spec = spring<Float>(Spring.DampingRatioMediumBouncy)
-                isExpanding = true
                 if (expanded) {
                     iconsAlpha.snapTo(0f)
                     offsets.reversed().forEachIndexed { index, anim ->
@@ -103,7 +87,6 @@ fun DraggableFab(
                         iconsAlpha.animateTo(0f, tween(75))
                         delay(100)
                         iconsAlpha.snapTo(1f)
-                        isExpanding = false
                     }
                     launch { rotation.animateTo(0f, spec) }
                 }
@@ -123,8 +106,8 @@ fun DraggableFab(
                     }
                     .alpha(iconsAlpha.value),
                 onClick = {},
-                backgroundColor = Blue700,
-                contentColor = Color.White,
+                backgroundColor = MaterialTheme.colors.primary,
+                contentColor = MaterialTheme.colors.onPrimary,
                 elevation = FloatingActionButtonDefaults.elevation(2.dp, 4.dp)
             ) {
                 Icon(
@@ -161,7 +144,10 @@ fun DraggableFab(
                                             }
                                         }
                                     }
-                                else expanded = true
+                                else {
+                                    scope.launch { offset.animateTo(TwoDimFloat(0f, 0f)) }
+                                    onExpand(true)
+                                }
                         }
                     }) { change, dragAmount ->
                         change.consumeAllChanges()
@@ -188,10 +174,10 @@ fun DraggableFab(
                         }
                     }
                 },
-            onClick = { if (offset.value.v2 == 0f) expanded = !expanded },
-            backgroundColor = Blue700,
+            onClick = { if (hypot(offset.value.v1, offset.value.v2) == 0f) onExpand(!expanded) },
+            backgroundColor = MaterialTheme.colors.primary,
             shape = CircleShape,
-            contentColor = Color.White
+            contentColor = MaterialTheme.colors.onPrimary
         ) {
             Icon(
                 imageVector = Icons.Rounded.Add,

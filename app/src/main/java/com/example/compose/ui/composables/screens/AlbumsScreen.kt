@@ -55,6 +55,4 @@ fun AlbumsScreen(modifier: Modifier=Modifier, viewModel: MainViewModel = viewMod
             ) { if (selectList.isNotEmpty()) onSelect(index) }
         }
     }
-
-    DraggableFab()
 }

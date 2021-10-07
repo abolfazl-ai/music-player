@@ -26,13 +26,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val drawerState = MutableStateFlow(DrawerValue.Closed)
     private val playerPanelState = MutableStateFlow(BottomSheetValue.Collapsed)
     private val playerPanelProgress = MutableStateFlow(0f)
-    private val homeScreens = MutableStateFlow(listOf(
+    private val homeScreens = MutableStateFlow(
+        listOf(
             Screen.Home,
             Screen.Songs,
             Screen.Folders,
             Screen.Artists,
             Screen.Albums
-        ))
+        )
+    )
     private val activeScreen = MutableStateFlow(Screen.Home)
 
     private val _uiState = MutableStateFlow(UiState())
@@ -45,6 +47,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val songScreenState: StateFlow<SongScreenState> get() = _songScreenState
 
     private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing = _isRefreshing
     fun refresh() {
         viewModelScope.launch {
             _isRefreshing.value = true

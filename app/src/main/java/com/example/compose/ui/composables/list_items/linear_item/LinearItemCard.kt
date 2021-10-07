@@ -1,15 +1,15 @@
-package com.example.compose.ui.composables.list_items.song_item
+package com.example.compose.ui.composables.list_items.linear_item
 
 import android.util.Size
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -17,23 +17,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
-import com.example.compose.local.model.Song
-import com.example.compose.ui.Screen
 import com.example.compose.ui.composables.list_items.Selectable
-import com.example.compose.ui.composables.player_screen.toTimeFormat
-import com.example.compose.utils.default_pictures.SongAndSize
-import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
-fun SongCard(
-    song: Song,
+internal fun LinearItemCard(
+    title: String,
+    subtitle: String,
+    description: String = "",
+    picture: @Composable BoxScope.(size: Size) -> Unit = {},
     selected: Boolean = false,
     onClick: () -> Unit = {},
     onSelect: () -> Unit = {},
@@ -55,16 +51,18 @@ fun SongCard(
             .fillMaxWidth()
             .height(height),
         shape = remember { RoundedCornerShape(cornerRadius) },
-        elevation = elevation,
-        border = if (selectAnimator > 0f) {
+        elevation = elevation, border = if (selectAnimator > 0f) {
             BorderStroke((2 * selectAnimator.coerceIn(-1f, 1f)).dp, MaterialTheme.colors.primary)
         } else null
     ) {
 
         val clipShape = remember { RoundedCornerShape(max(cornerRadius - padding, 4.dp)) }
-
         val density = LocalDensity.current
-        val size = remember { with(density) { (height - padding.times(2)).roundToPx() } }
+        val size = remember {
+            with(density) {
+                (height - padding.times(2)).roundToPx().let { Size(it, it) }
+            }
+        }
 
         Row(
             modifier = Modifier.clickable(onClick = onClick),
@@ -77,11 +75,9 @@ fun SongCard(
                     .size(height)
                     .padding(padding)
                     .scale(1 - selectAnimator / 10),
-                progress = selectAnimator,
-                selectColor = MaterialTheme.colors.primary,
-                shape = clipShape,
-                onclick = onSelect
-            ) { GlideImage(imageModel = SongAndSize(song, Size(size, size))) }
+                progress = selectAnimator, selectColor = MaterialTheme.colors.primary,
+                shape = clipShape, onclick = onSelect
+            ) { picture(size) }
 
             Column(
                 Modifier
@@ -91,7 +87,7 @@ fun SongCard(
             ) {
 
                 Text(
-                    text = song.title,
+                    text = title,
                     style = MaterialTheme.typography.subtitle1,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -104,7 +100,7 @@ fun SongCard(
 
                     Text(
                         modifier = Modifier.weight(1f),
-                        text = song.artist.replace(";"," & "),
+                        text = subtitle,
                         style = MaterialTheme.typography.subtitle2,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -112,7 +108,7 @@ fun SongCard(
 
                     Text(
                         modifier = Modifier.wrapContentWidth(),
-                        text = song.duration.toTimeFormat(),
+                        text = description,
                         style = MaterialTheme.typography.body1,
                     )
                 }
