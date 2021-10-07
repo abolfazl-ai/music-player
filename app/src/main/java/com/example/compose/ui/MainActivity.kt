@@ -9,7 +9,6 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -141,7 +140,7 @@ fun Main(viewModel: MainViewModel = viewModel()) {
 
     val navController = rememberNavController()
     var fabExpanded by remember { mutableStateOf(false) }
-    val backgroundAlpha by animateFloatAsState(targetValue = if (fabExpanded) 0.75f else 0f)
+    val backgroundAlpha by animateFloatAsState(targetValue = if (fabExpanded) 0.3f else 1f)
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
 
@@ -157,7 +156,7 @@ fun Main(viewModel: MainViewModel = viewModel()) {
         )
         {
             Box {
-                SwipeRefresh(
+                SwipeRefresh(modifier = Modifier.alpha(backgroundAlpha),
                     state = rememberSwipeRefreshState(isRefreshing = viewModel.isRefreshing.collectAsState().value),
                     onRefresh = { viewModel.refresh() }) {
                     NavHost(
@@ -172,15 +171,6 @@ fun Main(viewModel: MainViewModel = viewModel()) {
                         composable(Screen.Albums.route) { AlbumsScreen() }
                     }
                 }
-
-                if (backgroundAlpha > 0)
-                    Spacer(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .pointerInteropFilter { fabExpanded = false; true }
-                            .alpha(backgroundAlpha)
-                            .background(MaterialTheme.colors.background)
-                    )
             }
         }
 

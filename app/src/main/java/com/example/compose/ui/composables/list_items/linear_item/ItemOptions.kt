@@ -8,7 +8,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,27 +29,32 @@ fun ItemOptions() = Row(
 )
 {
     val modifier = Modifier.weight(1f)
-    OptionItem(modifier = modifier, imageVector = Icons.Default.Settings)
-    OptionItem(modifier = modifier, imageVector = Icons.Default.DateRange)
-    OptionItem(modifier = modifier, imageVector = Icons.Default.Favorite)
-    OptionItem(modifier = modifier, imageVector = Icons.Default.Edit)
-    OptionItem(modifier = modifier, imageVector = Icons.Default.Star)
-    OptionItem(modifier = modifier, imageVector = Icons.Default.Info)
-    OptionItem(modifier = modifier, imageVector = Icons.Default.Delete)
+    OptionItem(modifier, Icons.Rounded.PlayArrow, padding = 6.dp)
+    OptionItem(modifier, Icons.Rounded.SkipNext, padding = 4.dp)
+    OptionItem(modifier, Icons.Rounded.AddBox)
+    OptionItem(modifier, Icons.Rounded.ExitToApp)
+    OptionItem(modifier, Icons.Rounded.Info)
+    OptionItem(modifier, Icons.Rounded.Share, padding = 9.dp)
+    OptionItem(modifier, Icons.Rounded.Delete, tint = Red700)
 }
 
 @Composable
-fun OptionItem(modifier: Modifier = Modifier, imageVector: ImageVector) {
+fun OptionItem(
+    modifier: Modifier = Modifier,
+    imageVector: ImageVector,
+    tint: Color = MaterialTheme.colors.onSurface,
+    padding: Dp = 8.dp
+) {
     Icon(
-        imageVector,
-        contentDescription = null,
         modifier = modifier
             .height(40.dp)
             .clip(RoundedCornerShape(4.dp))
             .background(MaterialTheme.colors.surface)
             .clickable { }
-            .padding(8.dp),
-        tint = MaterialTheme.colors.onSurface
+            .padding(padding),
+        imageVector = imageVector,
+        contentDescription = null,
+        tint = tint
     )
 }
 
@@ -102,6 +106,6 @@ fun LargeOptionItem(
             contentDescription = null,
             tint = tint
         )
-        Text(text = title,color = tint)
+        Text(text = title, color = tint)
     }
 }

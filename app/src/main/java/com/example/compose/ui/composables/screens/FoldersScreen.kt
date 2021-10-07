@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.compose.ui.composables.list_items.linear_item.LinearItem
+import com.example.compose.ui.composables.player_screen.toTimeFormat
 import com.example.compose.viewmodel.MainViewModel
 
 @ExperimentalComposeUiApi
@@ -46,6 +47,7 @@ fun FoldersScreen(modifier: Modifier = Modifier, viewModel: MainViewModel = view
             LinearItem(
                 title = folder.title,
                 subtitle = "Contains ${folder.tracksNumber} tracks",
+                description = folder.totalDuration.toTimeFormat(),
                 picture = {
                     Icon(
                         modifier = Modifier

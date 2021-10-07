@@ -7,7 +7,7 @@ data class Folder(
     @PrimaryKey @ColumnInfo(name = "FOLDER_PATH") val path: String,
     @ColumnInfo(name = "FOLDER_TITLE") val title: String,
     @ColumnInfo(name = "FOLDER_TRACKS_NUMBER") val tracksNumber: Int = 0,
-    @ColumnInfo(name = "FOLDER_TOTAL_DURATION") val totalDuration: Int = 0,
+    @ColumnInfo(name = "FOLDER_TOTAL_DURATION") val totalDuration: Long = 0,
 )
 
 data class FolderWithSongs(

@@ -1,14 +1,16 @@
 package com.example.compose.ui.composables
 
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -41,6 +43,11 @@ fun DraggableFab(
     expanded: Boolean = false,
     onExpand: (expanded: Boolean) -> Unit = {}
 ) {
+
+
+    if (expanded) Spacer(modifier = Modifier
+        .fillMaxSize()
+        .pointerInteropFilter { onExpand(false); true })
 
     val scope = rememberCoroutineScope()
 
@@ -106,7 +113,7 @@ fun DraggableFab(
                     }
                     .alpha(iconsAlpha.value),
                 onClick = {},
-                backgroundColor = MaterialTheme.colors.primary,
+                backgroundColor = MaterialTheme.colors.secondary,
                 contentColor = MaterialTheme.colors.onPrimary,
                 elevation = FloatingActionButtonDefaults.elevation(2.dp, 4.dp)
             ) {
@@ -175,7 +182,7 @@ fun DraggableFab(
                     }
                 },
             onClick = { if (hypot(offset.value.v1, offset.value.v2) == 0f) onExpand(!expanded) },
-            backgroundColor = MaterialTheme.colors.primary,
+            backgroundColor = MaterialTheme.colors.secondary,
             shape = CircleShape,
             contentColor = MaterialTheme.colors.onPrimary
         ) {
