@@ -31,7 +31,7 @@ val albumsScreen = @Composable { modifier: Modifier -> AlbumsScreen(modifier) }
 @ExperimentalAnimationGraphicsApi
 @ExperimentalMaterialApi
 @Composable
-fun AlbumsScreen(modifier: Modifier, viewModel: MainViewModel = viewModel()) {
+fun AlbumsScreen(modifier: Modifier=Modifier, viewModel: MainViewModel = viewModel()) {
 
     val selectList = remember { mutableStateListOf<Int>() }
 

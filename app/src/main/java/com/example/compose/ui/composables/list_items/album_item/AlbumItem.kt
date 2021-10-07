@@ -50,7 +50,7 @@ fun AlbumItem(
         shape = RoundedCornerShape(7.dp),
         border = if (selectAnimator > 0f) BorderStroke(
             (4 * selectAnimator.coerceIn(-1f, 1f)).dp,
-            Screen.Albums.color
+            MaterialTheme.colors.primary
         ) else null,
         color = MaterialTheme.colors.surface,
         contentColor = MaterialTheme.colors.onSurface
@@ -119,7 +119,7 @@ fun AlbumItem(
                 Selectable(
                     modifier = Modifier.size(35.dp),
                     progress = selectAnimator,
-                    selectColor = Screen.Albums.color,
+                    selectColor = MaterialTheme.colors.primary,
                     backgroundColor = MaterialTheme.colors.onBackground.copy(0.15f),
                     shape = RoundedCornerShape(4.dp),
                     onclick = { if (selectAnimator > 0) onSelect(index) }

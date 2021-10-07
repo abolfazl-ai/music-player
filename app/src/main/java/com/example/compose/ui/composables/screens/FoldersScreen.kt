@@ -31,7 +31,7 @@ val foldersScreen = @Composable { modifier: Modifier -> FoldersScreen(modifier) 
 @ExperimentalAnimationGraphicsApi
 @ExperimentalMaterialApi
 @Composable
-fun FoldersScreen(modifier: Modifier, viewModel: MainViewModel = viewModel()) {
+fun FoldersScreen(modifier: Modifier=Modifier, viewModel: MainViewModel = viewModel()) {
 
     var expandIndex by remember { mutableStateOf(-1) }
     val selectList = remember { mutableStateListOf<Int>() }

@@ -19,8 +19,6 @@ import com.example.compose.ui.composables.list_items.song_item.SongItem
 import com.example.compose.viewmodel.MainViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
@@ -31,7 +29,7 @@ val songsScreen = @Composable { modifier: Modifier -> SongsScreen(modifier) }
 @ExperimentalAnimationGraphicsApi
 @ExperimentalMaterialApi
 @Composable
-fun SongsScreen(modifier: Modifier, viewModel: MainViewModel = viewModel()) {
+fun SongsScreen(modifier: Modifier = Modifier, viewModel: MainViewModel = viewModel()) {
 
     val state = viewModel.songScreenState.collectAsState()
 
@@ -47,7 +45,7 @@ fun SongsScreen(modifier: Modifier, viewModel: MainViewModel = viewModel()) {
 
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = state.value.isRefreshing),
-        onRefresh = {viewModel.refresh()}) {
+        onRefresh = { viewModel.refresh() }) {
         LazyColumn(
             modifier = modifier.fillMaxSize(),
             contentPadding = PaddingValues(8.dp, 36.dp, 8.dp, 88.dp),
@@ -138,7 +136,7 @@ fun SongsScreen(modifier: Modifier, viewModel: MainViewModel = viewModel()) {
                     song,
                     expanded = state.value.expandedIndex == index,
                     selected = selectList.contains(index),
-                    onExpand = {viewModel.setExpandedIndex(it,index)},
+                    onExpand = { viewModel.setExpandedIndex(it, index) },
                     onSelect = { onSelect(index) }
                 ) { if (selectList.isNotEmpty()) onSelect(index) }
             }

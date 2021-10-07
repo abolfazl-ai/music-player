@@ -17,3 +17,5 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector)
     object Albums : Screen("screen/albums", "Albums", Icons.Filled.Album)
 
 }
+
+val screens = listOf(Screen.Home, Screen.Songs, Screen.Folders, Screen.Artists, Screen.Albums)

@@ -53,7 +53,7 @@ fun FolderCard(
         shape = remember { RoundedCornerShape(cornerRadius) },
         elevation = elevation,
         border = if (selectAnimator > 0f) {
-            BorderStroke((2 * selectAnimator.coerceIn(-1f, 1f)).dp, Screen.Folders.color)
+            BorderStroke((2 * selectAnimator.coerceIn(-1f, 1f)).dp, MaterialTheme.colors.primary)
         } else null
     ) {
 
@@ -71,7 +71,7 @@ fun FolderCard(
                     .padding(padding)
                     .scale(1 - selectAnimator / 10),
                 progress = selectAnimator,
-                selectColor = Screen.Folders.color,
+                selectColor = MaterialTheme.colors.primary,
                 shape = clipShape,
                 onclick = onSelect
             ) {

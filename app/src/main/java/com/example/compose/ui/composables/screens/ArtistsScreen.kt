@@ -25,7 +25,7 @@ val artistsScreen = @Composable { modifier: Modifier -> ArtistsScreen(modifier) 
 @ExperimentalAnimationGraphicsApi
 @ExperimentalMaterialApi
 @Composable
-fun ArtistsScreen(modifier: Modifier, viewModel: MainViewModel = viewModel()) {
+fun ArtistsScreen(modifier: Modifier=Modifier, viewModel: MainViewModel = viewModel()) {
 
     val selectList = remember { mutableStateListOf<Int>() }
 

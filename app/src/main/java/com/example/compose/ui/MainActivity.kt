@@ -10,15 +10,23 @@ import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.example.compose.PlayerService
-import com.example.compose.ui.composables.DraggableFab
-import com.example.compose.ui.composables.screens.SongsScreen
+import com.example.compose.ui.composables.screens.*
 import com.example.compose.ui.theme.ComposeTheme
 import com.example.compose.viewmodel.MainViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -46,26 +54,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ComposeTheme {
-
-                BottomSheetScaffold(
-                    sheetContent = { Spacer(Modifier.fillMaxSize()) },
-                    drawerGesturesEnabled = true,
-                    drawerContent = {
-                        Spacer(
-                            Modifier
-                                .fillMaxHeight()
-                                .width(250.dp)
-                        )
-                    }, backgroundColor = MaterialTheme.colors.background,
-                    sheetPeekHeight = 56.dp
-                )
-                {
-                    Box(modifier = Modifier.padding(it)) {
-                        SongsScreen(Modifier)
-                        DraggableFab()
-                    }
-                    FeatureThatRequiresCameraPermission(Modifier.padding(it), viewModel)
-                }
+                FeatureThatRequiresCameraPermission()
             }
         }
     }
@@ -84,13 +73,14 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@ExperimentalAnimationGraphicsApi
 @ExperimentalComposeUiApi
 @ExperimentalAnimationApi
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @ExperimentalPermissionsApi
 @Composable
-private fun FeatureThatRequiresCameraPermission(modifier: Modifier, viewModel: MainViewModel) =
+private fun FeatureThatRequiresCameraPermission() =
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
         var doNotShowRationale by rememberSaveable { mutableStateOf(false) }
@@ -132,11 +122,60 @@ private fun FeatureThatRequiresCameraPermission(modifier: Modifier, viewModel: M
                 }
             }
         ) {
-            LaunchedEffect(0) { viewModel.repository.scan() }
+            Main()
         }
     }
 
+@ExperimentalFoundationApi
+@ExperimentalAnimationGraphicsApi
+@ExperimentalAnimationApi
+@ExperimentalMaterialApi
 @Composable
 fun Main() {
-
+    val navController = rememberNavController()
+    Scaffold(
+        backgroundColor = MaterialTheme.colors.background,
+        bottomBar = {
+            BottomNavigation {
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentDestination = navBackStackEntry?.destination
+                screens.forEach { screen ->
+                    BottomNavigationItem(
+                        icon = { Icon(screen.icon, contentDescription = null) },
+                        label = { Text(screen.title) },
+                        selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                        onClick = {
+                            navController.navigate(screen.route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                    )
+                }
+            }
+        }
+    ) { innerPadding ->
+        BottomSheetScaffold(
+            sheetContent = { Spacer(Modifier.fillMaxSize()) },
+            sheetPeekHeight = 56.dp
+        )
+        {
+            NavHost(
+                navController,
+                startDestination = Screen.Home.route,
+                Modifier
+                    .padding(innerPadding)
+                    .padding(it)
+            ) {
+                composable(Screen.Home.route) { HomeScreen() }
+                composable(Screen.Songs.route) { SongsScreen() }
+                composable(Screen.Folders.route) { FoldersScreen() }
+                composable(Screen.Artists.route) { ArtistsScreen() }
+                composable(Screen.Albums.route) { AlbumsScreen() }
+            }
+        }
+    }
 }

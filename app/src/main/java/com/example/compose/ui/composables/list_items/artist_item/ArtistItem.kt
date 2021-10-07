@@ -47,7 +47,7 @@ fun ArtistItem(
         shape = RoundedCornerShape(7.dp),
         border = if (selectAnimator > 0f) BorderStroke(
             (4 * selectAnimator.coerceIn(-1f, 1f)).dp,
-            Screen.Artists.color
+            MaterialTheme.colors.primary
         ) else null,
         color = MaterialTheme.colors.surface,
         contentColor = MaterialTheme.colors.onSurface
@@ -105,7 +105,7 @@ fun ArtistItem(
                         .height(35.dp)
                         .aspectRatio(1f),
                     progress = selectAnimator,
-                    selectColor = Screen.Artists.color,
+                    selectColor = MaterialTheme.colors.primary,
                     backgroundColor = MaterialTheme.colors.onBackground.copy(0.15f),
                     shape = RoundedCornerShape(4.dp),
                     onclick = { if (selectAnimator > 0) onSelect(index) }
