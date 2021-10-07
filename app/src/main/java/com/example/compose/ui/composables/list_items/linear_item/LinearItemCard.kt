@@ -75,8 +75,7 @@ internal fun LinearItemCard(
                     .size(height)
                     .padding(padding)
                     .scale(1 - selectAnimator / 10),
-                progress = selectAnimator, selectColor = MaterialTheme.colors.primary,
-                shape = clipShape, onclick = onSelect
+                progress = selectAnimator, shape = clipShape, onclick = onSelect
             ) { picture(size) }
 
             Column(

@@ -3,8 +3,9 @@ package com.example.compose.ui.theme
 import androidx.compose.ui.graphics.Color
 
 val PrimaryColor = Color(0xFF0061E9)
-val DarkPrimaryColor = Color(0xFF88BAFF)
-val Secondary = Color(0xFFF57C00)
+val DarkPrimaryColor = Color(0xFF658eff)
+val Secondary = Color(0xFF2962ff)
+val DarkSecondary = Color(0xFF768fff)
 
 val Purple200 = Color(0xFFBB86FC)
 val Purple500 = Color(0xFF6200EE)

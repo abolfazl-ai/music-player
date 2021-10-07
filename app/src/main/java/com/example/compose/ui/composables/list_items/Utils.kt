@@ -28,9 +28,9 @@ import kotlin.math.sqrt
 fun Selectable(
     modifier: Modifier = Modifier,
     progress: Float = 0f,
-    selectColor: Color = MaterialTheme.colors.primary,
-    tint: Color = Color.White,
-    backgroundColor: Color = DarkGray,
+    selectColor: Color = MaterialTheme.colors.secondary,
+    tint: Color = MaterialTheme.colors.onSecondary,
+    backgroundColor: Color = MaterialTheme.colors.onSurface.copy(0.1f),
     shape: Shape = RectangleShape,
     onclick: () -> Unit = {},
     content: @Composable BoxScope.() -> Unit = {}
