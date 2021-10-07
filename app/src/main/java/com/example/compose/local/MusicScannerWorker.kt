@@ -247,7 +247,7 @@ class MusicScannerWorker(context: Context, params: WorkerParameters) :
                         val year = cursor.getInt(columns[Media.YEAR]!!)
                         val composer = cursor.getStringOrNull(columns[Media.COMPOSER]!!) ?: ""
                         val trackNumber = cursor.getInt(columns[Media.TRACK]!!)
-                        val title = cursor.getStringOrNull(columns[Media.TITLE]!!) ?: fileName
+                        val title = (cursor.getStringOrNull(columns[Media.TITLE]!!) ?: fileName).trim()
                         val artist = cursor.getStringOrNull(columns[Media.ARTIST]!!) ?: "Unknown"
                         val artistId = cursor.getLong(columns[Media.ARTIST_ID]!!)
                         val album = cursor.getStringOrNull(columns[Media.ALBUM]!!) ?: "Unknown"
