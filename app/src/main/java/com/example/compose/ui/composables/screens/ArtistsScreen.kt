@@ -10,17 +10,15 @@ import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.compose.ui.composables.DraggableFab
 import com.example.compose.ui.composables.list_items.artist_item.ArtistItem
 import com.example.compose.viewmodel.MainViewModel
 
-@ExperimentalFoundationApi
-@ExperimentalMaterialApi
-@ExperimentalAnimationGraphicsApi
-val artistsScreen = @Composable { modifier: Modifier -> ArtistsScreen(modifier) }
-
+@ExperimentalComposeUiApi
 @ExperimentalFoundationApi
 @ExperimentalAnimationGraphicsApi
 @ExperimentalMaterialApi
@@ -37,7 +35,7 @@ fun ArtistsScreen(modifier: Modifier=Modifier, viewModel: MainViewModel = viewMo
 
     LazyVerticalGrid(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(8.dp, 36.dp, 8.dp, 88.dp),
+        contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         cells = GridCells.Fixed(2)
@@ -51,4 +49,6 @@ fun ArtistsScreen(modifier: Modifier=Modifier, viewModel: MainViewModel = viewMo
             ) { if (selectList.isNotEmpty()) onSelect(index) }
         }
     }
+
+    DraggableFab()
 }

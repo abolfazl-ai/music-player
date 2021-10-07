@@ -11,7 +11,7 @@ import com.example.compose.ui.composables.icons.Song
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
 
     object Home : Screen("screen/home", "Home", Icons.Filled.Home)
-    object Songs : Screen("screen/songs", "All Songs", Icons.Filled.Song)
+    object Songs : Screen("screen/songs", "Songs", Icons.Filled.Song)
     object Folders : Screen("screen/folders", "Folders", Icons.Filled.Folder)
     object Artists : Screen("screen/artists", "Artists", Icons.Filled.Artist)
     object Albums : Screen("screen/albums", "Albums", Icons.Filled.Album)

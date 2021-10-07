@@ -126,6 +126,7 @@ private fun FeatureThatRequiresCameraPermission() =
         }
     }
 
+@ExperimentalComposeUiApi
 @ExperimentalFoundationApi
 @ExperimentalAnimationGraphicsApi
 @ExperimentalAnimationApi
@@ -142,7 +143,6 @@ fun Main() {
                 screens.forEach { screen ->
                     BottomNavigationItem(
                         icon = { Icon(screen.icon, contentDescription = null) },
-                        label = { Text(screen.title) },
                         selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                         onClick = {
                             navController.navigate(screen.route) {
@@ -159,6 +159,10 @@ fun Main() {
         }
     ) { innerPadding ->
         BottomSheetScaffold(
+            modifier = Modifier.padding(innerPadding),
+            topBar = {
+                TopAppBar(title = { Text(text = navController.currentBackStackEntryAsState().value?.destination?.route.toString())})
+            },
             sheetContent = { Spacer(Modifier.fillMaxSize()) },
             sheetPeekHeight = 56.dp
         )
@@ -167,7 +171,6 @@ fun Main() {
                 navController,
                 startDestination = Screen.Home.route,
                 Modifier
-                    .padding(innerPadding)
                     .padding(it)
             ) {
                 composable(Screen.Home.route) { HomeScreen() }

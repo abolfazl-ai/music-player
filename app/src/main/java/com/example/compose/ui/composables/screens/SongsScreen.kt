@@ -12,19 +12,17 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.compose.ui.composables.DraggableFab
 import com.example.compose.ui.composables.list_items.song_item.SongItem
 import com.example.compose.viewmodel.MainViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
-@ExperimentalAnimationApi
-@ExperimentalMaterialApi
-@ExperimentalAnimationGraphicsApi
-val songsScreen = @Composable { modifier: Modifier -> SongsScreen(modifier) }
-
+@ExperimentalComposeUiApi
 @ExperimentalAnimationApi
 @ExperimentalAnimationGraphicsApi
 @ExperimentalMaterialApi
@@ -32,8 +30,6 @@ val songsScreen = @Composable { modifier: Modifier -> SongsScreen(modifier) }
 fun SongsScreen(modifier: Modifier = Modifier, viewModel: MainViewModel = viewModel()) {
 
     val state = viewModel.songScreenState.collectAsState()
-
-    val scope = rememberCoroutineScope()
 
     val selectList = remember { mutableStateListOf<Int>() }
 
@@ -48,7 +44,7 @@ fun SongsScreen(modifier: Modifier = Modifier, viewModel: MainViewModel = viewMo
         onRefresh = { viewModel.refresh() }) {
         LazyColumn(
             modifier = modifier.fillMaxSize(),
-            contentPadding = PaddingValues(8.dp, 36.dp, 8.dp, 88.dp),
+            contentPadding = PaddingValues(8.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             item {
@@ -142,4 +138,6 @@ fun SongsScreen(modifier: Modifier = Modifier, viewModel: MainViewModel = viewMo
             }
         }
     }
+
+    DraggableFab()
 }

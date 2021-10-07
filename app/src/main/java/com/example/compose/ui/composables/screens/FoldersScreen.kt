@@ -13,20 +13,18 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.compose.ui.composables.DraggableFab
 import com.example.compose.ui.composables.list_items.folder_item.FolderItem
 import com.example.compose.ui.composables.list_items.song_item.SongItem
 import com.example.compose.ui.theme.Blue700
 import com.example.compose.ui.theme.Purple700
 import com.example.compose.viewmodel.MainViewModel
 
-@ExperimentalAnimationApi
-@ExperimentalMaterialApi
-@ExperimentalAnimationGraphicsApi
-val foldersScreen = @Composable { modifier: Modifier -> FoldersScreen(modifier) }
-
+@ExperimentalComposeUiApi
 @ExperimentalAnimationApi
 @ExperimentalAnimationGraphicsApi
 @ExperimentalMaterialApi
@@ -44,7 +42,7 @@ fun FoldersScreen(modifier: Modifier=Modifier, viewModel: MainViewModel = viewMo
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(8.dp, 36.dp, 8.dp, 88.dp),
+        contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         itemsIndexed(folders) { index, folder ->
@@ -58,4 +56,6 @@ fun FoldersScreen(modifier: Modifier=Modifier, viewModel: MainViewModel = viewMo
             )
         }
     }
+
+    DraggableFab()
 }
