@@ -75,6 +75,7 @@ fun DraggableFab(
                 .alpha(alpha.value)
                 .background(MaterialTheme.colors.background)
         )
+    
 
     BoxWithConstraints(
         modifier = modifier
