@@ -9,13 +9,16 @@ import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.compose.ui.composables.DraggableFab
-import com.example.compose.ui.composables.list_items.artist_item.ArtistItem
+import com.example.compose.ui.composables.icons.Artist
+import com.example.compose.ui.composables.list_items.gird_item.GridItem
 import com.example.compose.viewmodel.MainViewModel
 
 @ExperimentalComposeUiApi
@@ -23,7 +26,7 @@ import com.example.compose.viewmodel.MainViewModel
 @ExperimentalAnimationGraphicsApi
 @ExperimentalMaterialApi
 @Composable
-fun ArtistsScreen(modifier: Modifier=Modifier, viewModel: MainViewModel = viewModel()) {
+fun ArtistsScreen(modifier: Modifier = Modifier, viewModel: MainViewModel = viewModel()) {
 
     val selectList = remember { mutableStateListOf<Int>() }
 
@@ -41,8 +44,17 @@ fun ArtistsScreen(modifier: Modifier=Modifier, viewModel: MainViewModel = viewMo
         cells = GridCells.Fixed(2)
     ) {
         itemsIndexed(artists) { index, artist ->
-            ArtistItem(
-                artist = artist,
+            GridItem(
+                title = artist.name.trim(),
+                subtitle = "${artist.albumsNumber} albums ${artist.tracksNumber} tracks",
+                picture = {
+                    Icon(
+                        modifier = Modifier.fillMaxSize(),
+                        imageVector = Icons.Filled.Artist,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                },
                 index = index,
                 selected = selectList.contains(index),
                 onSelect = onSelect

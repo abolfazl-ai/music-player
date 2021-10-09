@@ -1,5 +1,6 @@
-package com.example.compose.ui.composables.list_items.artist_item
+package com.example.compose.ui.composables.list_items.gird_item
 
+import android.util.Size
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
@@ -12,18 +13,15 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.compose.local.model.Artist
-import com.example.compose.ui.Screen
-import com.example.compose.ui.composables.icons.Artist
 import com.example.compose.ui.composables.icons.Play
 import com.example.compose.ui.composables.list_items.Selectable
 import com.example.compose.ui.theme.DarkGray
@@ -31,9 +29,12 @@ import com.example.compose.ui.theme.DarkGray
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
-fun ArtistItem(
-    artist: Artist,
+fun GridItem(
+    title: String,
+    subtitle: String,
+    picture: @Composable BoxScope.(size: Size) -> Unit = {},
     index: Int,
+    padding: Dp = 6.dp,
     selected: Boolean = false,
     onSelect: (Int) -> Unit = {},
     onClick: () -> Unit = {}
@@ -52,10 +53,11 @@ fun ArtistItem(
         color = MaterialTheme.colors.surface,
         contentColor = MaterialTheme.colors.onSurface
     ) {
+
         Column(
             modifier = Modifier
                 .combinedClickable(onLongClick = { onSelect(index) }, onClick = onClick)
-                .padding(6.dp)
+                .padding(padding)
                 .scale(1 - selectAnimator / 25, 1 - selectAnimator / 30),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -65,48 +67,54 @@ fun ArtistItem(
                     .fillMaxWidth()
                     .aspectRatio(1f)
                     .clip(RoundedCornerShape(4.dp))
-                    .background(DarkGray)
-                    .padding(4.dp)
             ) {
-                Icon(
-                    modifier = Modifier.fillMaxSize(),
-                    imageVector = Icons.Filled.Artist,
-                    contentDescription = null,
-                    tint = Color.White
+
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(0.25.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(DarkGray)
                 )
-/*                val den = LocalDensity.current
-                val size = remember { with(den) { Size(maxWidth.roundToPx(), maxHeight.roundToPx()) } }
-                GlideImage(imageModel = ArtistAndSize(artist, size))*/
+
+                val density = LocalDensity.current
+                val size = remember {
+                    with(density) {
+                        (maxWidth - padding.times(2)).roundToPx().let { Size(it, it) }
+                    }
+                }
+
+                picture(size)
             }
             Row(
                 Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                verticalAlignment = Alignment.Bottom
             ) {
                 Column(
                     Modifier
                         .weight(1f)
-                        .padding(start = 2.dp)
+                        .padding(start = 2.dp, end = 8.dp),
+                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = artist.name,
+                        text = title,
                         style = MaterialTheme.typography.subtitle1,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                     Text(
-                        text = "${artist.albumsNumber} albums ${artist.tracksNumber} tracks",
+                        text = subtitle,
                         style = MaterialTheme.typography.subtitle2,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
+
                 Selectable(
-                    modifier = Modifier
-                        .height(35.dp)
-                        .aspectRatio(1f),
+                    modifier = Modifier.size(35.dp),
                     progress = selectAnimator,
                     selectColor = MaterialTheme.colors.primary,
-                    backgroundColor = MaterialTheme.colors.onBackground.copy(0.15f),
+                    backgroundColor = MaterialTheme.colors.onSurface.copy(0.05f),
                     shape = RoundedCornerShape(4.dp),
                     onclick = { if (selectAnimator > 0) onSelect(index) }
                 ) {
@@ -121,12 +129,4 @@ fun ArtistItem(
             }
         }
     }
-}
-
-@ExperimentalFoundationApi
-@ExperimentalMaterialApi
-@Preview
-@Composable
-fun Preview() {
-    ArtistItem(artist = Artist(0L, "Selena Gomez", 20, 10, 0L), 1)
 }
