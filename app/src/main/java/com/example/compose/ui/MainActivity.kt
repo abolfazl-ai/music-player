@@ -17,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -29,7 +28,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.compose.PlayerService
 import com.example.compose.ui.composables.DraggableFab
 import com.example.compose.ui.composables.screens.*
-import com.example.compose.ui.theme.ComposeTheme
+import com.example.compose.ui.theme.*
 import com.example.compose.viewmodel.MainViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionRequired
@@ -147,9 +146,7 @@ fun Main(viewModel: MainViewModel = viewModel()) {
         BottomSheetScaffold(
             modifier = Modifier.padding(bottom = 56.dp),
             backgroundColor = MaterialTheme.colors.background,
-            topBar = {
-                TopAppBar(title = { Text(text = navController.currentBackStackEntryAsState().value?.destination?.route.toString()) })
-            },
+            topBar = { TopAppBar(title = { Text("Abolfazl is awesome :)") }) },
             sheetContent = { Spacer(Modifier.fillMaxSize()) },
             sheetElevation = 3.dp,
             sheetPeekHeight = 56.dp
@@ -200,3 +197,11 @@ fun Main(viewModel: MainViewModel = viewModel()) {
             onExpand = { fabExpanded = it })
     }
 }
+
+val colors1 = listOf(
+    Blue700,
+    Red700,
+    Green700,
+    Purple700,
+    Yellow700,
+)

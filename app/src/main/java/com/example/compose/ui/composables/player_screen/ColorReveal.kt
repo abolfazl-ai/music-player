@@ -16,6 +16,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.Dp
+import kotlinx.coroutines.launch
 import kotlin.math.hypot
 import kotlin.math.max
 
@@ -24,47 +25,50 @@ fun ColorReveal(
     modifier: Modifier = Modifier,
     color: Color,
     y: Dp,
-    content: @Composable (BoxScope.() -> Unit)? = null
+    content: @Composable BoxScope.() -> Unit = {}
 ) {
 
-    val colors = remember { mutableStateListOf(color) }
-    val animators = remember { arrayListOf(Animatable(1f)) }
-    if (color != colors.last()) {
-        colors.add(remember { color })
-        animators.add(remember { Animatable(0.05f) })
-    }
+    val colors = remember { mutableStateListOf(color to Animatable(1f)) }
 
-    animators.forEach { animator ->
-        LaunchedEffect(key1 = animator) {
-            animator.animateTo(1f, animationSpec = tween(durationMillis = 700)) {
-                if (animators.last().value == 1f && animators.size > 1) {
-                    for (i in 0 until colors.lastIndex) {
-                        animators.removeFirst()
-                        colors.removeFirst()
+    LaunchedEffect(color) {
+
+        launch {
+
+            colors.add(color to Animatable(0f))
+
+            colors.forEach { c ->
+                if (!c.second.isRunning) launch {
+                    c.second.animateTo(1f, tween(500), initialVelocity = 0f)
+                }
+            }
+
+        }.invokeOnCompletion {
+            launch {
+                with(colors) {
+                    while (size > 1) {
+                        if (first().second.value == 1f) removeFirst()
                     }
                 }
             }
         }
     }
+
     Box(
         modifier = modifier
             .fillMaxSize()
             .clip(RectangleShape)
             .drawBehind {
-                val centerY = y
-                    .roundToPx()
-                    .toFloat()
-                colors.forEachIndexed { i, color ->
+                colors.forEach {
                     drawCircle(
-                        color = color,
-                        radius = animators[i].value * hypot(
+                        color = it.first,
+                        radius = it.second.value * hypot(
                             center.x,
-                            max((size.height - centerY), centerY)
+                            max((size.height - y.toPx()), y.toPx())
                         ),
-                        center = Offset(center.x, centerY),
-                        alpha = 0.6f + 0.4f * animators[i].value
+                        center = Offset(center.x, y.toPx()),
                     )
                 }
-            }
-    ) { if (content != null) content() }
+            },
+        content = content
+    )
 }
