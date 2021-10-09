@@ -46,9 +46,8 @@ fun AlbumsScreen(modifier: Modifier = Modifier, viewModel: MainViewModel = viewM
                 title = album.name.trim(),
                 subtitle =album.artist.trim(),
                 picture = { GlideImage(imageModel = AlbumAndSize(album, it)) },
-                index = index,
                 selected = selectList.contains(index),
-                onSelect = onSelect
+                onSelect = {onSelect(index)}
             ) { if (selectList.isNotEmpty()) onSelect(index) }
         }
     }

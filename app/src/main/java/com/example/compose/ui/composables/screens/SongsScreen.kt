@@ -2,6 +2,7 @@ package com.example.compose.ui.composables.screens
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +20,7 @@ import com.example.compose.utils.default_pictures.SongAndSize
 import com.example.compose.viewmodel.MainViewModel
 import com.skydoves.landscapist.glide.GlideImage
 
+@ExperimentalFoundationApi
 @ExperimentalComposeUiApi
 @ExperimentalAnimationApi
 @ExperimentalAnimationGraphicsApi
@@ -40,86 +42,6 @@ fun SongsScreen(modifier: Modifier = Modifier, viewModel: MainViewModel = viewMo
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-/*        item {
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                Card(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(42.dp),
-                    elevation = 0.dp,
-                    onClick = {}
-                ) {
-                    Row(
-                        Modifier.padding(10.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.PlayArrow,
-                            contentDescription = null
-                        )
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .align(Alignment.CenterVertically),
-                            text = "Play all",
-                            style = MaterialTheme.typography.subtitle1,
-                        )
-                    }
-                }
-                Card(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(42.dp),
-                    elevation = 0.dp,
-                    onClick = {}
-                ) {
-                    Row(
-                        Modifier.padding(10.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            modifier = Modifier.padding(3.dp),
-                            imageVector = Icons.Default.ThumbUp,
-                            contentDescription = null
-                        )
-                        Text(
-                            modifier = Modifier.align(Alignment.CenterVertically),
-                            text = "Shuffle",
-                            style = MaterialTheme.typography.subtitle1,
-                        )
-                    }
-                }
-                Card(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(42.dp),
-                    elevation = 0.dp,
-                    onClick = {}
-                ) {
-                    Row(
-                        Modifier.padding(10.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            modifier = Modifier.padding(3.dp),
-                            imageVector = Icons.Default.Favorite,
-                            contentDescription = null,
-                            tint = MaterialTheme.colors.primary
-                        )
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .align(Alignment.CenterVertically),
-                            text = "Favorites",
-                            color = MaterialTheme.colors.primary,
-                            style = MaterialTheme.typography.subtitle1,
-                        )
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(2.dp))
-        }*/
-
         itemsIndexed(songs) { index, song ->
             LinearItem(
                 title = song.title,

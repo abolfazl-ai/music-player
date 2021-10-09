@@ -33,10 +33,9 @@ fun GridItem(
     title: String,
     subtitle: String,
     picture: @Composable BoxScope.(size: Size) -> Unit = {},
-    index: Int,
-    padding: Dp = 6.dp,
+    padding: Dp = 5.dp,
     selected: Boolean = false,
-    onSelect: (Int) -> Unit = {},
+    onSelect: () -> Unit = {},
     onClick: () -> Unit = {}
 ) {
     val selectAnimator by animateFloatAsState(
@@ -45,18 +44,16 @@ fun GridItem(
     )
 
     Surface(
-        shape = RoundedCornerShape(7.dp),
+        shape = remember { RoundedCornerShape(6.dp) },
         border = if (selectAnimator > 0f) BorderStroke(
             (4 * selectAnimator.coerceIn(-1f, 1f)).dp,
             MaterialTheme.colors.primary
         ) else null,
-        color = MaterialTheme.colors.surface,
-        contentColor = MaterialTheme.colors.onSurface
     ) {
 
         Column(
             modifier = Modifier
-                .combinedClickable(onLongClick = { onSelect(index) }, onClick = onClick)
+                .combinedClickable(onLongClick = onSelect, onClick = onClick)
                 .padding(padding)
                 .scale(1 - selectAnimator / 25, 1 - selectAnimator / 30),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -66,7 +63,7 @@ fun GridItem(
                     .padding(bottom = 6.dp)
                     .fillMaxWidth()
                     .aspectRatio(1f)
-                    .clip(RoundedCornerShape(4.dp))
+                    .clip(remember { RoundedCornerShape(4.dp) })
             ) {
 
                 Spacer(
@@ -93,7 +90,7 @@ fun GridItem(
                 Column(
                     Modifier
                         .weight(1f)
-                        .padding(start = 2.dp, end = 8.dp),
+                        .padding(start = 2.dp, end = 8.dp, bottom = 2.dp),
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
@@ -116,7 +113,7 @@ fun GridItem(
                     selectColor = MaterialTheme.colors.primary,
                     backgroundColor = MaterialTheme.colors.onSurface.copy(0.05f),
                     shape = RoundedCornerShape(4.dp),
-                    onclick = { if (selectAnimator > 0) onSelect(index) }
+                    onclick = { if (selectAnimator > 0) onSelect() }
                 ) {
                     Icon(
                         modifier = Modifier

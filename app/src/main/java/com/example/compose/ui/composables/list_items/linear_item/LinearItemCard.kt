@@ -4,7 +4,8 @@ import android.util.Size
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import com.example.compose.ui.composables.list_items.Selectable
 
+@ExperimentalFoundationApi
 @Composable
 internal fun LinearItemCard(
     title: String,
@@ -52,7 +54,7 @@ internal fun LinearItemCard(
             .height(height),
         shape = remember { RoundedCornerShape(cornerRadius) },
         elevation = elevation, border = if (selectAnimator > 0f) {
-            BorderStroke((2 * selectAnimator.coerceIn(-1f, 1f)).dp, MaterialTheme.colors.primary)
+            BorderStroke((2.5 * selectAnimator.coerceIn(-1f, 1f)).dp, MaterialTheme.colors.primary)
         } else null
     ) {
 
@@ -65,16 +67,16 @@ internal fun LinearItemCard(
         }
 
         Row(
-            modifier = Modifier.clickable(onClick = onClick),
+            modifier = Modifier.combinedClickable(onLongClick = onSelect, onClick = onClick),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
         ) {
 
             Selectable(
                 Modifier
                     .size(height)
+                    .scale(1 - selectAnimator / 15)
                     .padding(padding)
-                    .scale(1 - selectAnimator / 10),
+                ,
                 progress = selectAnimator, shape = clipShape, onclick = onSelect
             ) { picture(size) }
 
@@ -94,7 +96,7 @@ internal fun LinearItemCard(
 
                 Row(
                     verticalAlignment = Alignment.Top,
-                    horizontalArrangement = Arrangement.spacedBy(spacing.times(2))
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
 
                     Text(
@@ -117,7 +119,7 @@ internal fun LinearItemCard(
                 modifier = Modifier
                     .size(height)
                     .padding(padding)
-                    .scale(1 - selectAnimator / 10)
+                    .scale(1 - selectAnimator / 15)
                     .clip(clipShape)
             )
         }

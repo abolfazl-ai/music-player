@@ -55,9 +55,8 @@ fun ArtistsScreen(modifier: Modifier = Modifier, viewModel: MainViewModel = view
                         tint = Color.White
                     )
                 },
-                index = index,
                 selected = selectList.contains(index),
-                onSelect = onSelect
+                onSelect =  {onSelect(index)}
             ) { if (selectList.isNotEmpty()) onSelect(index) }
         }
     }

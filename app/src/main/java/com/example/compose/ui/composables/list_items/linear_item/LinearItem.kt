@@ -8,6 +8,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -25,8 +26,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
-import com.example.compose.ui.composables.list_items.ArrowToX
 
+@ExperimentalFoundationApi
 @ExperimentalAnimationApi
 @Composable
 fun LinearItem(
@@ -67,15 +68,8 @@ fun LinearItem(
             .background(MaterialTheme.colors.onSurface.copy(0.05f))
             .clickable { onExpand(!expanded) }
             .padding(8.dp)
-            .rotate(animateFloatAsState(if (expanded) 180f else 0f,spring(0.65f, 400f)).value),
+            .rotate(animateFloatAsState(if (expanded) 180f else 0f, spring(0.65f, 400f)).value),
             imageVector = Icons.Rounded.ExpandMore,
             contentDescription = "Expand")
-/*        ArrowToX(
-            modifier = it
-                .background(MaterialTheme.colors.onSurface.copy(0.04f))
-                .clickable { onExpand(!expanded) }
-                .padding(8.dp),
-            down = !expanded
-        )*/
     }
 }
