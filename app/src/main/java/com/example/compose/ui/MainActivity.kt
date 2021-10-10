@@ -197,11 +197,3 @@ fun Main(viewModel: MainViewModel = viewModel()) {
             onExpand = { fabExpanded = it })
     }
 }
-
-val colors1 = listOf(
-    Blue700,
-    Red700,
-    Green700,
-    Purple700,
-    Yellow700,
-)
