@@ -21,7 +21,6 @@ fun HomeScreen() {
     }
 }
 
-
 val colors1 = listOf(
     C01,
     C02,
