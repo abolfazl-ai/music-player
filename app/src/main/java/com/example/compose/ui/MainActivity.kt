@@ -28,7 +28,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.compose.PlayerService
 import com.example.compose.ui.composables.DraggableFab
 import com.example.compose.ui.composables.screens.*
-import com.example.compose.ui.theme.*
+import com.example.compose.ui.theme.ComposeTheme
 import com.example.compose.viewmodel.MainViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionRequired
@@ -43,12 +43,12 @@ class MainActivity : ComponentActivity() {
 
     private var playerService: PlayerService? = null
 
-    @ExperimentalAnimationGraphicsApi
-    @ExperimentalComposeUiApi
-    @ExperimentalAnimationApi
-    @ExperimentalFoundationApi
-    @ExperimentalMaterialApi
     @ExperimentalPermissionsApi
+    @ExperimentalMaterialApi
+    @ExperimentalFoundationApi
+    @ExperimentalAnimationApi
+    @ExperimentalComposeUiApi
+    @ExperimentalAnimationGraphicsApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -94,21 +94,14 @@ private fun FeatureThatRequiresCameraPermission() =
         PermissionRequired(
             permissionState = storagePermissionState,
             permissionNotGrantedContent = {
-                if (doNotShowRationale) {
-                    Text("Permission required")
-                } else {
-                    Column {
-                        Text("The Storage Permission is important for this app. Please grant the permission.")
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Row {
-                            Button(onClick = { storagePermissionState.launchPermissionRequest() }) {
-                                Text("Ok!")
-                            }
-                            Spacer(Modifier.width(8.dp))
-                            Button(onClick = { doNotShowRationale = true }) {
-                                Text("Nope")
-                            }
-                        }
+                Box(
+                    Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Button(
+                        modifier = Modifier.height(44.dp),
+                        onClick = { storagePermissionState.launchPermissionRequest() }) {
+                        Text("Grant Storage Permission")
                     }
                 }
             },
