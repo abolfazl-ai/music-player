@@ -68,8 +68,8 @@ fun PlayerScreen(
                             .fillMaxWidth()
                             .aspectRatio(2 - progress)
                     )
-
-                    ColorReveal(
+                    
+/*                    ColorReveal(
                         modifier = Modifier.fillMaxSize(),
                         color = colorCache[pageState.currentPage]?.back ?: Purple500,
                         y = 68.dp
@@ -78,7 +78,7 @@ fun PlayerScreen(
                             Modifier.alpha(4 * (progress.coerceIn(0.5f, 0.75f) - 0.5f)),
                             colorCache[pageState.currentPage]?.front ?: Color.White
                         )
-                    }
+                    }*/
                 }
         }
 

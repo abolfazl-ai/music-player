@@ -2,6 +2,7 @@ package com.example.compose.ui.composables.screens
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -25,6 +26,7 @@ import com.example.compose.ui.composables.player_screen.toTimeFormat
 import com.example.compose.ui.theme.DarkGray
 import com.example.compose.viewmodel.MainViewModel
 
+@ExperimentalFoundationApi
 @ExperimentalComposeUiApi
 @ExperimentalAnimationApi
 @ExperimentalAnimationGraphicsApi
