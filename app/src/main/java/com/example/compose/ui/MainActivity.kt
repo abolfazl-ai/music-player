@@ -25,6 +25,8 @@ import com.example.compose.viewmodel.MainViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionRequired
 import com.google.accompanist.permissions.rememberPermissionState
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -64,17 +66,13 @@ class MainActivity : ComponentActivity() {
                     sheetPeekHeight = 56.dp
                 )
                 {
-                    Box(modifier = Modifier.padding(it)) {
-                        SongsScreen(Modifier)
-                        DraggableFab()
-                    }
-/*                    if (s) FeatureThatRequiresCameraPermission(Modifier.padding(it), viewModel)
+                    if (s) FeatureThatRequiresCameraPermission(Modifier.padding(it), viewModel)
                     LaunchedEffect(key1 = 0) {
                         launch {
                             delay(150)
                             s = true
                         }
-                    }*/
+                    }
                 }
             }
         }
