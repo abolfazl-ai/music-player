@@ -54,13 +54,5 @@ fun PlayerScreen(
             songList = songs,
             onPageCreated = { i, c -> colorCache.put(i, c) }
         )
-
-        FloatingActionButton(
-            modifier = Modifier.padding(16.dp),
-            onClick = { },
-            backgroundColor = Color.White
-        ) {
-
-        }
     }
 }

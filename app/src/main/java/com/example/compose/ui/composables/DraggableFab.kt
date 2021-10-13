@@ -15,10 +15,10 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -39,14 +39,11 @@ fun DraggableFab(
         Icons.Rounded.GridView,
         Icons.Rounded.Settings,
     ),
+    backgroundColor: Color = MaterialTheme.colors.secondary,
+    contentColor: Color = MaterialTheme.colors.onPrimary,
     expanded: Boolean = false,
     onExpand: (expanded: Boolean) -> Unit = {}
 ) {
-
-
-    if (expanded) Spacer(modifier = Modifier
-        .fillMaxSize()
-        .pointerInteropFilter { onExpand(false); true })
 
     val scope = rememberCoroutineScope()
 
@@ -110,8 +107,8 @@ fun DraggableFab(
                     }
                     .alpha(iconsAlpha.value),
                 onClick = {},
-                backgroundColor = MaterialTheme.colors.secondary,
-                contentColor = MaterialTheme.colors.onPrimary,
+                backgroundColor = backgroundColor,
+                contentColor = contentColor,
                 elevation = FloatingActionButtonDefaults.elevation(2.dp, 4.dp)
             ) {
                 Icon(
@@ -179,9 +176,9 @@ fun DraggableFab(
                     }
                 },
             onClick = { if (hypot(offset.value.v1, offset.value.v2) == 0f) onExpand(!expanded) },
-            backgroundColor = MaterialTheme.colors.secondary,
+            backgroundColor = backgroundColor,
+            contentColor = contentColor,
             shape = CircleShape,
-            contentColor = MaterialTheme.colors.onPrimary
         ) {
             Icon(
                 imageVector = Icons.Rounded.Add,
