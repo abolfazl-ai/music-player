@@ -32,11 +32,12 @@ fun SongsScreen(modifier: Modifier = Modifier, viewModel: MainViewModel = viewMo
 
     val selectList = remember { mutableStateListOf<Int>() }
 
-    val songs by viewModel.repository.getSongs().collectAsState(initial = emptyList())
+    val songs by viewModel.repository.getSongs(state.value.sortBy).collectAsState(initial = emptyList())
 
     val onSelect: (Int) -> Unit = remember {
         { if (selectList.contains(it)) selectList.remove(it) else selectList.add(it) }
     }
+
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(8.dp),
@@ -50,7 +51,7 @@ fun SongsScreen(modifier: Modifier = Modifier, viewModel: MainViewModel = viewMo
                 picture = { GlideImage(imageModel = SongAndSize(song, it)) },
                 expanded = state.value.expandedIndex == index,
                 selected = selectList.contains(index),
-                onExpand = { viewModel.setExpandedIndex(it, index) },
+                onExpand = { viewModel.setExpandedSongIndex(it, index) },
                 onSelect = { onSelect(index) }
             ) { if (selectList.isNotEmpty()) onSelect(index) }
         }

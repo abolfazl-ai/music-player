@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -64,41 +63,39 @@ fun DraggableFab(
 
     var job: Job? = remember { null }
 
-    BoxWithConstraints(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.BottomEnd
-    ) {
-
-        with(LocalDensity.current) {
-            LaunchedEffect(expanded) {
-                val spec = spring<Float>(Spring.DampingRatioMediumBouncy)
-                if (expanded) {
-                    iconsAlpha.snapTo(0f)
-                    offsets.reversed().forEachIndexed { index, anim ->
-                        launch {
-                            anim.animateTo(
-                                TwoDimFloat(0f, -(60 + index * 56).dp.toPx()),
-                                spring(Spring.DampingRatioMediumBouncy)
-                            )
-                        }
-                    }
-                    launch { iconsAlpha.animateTo(1f) }
-                    launch { rotation.animateTo(135f, spec) }
-                } else {
-                    offsets.forEach {
-                        launch {
-                            it.animateTo(TwoDimFloat(0f, 0f))
-                        }
-                    }
+    with(LocalDensity.current) {
+        LaunchedEffect(expanded) {
+            val spec = spring<Float>(Spring.DampingRatioMediumBouncy)
+            if (expanded) {
+                iconsAlpha.snapTo(0f)
+                offsets.reversed().forEachIndexed { index, anim ->
                     launch {
-                        iconsAlpha.animateTo(0f, tween(75))
-                        delay(100)
-                        iconsAlpha.snapTo(1f)
+                        anim.animateTo(
+                            TwoDimFloat(0f, -(60 + index * 56).dp.toPx()),
+                            spring(Spring.DampingRatioMediumBouncy)
+                        )
                     }
-                    launch { rotation.animateTo(0f, spec) }
                 }
+                launch { iconsAlpha.animateTo(1f) }
+                launch { rotation.animateTo(135f, spec) }
+            } else {
+                offsets.forEach {
+                    launch {
+                        it.animateTo(TwoDimFloat(0f, 0f))
+                    }
+                }
+                launch {
+                    iconsAlpha.animateTo(0f, tween(75))
+                    delay(100)
+                    iconsAlpha.snapTo(1f)
+                }
+                launch { rotation.animateTo(0f, spec) }
             }
         }
+    }
+
+
+    BoxWithConstraints(modifier) {
 
         offsets.reversed().forEachIndexed { index, anim ->
             FloatingActionButton(

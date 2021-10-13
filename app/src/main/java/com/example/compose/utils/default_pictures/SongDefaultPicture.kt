@@ -2,6 +2,7 @@ package com.example.compose.utils.default_pictures
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Typeface
 import android.util.Size
@@ -56,3 +57,5 @@ fun SongAndSize.getDefaultCover(c: Context): Bitmap {
 
     return bitmap
 }
+
+fun Song.getDefaultCover(c: Context): Bitmap = SongAndSize(this, Size(1000, 1000)).getDefaultCover(c)

@@ -5,13 +5,15 @@ import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.runtime.*
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.compose.ui.theme.Blue700
-import com.example.compose.ui.theme.Red700
 import com.example.compose.viewmodel.MainViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.rememberPagerState
@@ -36,18 +38,29 @@ fun PlayerScreen(
         launch { viewModel.serviceController.seekTo(pageState.currentPage, 0L) }
     }*/
 
-    Box(
+    Column(
         modifier
             .fillMaxSize()
-            .background(Color.Black)
-            .reveal(colorCache[pageState.currentPage]?.back ?: Color.Black, 400.dp)
+            .reveal(colorCache[pageState.currentPage]?.back ?: Color.Black, 404.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         CoverViewPager(
-            modifier = Modifier.fillMaxWidth().aspectRatio(1f).background(Red700),
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(1f)
+                .background(Color.Black),
             pagerState = pageState,
             songList = songs,
             onPageCreated = { i, c -> colorCache.put(i, c) }
         )
+
+        FloatingActionButton(
+            modifier = Modifier.padding(16.dp),
+            onClick = { },
+            backgroundColor = Color.White
+        ) {
+
+        }
     }
 }

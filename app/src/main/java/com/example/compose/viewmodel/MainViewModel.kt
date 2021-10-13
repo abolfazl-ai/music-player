@@ -1,13 +1,10 @@
 package com.example.compose.viewmodel
 
 import android.app.Application
-import androidx.compose.material.BottomSheetValue
-import androidx.compose.material.DrawerValue
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.compose.local.model.Song
-import com.example.compose.ui.Screen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,29 +19,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     val serviceController = ServiceController()
 
-
-    private val drawerState = MutableStateFlow(DrawerValue.Closed)
-    private val playerPanelState = MutableStateFlow(BottomSheetValue.Collapsed)
-    private val playerPanelProgress = MutableStateFlow(0f)
-    private val homeScreens = MutableStateFlow(
-        listOf(
-            Screen.Home,
-            Screen.Songs,
-            Screen.Folders,
-            Screen.Artists,
-            Screen.Albums
-        )
-    )
-    private val activeScreen = MutableStateFlow(Screen.Home)
-
-    private val _uiState = MutableStateFlow(UiState())
-    val uiState: StateFlow<UiState> get() = _uiState
-
-
-    //Song Screen State
-
-    private val _songScreenState = MutableStateFlow(SongScreenState())
-    val songScreenState: StateFlow<SongScreenState> get() = _songScreenState
 
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing
@@ -61,54 +35,27 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private val _isSettingsOpen = MutableStateFlow(false)
+    //Song Screen State
 
+    private val _songScreenState = MutableStateFlow(SongScreenState())
+    val songScreenState: StateFlow<SongScreenState> get() = _songScreenState
     private val _sortBy = MutableStateFlow(Song.Sort.TitleASC)
 
-    private val _expandedIndex = MutableStateFlow(-1)
-    fun setExpandedIndex(expanded: Boolean, index: Int) {
-        if (expanded) _expandedIndex.value = index
-        else if (_expandedIndex.value == index) _expandedIndex.value = -1
-
+    private val _expandedSongIndex = MutableStateFlow(-1)
+    fun setExpandedSongIndex(expanded: Boolean, index: Int) = viewModelScope.launch {
+        if (expanded) _expandedSongIndex.value = index
+        else if (_expandedSongIndex.value == index) _expandedSongIndex.value = -1
         recombine()
     }
 
     private fun recombine() {
         viewModelScope.launch {
             combine(
-                _isRefreshing,
-                _isSettingsOpen,
                 _sortBy,
-                _expandedIndex
-            ) { _isRefreshing, _isSettingsOpen, _sortBy, _expandedIndex ->
-                SongScreenState(_isRefreshing, _isSettingsOpen, _sortBy, _expandedIndex)
+                _expandedSongIndex
+            ) { _isRefreshing, _isSettingsOpen ->
+                SongScreenState(_isRefreshing, _isSettingsOpen)
             }.collect { _songScreenState.value = it }
-        }
-    }
-
-    init {
-        viewModelScope.launch {
-            combine(
-                drawerState,
-                playerPanelState,
-                playerPanelProgress,
-                homeScreens,
-                activeScreen
-            ) { drawerState,
-                playerPanelState,
-                playerPanelProgress,
-                homeScreens,
-                activeScreen ->
-                UiState(
-                    drawerState,
-                    playerPanelState,
-                    playerPanelProgress,
-                    homeScreens,
-                    activeScreen
-                )
-            }.collect {
-                _uiState.value = it
-            }
         }
     }
 }

@@ -28,7 +28,7 @@ fun Modifier.reveal(color: Color, y: Dp) = composed {
             (color to Animatable(0f)).let {
                 colors.add(it)
                 scope.launch {
-                    it.second.animateTo(1f, tween(500))
+                    it.second.animateTo(1f, tween(1000))
                 }.invokeOnCompletion {
                     if (colors.size > 1 && colors[1].second.value == 1f) colors.removeFirst()
                 }
