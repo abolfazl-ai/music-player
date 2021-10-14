@@ -10,8 +10,10 @@
         <item name="colorSecondaryVariant">@color/teal_700</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">#0043C8</item>
-<!--        <item name="android:windowTranslucentStatus">true</item>-->
+        <item name="android:statusBarColor" tools:targetApi="l">#2F000000</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:navigationBarColor">#2F000000</item>
+        <item name="android:windowTranslucentNavigation">true</item>
         <!-- Customize your theme here. -->
     </style>
 

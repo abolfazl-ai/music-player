@@ -3,8 +3,6 @@ package com.example.compose.ui.composables.player_screen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,7 +42,8 @@ fun CoverViewPager(
         }
     }*/
 
-    HorizontalPager(modifier =modifier,
+    HorizontalPager(
+        modifier = modifier,
         state = pagerState, count = songList.size
     ) { page ->
 

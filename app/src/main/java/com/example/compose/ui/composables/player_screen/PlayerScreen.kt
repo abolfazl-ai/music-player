@@ -4,8 +4,9 @@ import androidx.collection.LruCache
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
@@ -24,7 +25,6 @@ import com.google.accompanist.pager.rememberPagerState
 @Composable
 fun PlayerScreen(
     modifier: Modifier = Modifier,
-    progress: Float,
     viewModel: MainViewModel = viewModel()
 ) {
 
@@ -54,5 +54,16 @@ fun PlayerScreen(
             songList = songs,
             onPageCreated = { i, c -> colorCache.put(i, c) }
         )
+
+        Surface(
+            Modifier
+                .fillMaxSize()
+                .padding(top = 88.dp)
+                .padding(horizontal = 24.dp),
+            shape = RoundedCornerShape(16.dp, 16.dp, 0.dp, 0.dp),color = Color.White,
+            elevation = 4.dp
+        ) {
+
+        }
     }
 }

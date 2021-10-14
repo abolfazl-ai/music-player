@@ -19,6 +19,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     val serviceController = ServiceController()
 
+    var bottomSheetProgress = MutableStateFlow(0f)
 
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing
