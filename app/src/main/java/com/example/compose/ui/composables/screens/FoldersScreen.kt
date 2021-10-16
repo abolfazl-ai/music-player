@@ -48,7 +48,7 @@ fun FoldersScreen(modifier: Modifier = Modifier, viewModel: MainViewModel = view
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        itemsIndexed(folders) { index, folder ->
+/*        itemsIndexed(folders) { index, folder ->
             LinearItem(
                 title = folder.title,
                 subtitle = "Contains ${folder.tracksNumber} tracks",
@@ -71,6 +71,6 @@ fun FoldersScreen(modifier: Modifier = Modifier, viewModel: MainViewModel = view
                 },
                 onSelect = { onSelect(index) }
             ) { if (selectList.isNotEmpty()) onSelect(index) }
-        }
+        }*/
     }
 }

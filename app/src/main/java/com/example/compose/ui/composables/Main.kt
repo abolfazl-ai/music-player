@@ -126,7 +126,7 @@ fun Home(viewModel: MainViewModel = viewModel()) {
                         contentAlignment = Alignment.CenterStart
                     ) {
                         Text(
-                            text = "Abolfazl is awesome :)",
+                            text = "Abolfazl is awesome",
                             style = MaterialTheme.typography.h5
                         )
                     }

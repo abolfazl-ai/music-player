@@ -60,10 +60,6 @@ fun PlayerScreen(
                 .fillMaxSize()
                 .padding(top = 88.dp)
                 .padding(horizontal = 24.dp),
-            shape = RoundedCornerShape(16.dp, 16.dp, 0.dp, 0.dp),color = Color.White,
-            elevation = 4.dp
-        ) {
-
-        }
+            shape = RoundedCornerShape(16.dp, 16.dp, 0.dp, 0.dp), elevation = 4.dp) {}
     }
 }

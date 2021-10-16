@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,7 +24,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
-import com.example.compose.ui.composables.list_items.Selectable
+import com.example.compose.ui.composables.modifiers.selectable
+import com.example.compose.ui.theme.Red700
 
 @ExperimentalFoundationApi
 @Composable
@@ -31,7 +33,7 @@ internal fun LinearItemCard(
     title: String,
     subtitle: String,
     description: String = "",
-    picture: @Composable BoxScope.(size: Size) -> Unit = {},
+    picture: @Composable BoxScope.(size: Size) -> Unit,
     selected: Boolean = false,
     onClick: () -> Unit = {},
     onSelect: () -> Unit = {},
@@ -71,13 +73,17 @@ internal fun LinearItemCard(
             verticalAlignment = Alignment.CenterVertically,
         ) {
 
-            Selectable(
+            Box(
                 Modifier
                     .size(height)
-                    .scale(1 - selectAnimator / 15)
                     .padding(padding)
-                ,
-                progress = selectAnimator, shape = clipShape, onclick = onSelect
+                    .selectable(
+                        selected,
+                        clipShape,
+                        MaterialTheme.colors.primary,
+                        MaterialTheme.colors.onPrimary
+                    )
+                    .background(Red700),
             ) { picture(size) }
 
             Column(

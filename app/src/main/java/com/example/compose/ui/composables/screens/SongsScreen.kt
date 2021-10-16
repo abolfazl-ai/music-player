@@ -1,5 +1,6 @@
 package com.example.compose.ui.composables.screens
 
+import android.util.Size
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -32,7 +33,8 @@ fun SongsScreen(modifier: Modifier = Modifier, viewModel: MainViewModel = viewMo
 
     val selectList = remember { mutableStateListOf<Int>() }
 
-    val songs by viewModel.repository.getSongs(state.value.sortBy).collectAsState(initial = emptyList())
+    val songs by viewModel.repository.getSongs(state.value.sortBy)
+        .collectAsState(initial = emptyList())
 
     val onSelect: (Int) -> Unit = remember {
         { if (selectList.contains(it)) selectList.remove(it) else selectList.add(it) }
@@ -48,7 +50,7 @@ fun SongsScreen(modifier: Modifier = Modifier, viewModel: MainViewModel = viewMo
                 title = song.title,
                 subtitle = song.artist.replace(";", " & "),
                 description = song.duration.toTimeFormat(),
-                picture = { GlideImage(imageModel = SongAndSize(song, it)) },
+                picture = {GlideImage(imageModel = SongAndSize(song, it)) },
                 expanded = state.value.expandedIndex == index,
                 selected = selectList.contains(index),
                 onExpand = { viewModel.setExpandedSongIndex(it, index) },
