@@ -2,10 +2,9 @@ package com.example.compose.ui.composables.list_items.linear_item
 
 import android.util.Size
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,7 +24,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import com.example.compose.ui.composables.modifiers.selectable
-import com.example.compose.ui.theme.Red700
 
 @ExperimentalFoundationApi
 @Composable
@@ -45,19 +43,17 @@ internal fun LinearItemCard(
     expandIcon: @Composable RowScope.(modifier: Modifier) -> Unit = {}
 ) {
 
-    val selectAnimator by animateFloatAsState(
-        targetValue = if (selected) 1.1f else -0.1f,
-        animationSpec = spring(if (selected) 0.5f else 1f, if (selected) 600f else 1500f)
-    )
+    val selectAnimator by animateFloatAsState(if (selected) 1f else 0f)
 
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .height(height),
         shape = remember { RoundedCornerShape(cornerRadius) },
-        elevation = elevation, border = if (selectAnimator > 0f) {
-            BorderStroke((2.5 * selectAnimator.coerceIn(-1f, 1f)).dp, MaterialTheme.colors.primary)
-        } else null
+        elevation = elevation, border = selectAnimator.let {
+            if (it > 0f) BorderStroke((2.5 * it).dp, MaterialTheme.colors.primary)
+            else null
+        }
     ) {
 
         val clipShape = remember { RoundedCornerShape(max(cornerRadius - padding, 4.dp)) }
@@ -83,7 +79,7 @@ internal fun LinearItemCard(
                         MaterialTheme.colors.primary,
                         MaterialTheme.colors.onPrimary
                     )
-                    .background(Red700),
+                    .clickable(onClick = onSelect)
             ) { picture(size) }
 
             Column(
