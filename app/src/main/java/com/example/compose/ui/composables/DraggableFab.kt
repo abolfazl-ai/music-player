@@ -1,10 +1,6 @@
 package com.example.compose.ui.composables
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationVector2D
-import androidx.compose.animation.core.VectorConverter
-import androidx.compose.animation.core.spring
-import androidx.compose.foundation.clickable
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -18,7 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -29,8 +24,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.example.compose.ui.composables.modifiers.drag
 import com.example.compose.utils.toIntOffset
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
@@ -49,8 +42,6 @@ fun DraggableFab(
     onExpand: (expanded: Boolean) -> Unit = {}
 ) {
 
-    val scope = rememberCoroutineScope()
-    val rotation = remember { Animatable(0f) }
     val iconsAlpha = remember { Animatable(1f) }
     val offsets = remember(items) {
         ArrayList<Animatable<Offset, AnimationVector2D>>().also { list ->
@@ -116,30 +107,21 @@ fun DraggableFab(
             modifier = Modifier
                 .offset { offsets[0].value.toIntOffset() }
                 .size(56.dp)
-                .rotate(rotation.value)
-                .clickable { }
-                .drag(!expanded) { ended, value ->
-                    scope.launch {
-                        offsets.forEachIndexed { i, anim ->
-                            scope.launch {
-                                if (ended) anim.animateTo(
-                                    Offset.Zero,
-                                    spring(if (i == 0) 0.75f else 1f, 300f),
-                                    value
-                                )
-                                else anim.snapTo(anim.value + value)
-                            }
-                            delay(100)
-                        }
-                    }
-                },
+                .rotate(
+                    animateFloatAsState(
+                        if (expanded) 135f else 0f,
+                        spring(Spring.DampingRatioMediumBouncy)
+                    ).value
+                ),
             color = backgroundColor,
             contentColor = contentColor,
             elevation = 6.dp,
-            shape = CircleShape
+            shape = CircleShape, onClick = { onExpand(!expanded) }
         ) {
             Icon(
-                modifier = Modifier.padding(12.dp),
+                modifier = Modifier
+                    .drag(!expanded, offsets)
+                    .padding(12.dp),
                 imageVector = Icons.Rounded.Add,
                 contentDescription = null
             )
