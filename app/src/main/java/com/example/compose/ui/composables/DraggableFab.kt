@@ -112,11 +112,9 @@ fun DraggableFab(
                         if (expanded) 135f else 0f,
                         spring(Spring.DampingRatioMediumBouncy)
                     ).value
-                ),
-            color = backgroundColor,
-            contentColor = contentColor,
-            elevation = 6.dp,
-            shape = CircleShape, onClick = { onExpand(!expanded) }
+                ), shape = CircleShape,
+            color = backgroundColor, contentColor = contentColor, elevation = 6.dp,
+            onClick = { if (offsets[0].value.getDistance() == 0f) onExpand(!expanded) }
         ) {
             Icon(
                 modifier = Modifier

@@ -169,7 +169,7 @@ fun Home(viewModel: MainViewModel = viewModel()) {
                     }
             } """
             ),
-            progress = viewModel.bottomSheetProgress.collectAsState().value,
+            progress = 2 * (viewModel.bottomSheetProgress.collectAsState().value.coerceIn(0.5f,1f)-0.5f),
             modifier = Modifier.fillMaxSize()
         ) {
 
