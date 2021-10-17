@@ -1,32 +1,36 @@
 package com.example.compose.ui.composables
 
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.layout.*
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector2D
+import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.pointer.consumeAllChanges
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.Job
+import com.example.compose.ui.composables.modifiers.drag
+import com.example.compose.utils.toIntOffset
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.math.hypot
-import kotlin.math.roundToInt
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
@@ -46,21 +50,17 @@ fun DraggableFab(
 ) {
 
     val scope = rememberCoroutineScope()
-
     val rotation = remember { Animatable(0f) }
     val iconsAlpha = remember { Animatable(1f) }
-    val offset = remember { Animatable(TwoDimFloat(0f, 0f), TwoDimFloat.VECTOR_CONVERTER) }
-    val offsets = remember {
-        ArrayList<Animatable<TwoDimFloat, AnimationVector2D>>().also {
-            items.forEach { _ ->
-                it.add(Animatable(TwoDimFloat(0f, 0f), TwoDimFloat.VECTOR_CONVERTER))
+    val offsets = remember(items) {
+        ArrayList<Animatable<Offset, AnimationVector2D>>().also { list ->
+            repeat(items.size + 1) {
+                list.add(Animatable(Offset.Zero, Offset.VectorConverter))
             }
         }
     }
 
-    var job: Job? = remember { null }
-
-    with(LocalDensity.current) {
+/*    with(LocalDensity.current) {
         LaunchedEffect(expanded) {
             val spec = spring<Float>(Spring.DampingRatioMediumBouncy)
             if (expanded) {
@@ -68,7 +68,7 @@ fun DraggableFab(
                 offsets.reversed().forEachIndexed { index, anim ->
                     launch {
                         anim.animateTo(
-                            TwoDimFloat(0f, -(60 + index * 56).dp.toPx()),
+                            Offset(0f, -(60 + index * 56).dp.toPx()),
                             spring(Spring.DampingRatioMediumBouncy)
                         )
                     }
@@ -78,7 +78,7 @@ fun DraggableFab(
             } else {
                 offsets.forEach {
                     launch {
-                        it.animateTo(TwoDimFloat(0f, 0f))
+                        it.animateTo(Offset(0f, 0f))
                     }
                 }
                 launch {
@@ -89,27 +89,20 @@ fun DraggableFab(
                 launch { rotation.animateTo(0f, spec) }
             }
         }
-    }
-
+    }*/
 
     BoxWithConstraints(modifier) {
 
-        offsets.reversed().forEachIndexed { index, anim ->
-            FloatingActionButton(
+        offsets.minus(offsets[0]).reversed().forEachIndexed { index, anim ->
+            Surface(
                 modifier = Modifier
+                    .offset { anim.value.toIntOffset() }
                     .padding(4.dp)
                     .size(48.dp)
-                    .offset {
-                        IntOffset(
-                            anim.value.v1.roundToInt(),
-                            anim.value.v2.roundToInt()
-                        )
-                    }
                     .alpha(iconsAlpha.value),
-                onClick = {},
-                backgroundColor = backgroundColor,
-                contentColor = contentColor,
-                elevation = FloatingActionButtonDefaults.elevation(2.dp, 4.dp)
+                onClick = {}, color = backgroundColor,
+                contentColor = contentColor, shape = CircleShape,
+                elevation = if (anim.value.getDistance() > 24) 4.dp else 0.dp
             ) {
                 Icon(
                     modifier = Modifier.padding(12.dp),
@@ -119,80 +112,37 @@ fun DraggableFab(
             }
         }
 
-        FloatingActionButton(
+        Surface(
             modifier = Modifier
-                .offset { IntOffset(offset.value.v1.roundToInt(), offset.value.v2.roundToInt()) }
+                .offset { offsets[0].value.toIntOffset() }
+                .size(56.dp)
                 .rotate(rotation.value)
-                .pointerInput(Unit) {
-                    detectDragGestures(onDragEnd = {
-                        scope.launch {
-                            if (!expanded)
-                                if (hypot(offset.value.v1, offset.value.v2) > 16.dp.toPx())
-                                    job?.invokeOnCompletion {
-                                        scope.launch {
-                                            offset.animateTo(
-                                                TwoDimFloat(0f, 0f),
-                                                animationSpec = spring(0.65f, 300f)
-                                            )
-                                        }
-                                        offsets.forEachIndexed { index, anim ->
-                                            scope.launch {
-                                                delay(((1 + index) * 70).toLong())
-                                                anim.animateTo(
-                                                    TwoDimFloat(0f, 0f),
-                                                    animationSpec = spring(1f, 300f)
-                                                )
-                                            }
-                                        }
-                                    }
-                                else {
-                                    scope.launch { offset.animateTo(TwoDimFloat(0f, 0f)) }
-                                    onExpand(true)
-                                }
-                        }
-                    }) { change, dragAmount ->
-                        change.consumeAllChanges()
-                        if (!expanded) job = scope.launch {
-                            offset.snapTo(
-                                TwoDimFloat(
-                                    offset.value.v1 + dragAmount.x,
-                                    offset.value.v2 + dragAmount.y
+                .clickable { }
+                .drag(!expanded) { ended, value ->
+                    scope.launch {
+                        offsets.forEachIndexed { i, anim ->
+                            scope.launch {
+                                if (ended) anim.animateTo(
+                                    Offset.Zero,
+                                    spring(if (i == 0) 0.75f else 1f, 300f),
+                                    value
                                 )
-                            )
-
-                            offsets.forEach {
-                                delay(100)
-                                if (!expanded)
-                                    launch {
-                                        it.snapTo(
-                                            TwoDimFloat(
-                                                it.value.v1 + dragAmount.x,
-                                                it.value.v2 + dragAmount.y
-                                            )
-                                        )
-                                    }
+                                else anim.snapTo(anim.value + value)
                             }
+                            delay(100)
                         }
                     }
                 },
-            onClick = { if (hypot(offset.value.v1, offset.value.v2) == 0f) onExpand(!expanded) },
-            backgroundColor = backgroundColor,
+            color = backgroundColor,
             contentColor = contentColor,
-            shape = CircleShape,
+            elevation = 6.dp,
+            shape = CircleShape
         ) {
             Icon(
+                modifier = Modifier.padding(12.dp),
                 imageVector = Icons.Rounded.Add,
                 contentDescription = null
             )
         }
-    }
-}
-
-data class TwoDimFloat(val v1: Float, val v2: Float) {
-    companion object {
-        val VECTOR_CONVERTER: TwoWayConverter<TwoDimFloat, AnimationVector2D> =
-            TwoWayConverter(
-                { AnimationVector2D(it.v1, it.v2) },
-                { TwoDimFloat(it.v1, it.v2) })
     }
 }
