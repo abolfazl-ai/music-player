@@ -13,7 +13,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.palette.graphics.Palette
 import com.example.compose.local.model.Song
 import com.example.compose.ui.composables.modifiers.crossFade
-import com.example.compose.utils.classes.MainColors
+import com.example.compose.utils.util_classes.MainColors
 import com.example.compose.utils.kotlin_extensions.getAccurateColor
 import com.example.compose.viewmodel.MainViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi

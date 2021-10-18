@@ -23,7 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.compose.R
-import com.example.compose.utils.classes.PlaybackAction.*
+import com.example.compose.utils.util_classes.PlaybackAction.*
 import com.example.compose.viewmodel.MainViewModel
 
 @ExperimentalMaterialApi

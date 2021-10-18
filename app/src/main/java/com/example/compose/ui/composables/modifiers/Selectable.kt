@@ -25,7 +25,7 @@ fun Modifier.selectable(
 
     val progress by animateFloatAsState(
         if (selected) 1f else 0f,
-        spring(if (selected) 0.5f else 1f, if (selected) 600f else 1000f)
+        spring(if (selected) 0.5f else 1f, if (selected) 600f else 1500f)
     )
 
     val path = remember {
