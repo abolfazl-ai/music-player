@@ -2,13 +2,12 @@ package com.example.compose.utils.default_pictures
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Typeface
 import android.util.Size
 import com.example.compose.R
 import com.example.compose.local.model.Song
-import com.example.compose.utils.decodeSampledBitmapFromResource
+import com.example.compose.utils.kotlin_extensions.decodeSampledBitmapFromResource
 
 val CoverList = listOf(
     R.drawable.cover_1,
@@ -58,4 +57,5 @@ fun SongAndSize.getDefaultCover(c: Context): Bitmap {
     return bitmap
 }
 
-fun Song.getDefaultCover(c: Context): Bitmap = SongAndSize(this, Size(1000, 1000)).getDefaultCover(c)
+fun Song.getDefaultCover(c: Context): Bitmap =
+    SongAndSize(this, Size(1000, 1000)).getDefaultCover(c)

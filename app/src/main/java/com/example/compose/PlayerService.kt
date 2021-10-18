@@ -12,8 +12,8 @@ import com.example.compose.local.model.PlaylistItem
 import com.example.compose.local.model.Song
 import com.example.compose.local.room.DataBase
 import com.example.compose.local.room.PlaylistDao
-import com.example.compose.ui.composables.player_screen.PlaybackAction
-import com.example.compose.ui.composables.player_screen.PlaybackAction.*
+import com.example.compose.utils.classes.PlaybackAction
+import com.example.compose.utils.classes.PlaybackAction.*
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
@@ -154,8 +154,8 @@ class PlayerService : LifecycleService() {
                         if (playWhenReady) pause() else play()
                     }
                     PAUSE -> pause()
-                    NEXT -> next()
-                    PREVIOUS -> previous()
+                    NEXT -> seekToNextWindow()
+                    PREVIOUS -> seekToPreviousWindow()
                     STOP -> stop()
                     SHUFFLE -> shuffle(!isShuffleModeOn)
                     REPEAT -> {

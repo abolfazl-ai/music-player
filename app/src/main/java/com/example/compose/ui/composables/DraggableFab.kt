@@ -23,7 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.example.compose.ui.composables.modifiers.drag
-import com.example.compose.utils.toIntOffset
+import com.example.compose.utils.kotlin_extensions.toIntOffset
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi

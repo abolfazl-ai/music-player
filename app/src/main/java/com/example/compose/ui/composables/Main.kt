@@ -26,9 +26,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.compose.ui.Screen
 import com.example.compose.ui.composables.player_screen.PlayerScreen
-import com.example.compose.ui.composables.player_screen.progress
 import com.example.compose.ui.composables.screens.*
 import com.example.compose.ui.screens
+import com.example.compose.utils.kotlin_extensions.progress
 import com.example.compose.viewmodel.MainViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -169,7 +169,10 @@ fun Home(viewModel: MainViewModel = viewModel()) {
                     }
             } """
             ),
-            progress = 2 * (viewModel.bottomSheetProgress.collectAsState().value.coerceIn(0.5f,1f)-0.5f),
+            progress = 2 * (viewModel.bottomSheetProgress.collectAsState().value.coerceIn(
+                0.5f,
+                1f
+            ) - 0.5f),
             modifier = Modifier.fillMaxSize()
         ) {
 

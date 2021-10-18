@@ -7,7 +7,7 @@ import android.graphics.Typeface
 import android.util.Size
 import com.example.compose.R
 import com.example.compose.local.model.Album
-import com.example.compose.utils.decodeSampledBitmapFromResource
+import com.example.compose.utils.kotlin_extensions.decodeSampledBitmapFromResource
 
 val AlbumCoverList = listOf(
     R.drawable.album_1,

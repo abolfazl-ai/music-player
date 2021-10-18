@@ -15,8 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.compose.ui.composables.list_items.linear_item.LinearItem
-import com.example.compose.ui.composables.player_screen.toTimeFormat
 import com.example.compose.utils.default_pictures.SongAndSize
+import com.example.compose.utils.kotlin_extensions.toTimeFormat
 import com.example.compose.viewmodel.MainViewModel
 import com.skydoves.landscapist.glide.GlideImage
 

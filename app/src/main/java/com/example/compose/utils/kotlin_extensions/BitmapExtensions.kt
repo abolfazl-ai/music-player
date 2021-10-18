@@ -1,11 +1,8 @@
-package com.example.compose.utils
+package com.example.compose.utils.kotlin_extensions
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.unit.IntOffset
-import kotlin.math.roundToInt
 
 fun Context.decodeSampledBitmapFromResource(resId: Int, reqWidth: Int, reqHeight: Int): Bitmap {
     return BitmapFactory.Options().run {
@@ -30,5 +27,3 @@ fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeig
     }
     return inSampleSize
 }
-
-fun Offset.toIntOffset() = IntOffset(x.roundToInt(), y.roundToInt())
