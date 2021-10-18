@@ -6,7 +6,7 @@ import android.os.IBinder
 import androidx.lifecycle.MutableLiveData
 import com.example.compose.PlayerService
 import com.example.compose.local.model.Song
-import com.example.compose.utils.classes.PlaybackAction
+import com.example.compose.utils.util_classes.PlaybackAction
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import kotlinx.coroutines.flow.MutableStateFlow
