@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.compose.ui.composables.modifiers.reveal
 import com.example.compose.viewmodel.MainViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.rememberPagerState
@@ -41,7 +42,7 @@ fun PlayerScreen(
     Column(
         modifier
             .fillMaxSize()
-            .reveal(colorCache[pageState.currentPage]?.back ?: Color.Black, 404.dp),
+            .reveal(colorCache[pageState.currentPage]?.back ?: Color.Black, 404.dp, 750),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -60,6 +61,7 @@ fun PlayerScreen(
                 .fillMaxSize()
                 .padding(top = 88.dp)
                 .padding(horizontal = 24.dp),
-            shape = RoundedCornerShape(16.dp, 16.dp, 0.dp, 0.dp), elevation = 4.dp) {}
+            shape = RoundedCornerShape(16.dp, 16.dp, 0.dp, 0.dp), elevation = 4.dp
+        ) {}
     }
 }
