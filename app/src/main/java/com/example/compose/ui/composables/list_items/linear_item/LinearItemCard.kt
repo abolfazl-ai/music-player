@@ -2,6 +2,7 @@ package com.example.compose.ui.composables.list_items.linear_item
 
 import android.util.Size
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -43,7 +44,7 @@ internal fun LinearItemCard(
     expandIcon: @Composable RowScope.(modifier: Modifier) -> Unit = {}
 ) {
 
-    val selectAnimator by animateFloatAsState(if (selected) 1f else 0f)
+    val selectAnimator by animateFloatAsState(if (selected) 1.1f else -0.1f, spring(0.5f))
 
     Surface(
         modifier = Modifier
@@ -51,17 +52,14 @@ internal fun LinearItemCard(
             .height(height),
         shape = remember { RoundedCornerShape(cornerRadius) },
         elevation = elevation, border = selectAnimator.let {
-            if (it > 0f) BorderStroke((2.5 * it).dp, MaterialTheme.colors.primary)
+            if (it > 0f) BorderStroke((2.5 * it.coerceIn(0f,1f)).dp, MaterialTheme.colors.primary)
             else null
         }
     ) {
 
         val clipShape = remember { RoundedCornerShape(max(cornerRadius - padding, 4.dp)) }
-        val density = LocalDensity.current
-        val size = remember {
-            with(density) {
-                (height - padding.times(2)).roundToPx().let { Size(it, it) }
-            }
+        val size = with(LocalDensity.current) {
+            remember { (height - padding.times(2)).roundToPx().let { Size(it, it) } }
         }
 
         Row(
@@ -73,9 +71,10 @@ internal fun LinearItemCard(
                 Modifier
                     .size(height)
                     .padding(padding)
+                    .scale(1 - selectAnimator / 15)
+                    .clip(clipShape)
                     .selectable(
                         selected,
-                        clipShape,
                         MaterialTheme.colors.primary,
                         MaterialTheme.colors.onPrimary
                     )

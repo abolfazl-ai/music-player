@@ -3,10 +3,7 @@ package com.example.compose.ui.composables.list_items.gird_item
 import android.util.Size
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -23,7 +20,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.compose.ui.composables.icons.Play
-import com.example.compose.ui.composables.list_items.Selectable
+import com.example.compose.ui.composables.modifiers.selectable
 import com.example.compose.ui.theme.DarkGray
 
 @ExperimentalFoundationApi
@@ -107,22 +104,21 @@ fun GridItem(
                     )
                 }
 
-                Selectable(
-                    modifier = Modifier.size(35.dp),
-                    progress = selectAnimator,
-                    selectColor = MaterialTheme.colors.primary,
-                    backgroundColor = MaterialTheme.colors.onSurface.copy(0.05f),
-                    shape = RoundedCornerShape(4.dp),
-                    onclick = { if (selectAnimator > 0) onSelect() }
-                ) {
-                    Icon(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(4.dp),
-                        imageVector = Icons.Filled.Play,
-                        contentDescription = null
-                    )
-                }
+                Icon(
+                    modifier = Modifier
+                        .size(35.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .selectable(
+                            selected,
+                            MaterialTheme.colors.primary,
+                            MaterialTheme.colors.onPrimary
+                        )
+                        .background(MaterialTheme.colors.onSurface.copy(0.05f))
+                        .clickable { if (selectAnimator > 0) onSelect() }
+                        .padding(4.dp),
+                    imageVector = Icons.Filled.Play,
+                    contentDescription = null
+                )
             }
         }
     }

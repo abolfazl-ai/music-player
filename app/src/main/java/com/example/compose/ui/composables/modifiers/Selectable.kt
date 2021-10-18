@@ -6,9 +6,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -18,7 +17,6 @@ import kotlin.math.sqrt
 
 fun Modifier.selectable(
     selected: Boolean,
-    shape: Shape,
     color: Color,
     tint: Color,
 ) = composed {
@@ -36,41 +34,39 @@ fun Modifier.selectable(
         }
     }
 
-    this.then(
-        scale(1 - progress / 15)
-            .clip(shape)
-            .drawWithContent {
+    clipToBounds()
+    drawWithContent {
 
-                drawContent()
+        drawContent()
 
-                drawCircle(
-                    color = color.copy(alpha = progress.coerceIn(0f, 1f)),
-                    radius = progress * size.width / 5,
-                )
+        drawCircle(
+            color = color.copy(alpha = progress.coerceIn(0f, 1f)),
+            radius = progress * size.width / 5,
+        )
 
-                drawCircle(
-                    color = color.copy(alpha = progress.coerceIn(0.5f, 1f)),
-                    radius = sqrt(0.5f) * size.width,
-                    style = Stroke(width = progress * 1.47f * size.width, size.height)
-                )
+        drawCircle(
+            color = color.copy(alpha = progress.coerceIn(0.5f, 1f)),
+            radius = sqrt(0.5f) * size.width,
+            style = Stroke(width = progress * 1.47f * size.width, size.height)
+        )
 
-                withTransform({
-                    scale(progress)
-                    rotate(45 * (1 - progress))
-                    scale(size.minDimension / 24, Offset.Zero)
-                }) {
-                    drawPath(
-                        path = path,
-                        color = tint,
-                        style = Stroke(
-                            width = 1.5f,
-                            cap = StrokeCap.Round,
-                            join = StrokeJoin.Round,
-                            pathEffect = PathEffect.dashPathEffect(
-                                floatArrayOf(125 * progress.coerceIn(0f, 1f), 125f), 1f
-                            )
-                        )
+        withTransform({
+            scale(progress)
+            rotate(45 * (1 - progress))
+            scale(size.minDimension / 24, Offset.Zero)
+        }) {
+            drawPath(
+                path = path,
+                color = tint,
+                style = Stroke(
+                    width = 1.5f,
+                    cap = StrokeCap.Round,
+                    join = StrokeJoin.Round,
+                    pathEffect = PathEffect.dashPathEffect(
+                        floatArrayOf(125 * progress.coerceIn(0f, 1f), 125f), 1f
                     )
-                }
-            })
+                )
+            )
+        }
+    }
 }
