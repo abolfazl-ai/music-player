@@ -3,6 +3,7 @@ package com.example.compose.ui.composables.icons.animated
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -16,7 +17,7 @@ import com.example.compose.utils.util_classes.Path4dVector
 import kotlinx.coroutines.launch
 
 @Composable
-fun Arrow(modifier: Modifier = Modifier, down: Boolean, tint: Color = Color.Black) {
+fun Arrow(modifier: Modifier = Modifier, down: Boolean, tint: Color = MaterialTheme.colors.onSurface) {
 
     val states = remember {
         listOf(
@@ -53,7 +54,7 @@ fun Arrow(modifier: Modifier = Modifier, down: Boolean, tint: Color = Color.Blac
         }.also {
             drawPath(
                 it, tint, style = Stroke(
-                    1.5f * size.width / 24,
+                    1.8f * size.width / 24,
                     cap = StrokeCap.Round,
                     join = StrokeJoin.Round
                 )

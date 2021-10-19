@@ -4,7 +4,6 @@ import android.util.Size
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -17,15 +16,12 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
+import com.example.compose.ui.composables.icons.animated.ArrowToX2
 
 @ExperimentalFoundationApi
 @ExperimentalAnimationApi
@@ -48,7 +44,7 @@ fun LinearItem(
     AnimatedVisibility(
         modifier = Modifier.padding(top = cardHeight / 4),
         visible = expanded,
-        enter = expandVertically(animationSpec = spring(0.65f, 600f)),
+        enter = expandVertically(spring(0.55f, 600f)),
         exit = shrinkVertically()
     ) {
         Box(
@@ -64,12 +60,17 @@ fun LinearItem(
         title, subtitle, description, picture, selected, onClick, onSelect,
         animateDpAsState(targetValue = (if (expanded) 2 else 0).dp).value, cardHeight
     ) {
-        Icon(modifier = it
+/*        Icon(modifier = it
             .background(MaterialTheme.colors.onSurface.copy(0.05f))
             .clickable { onExpand(!expanded) }
             .padding(8.dp)
-            .rotate(animateFloatAsState(if (expanded) 180f else 0f, spring(0.65f, 400f)).value),
+            .rotate(animateFloatAsState(if (expanded) 180f else 0f, spring(0.55f, 500f)).value),
             imageVector = Icons.Rounded.ExpandMore,
-            contentDescription = "Expand")
+            contentDescription = "Expand")*/
+
+        ArrowToX2(modifier = it
+            .background(MaterialTheme.colors.onSurface.copy(0.05f))
+            .clickable { onExpand(!expanded) }
+            .padding(8.dp),x = expanded)
     }
 }

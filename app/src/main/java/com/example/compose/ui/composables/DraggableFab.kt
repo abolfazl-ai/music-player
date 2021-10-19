@@ -13,6 +13,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -21,9 +22,12 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.example.compose.ui.composables.modifiers.drag
 import com.example.compose.utils.kotlin_extensions.toIntOffset
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
@@ -51,12 +55,11 @@ fun DraggableFab(
         }
     }
 
-/*    with(LocalDensity.current) {
+    with(LocalDensity.current) {
         LaunchedEffect(expanded) {
-            val spec = spring<Float>(Spring.DampingRatioMediumBouncy)
             if (expanded) {
                 iconsAlpha.snapTo(0f)
-                offsets.reversed().forEachIndexed { index, anim ->
+                offsets.minus(offsets[0]).reversed().forEachIndexed { index, anim ->
                     launch {
                         anim.animateTo(
                             Offset(0f, -(60 + index * 56).dp.toPx()),
@@ -65,9 +68,8 @@ fun DraggableFab(
                     }
                 }
                 launch { iconsAlpha.animateTo(1f) }
-                launch { rotation.animateTo(135f, spec) }
             } else {
-                offsets.forEach {
+                offsets.minus(offsets[0]).forEach {
                     launch {
                         it.animateTo(Offset(0f, 0f))
                     }
@@ -77,10 +79,9 @@ fun DraggableFab(
                     delay(100)
                     iconsAlpha.snapTo(1f)
                 }
-                launch { rotation.animateTo(0f, spec) }
             }
         }
-    }*/
+    }
 
     BoxWithConstraints(modifier) {
 
@@ -106,22 +107,16 @@ fun DraggableFab(
         Surface(
             modifier = Modifier
                 .offset { offsets[0].value.toIntOffset() }
-                .size(56.dp)
-                .rotate(
-                    animateFloatAsState(
-                        if (expanded) 135f else 0f,
-                        spring(Spring.DampingRatioMediumBouncy)
-                    ).value
-                ), shape = CircleShape,
+                .size(56.dp), shape = CircleShape,
             color = backgroundColor, contentColor = contentColor, elevation = 6.dp,
             onClick = { if (offsets[0].value.getDistance() == 0f) onExpand(!expanded) }
         ) {
             Icon(
                 modifier = Modifier
                     .drag(!expanded, offsets)
-                    .padding(12.dp),
-                imageVector = Icons.Rounded.Add,
-                contentDescription = null
+                    .padding(12.dp)
+                    .rotate(animateFloatAsState(if (expanded) 135f else 0f, spring(0.5f)).value),
+                imageVector = Icons.Rounded.Add, contentDescription = "Fab"
             )
         }
     }

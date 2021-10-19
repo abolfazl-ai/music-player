@@ -56,14 +56,13 @@ fun ArrowToX(
                 lineTo((24 - v3) * size.width / 24, v4 * size.height / 24)
             }
         }.also {
-            rotate(90 - 90 * animator.value.v1) {
+            rotate(90 - 180 * animator.value.v1.coerceIn(-0.1f,1.1f)) {
                 scale(0.5f + abs(animator.value.v1 - 0.5f).coerceIn(0f, 0.5f)) {
                     drawPath(
                         it, tint, style = Stroke(
-                            1.5f * size.width / 24,
-                            cap = StrokeCap.Round,
-                            join = StrokeJoin.Round
-                        )
+                            1.8f * size.width / 24,
+                            cap = StrokeCap.Round, join = StrokeJoin.Round
+                        ), alpha = 0.8f
                     )
                 }
             }

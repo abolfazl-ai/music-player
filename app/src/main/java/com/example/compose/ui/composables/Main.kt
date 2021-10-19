@@ -25,8 +25,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.compose.ui.Screen
-import com.example.compose.ui.composables.player_screen.PlayerScreen
 import com.example.compose.ui.composables.main_screens.*
+import com.example.compose.ui.composables.player_screen.PlayerScreen
 import com.example.compose.ui.screens
 import com.example.compose.utils.kotlin_extensions.progress
 import com.example.compose.viewmodel.MainViewModel
