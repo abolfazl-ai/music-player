@@ -13,10 +13,9 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintSet
-import androidx.constraintlayout.compose.MotionLayout
-import androidx.constraintlayout.compose.layoutId
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -70,7 +69,10 @@ fun Home(viewModel: MainViewModel = viewModel()) {
         viewModel.bottomSheetProgress.value = sheetState.progress()
     }
 
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.BottomCenter
+    ) {
 
         BottomSheetScaffold(
             backgroundColor = MaterialTheme.colors.background,
@@ -78,7 +80,7 @@ fun Home(viewModel: MainViewModel = viewModel()) {
             sheetContent = {
                 Box {
                     PlayerScreen()
-                    if (viewModel.bottomSheetProgress.value < 1)
+                    if (viewModel.bottomSheetProgress.collectAsState().value < 1)
                         Surface(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -126,7 +128,7 @@ fun Home(viewModel: MainViewModel = viewModel()) {
                         contentAlignment = Alignment.CenterStart
                     ) {
                         Text(
-                            text = "Abolfazl is awesome",
+                            text = sheetState.offset.value.toString() /*"Abolfazl is awesome"*/,
                             style = MaterialTheme.typography.h5
                         )
                     }
@@ -134,10 +136,72 @@ fun Home(viewModel: MainViewModel = viewModel()) {
             }
         }
 
-        MotionLayout(
+        BottomNavigation(
+            Modifier
+                .padding(bottom = 48.dp)
+                .offset { IntOffset(0, (1860 - sheetState.offset.value).toInt()) },
+            backgroundColor = MaterialTheme.colors.surface
+        ) {
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentDestination = navBackStackEntry?.destination
+            screens.forEach { screen ->
+                BottomNavigationItem(
+                    icon = { Icon(screen.icon, contentDescription = null) },
+                    selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                    onClick = {
+                        navController.navigate(screen.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                )
+            }
+        }
+
+        Box(Modifier.fillMaxSize()) {
+            if (fabExpanded) Spacer(modifier = Modifier
+                .fillMaxSize()
+                .pointerInteropFilter { fabExpanded = false;true })
+        }
+
+        val maxOffset = remember { maxHeight - 160.dp }
+        val neededOffset = remember { maxWidth + 12.dp + 16.dp + 56.dp }
+        val startOffset = remember { maxOffset - neededOffset }
+
+        with(LocalDensity.current) {
+            DraggableFab(
+                Modifier
+                    .padding(bottom = 176.dp)
+                    .offset {
+                        with(sheetState.offset.value) {
+                            IntOffset(
+                                (((coerceIn(
+                                    startOffset.toPx(),
+                                    maxOffset.toPx()
+                                ) - startOffset.toPx()) / neededOffset.toPx()) *
+                                        ((maxWidth - 56.dp) / 2 - 16.dp).toPx()).toInt(),
+                                (coerceIn(0f, startOffset.toPx()) - startOffset.toPx()).toInt()
+                            )
+                        }
+                    },
+                expanded = fabExpanded,
+                onExpand = { fabExpanded = it },
+                colorProgress = (1 - (sheetState.offset.value.coerceIn(
+                    startOffset.toPx(),
+                    maxOffset.toPx()
+                ) - startOffset.toPx()) / neededOffset.toPx())
+            )
+        }
+    }
+}
+
+/*        MotionLayout(
             ConstraintSet(
                 """ {
-                    fab: { 
+                    fab: {
                       bottom: ['parent', 'bottom', 176],
                       end: ['parent', 'end', 16],
                       custom: {
@@ -145,7 +209,7 @@ fun Home(viewModel: MainViewModel = viewModel()) {
                         onColor: "#ffffff"
                       }
                     },
-                    nav: { 
+                    nav: {
                       bottom: ['parent', 'bottom',48],
                       start: ['parent', 'start'],
                       end: ['parent', 'end'],
@@ -153,7 +217,7 @@ fun Home(viewModel: MainViewModel = viewModel()) {
             } """
             ), ConstraintSet(
                 """ {
-                    fab: { 
+                    fab: {
                       top: ['parent', 'top', 376],
                       start: ['parent', 'start'],
                       end: ['parent', 'end'],
@@ -162,7 +226,7 @@ fun Home(viewModel: MainViewModel = viewModel()) {
                         onColor: "#2962ff"
                       }
                     },
-                    nav: { 
+                    nav: {
                       top: ['parent', 'bottom',32],
                       start: ['parent', 'start'],
                       end: ['parent', 'end'],
@@ -174,44 +238,4 @@ fun Home(viewModel: MainViewModel = viewModel()) {
                 1f
             ) - 0.5f),
             modifier = Modifier.fillMaxSize()
-        ) {
-
-            BottomNavigation(
-                Modifier.layoutId("nav", "box"),
-                backgroundColor = MaterialTheme.colors.surface
-            ) {
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination
-                screens.forEach { screen ->
-                    BottomNavigationItem(
-                        icon = { Icon(screen.icon, contentDescription = null) },
-                        selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
-                        onClick = {
-                            navController.navigate(screen.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
-                    )
-                }
-            }
-
-            Box(Modifier.fillMaxSize()) {
-                if (fabExpanded) Spacer(modifier = Modifier
-                    .fillMaxSize()
-                    .pointerInteropFilter { fabExpanded = false;true })
-            }
-
-            DraggableFab(
-                Modifier.layoutId("fab", "box"),
-                expanded = fabExpanded,
-                onExpand = { fabExpanded = it },
-                backgroundColor = motionProperties("fab").value.color("color"),
-                contentColor = motionProperties("fab").value.color("onColor")
-            )
-        }
-    }
-}
+        ) {}*/

@@ -41,7 +41,7 @@ fun Modifier.drag(active: Boolean, animators: List<Animatable<Offset, AnimationV
                             anim.animateTo(
                                 Offset.Zero,
                                 spring(if (i == 0) 0.75f else 1f, 300f),
-                                Offset(velocity.x, velocity.y)
+                                Offset(2*velocity.x, 2*velocity.y)
                             )
                         }
                         delay(100)

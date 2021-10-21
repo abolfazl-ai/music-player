@@ -43,7 +43,9 @@ fun DraggableFab(
     backgroundColor: Color = MaterialTheme.colors.secondary,
     contentColor: Color = MaterialTheme.colors.onPrimary,
     expanded: Boolean = false,
-    onExpand: (expanded: Boolean) -> Unit = {}
+    onExpand: (expanded: Boolean) -> Unit = {},
+    colorProgress: Float = 0f,
+    iconProgress: Float = 0f
 ) {
 
     val iconsAlpha = remember { Animatable(1f) }
@@ -107,8 +109,17 @@ fun DraggableFab(
         Surface(
             modifier = Modifier
                 .offset { offsets[0].value.toIntOffset() }
-                .size(56.dp), shape = CircleShape,
-            color = backgroundColor, contentColor = contentColor, elevation = 6.dp,
+                .size(56.dp),
+            shape = CircleShape,
+            color = colorProgress.getMidColor(
+                MaterialTheme.colors.secondary,
+                MaterialTheme.colors.surface
+            ),
+            contentColor =colorProgress.getMidColor(
+                MaterialTheme.colors.surface,
+                MaterialTheme.colors.secondary
+            ),
+            elevation = 6.dp,
             onClick = { if (offsets[0].value.getDistance() == 0f) onExpand(!expanded) }
         ) {
             Icon(
@@ -120,4 +131,12 @@ fun DraggableFab(
             )
         }
     }
+}
+
+fun Float.getMidColor(start: Color, end: Color): Color {
+    return Color(
+        red = start.red * (1 - this) + (end.red * this),
+        green = start.green * (1 - this) + (end.green * this),
+        blue = start.blue * (1 - this) + (end.blue * this)
+    )
 }
