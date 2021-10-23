@@ -16,5 +16,4 @@ fun BottomSheetState.progress(): Float {
     } else if (progress.fraction != 1f && progress.fraction != 0f) {
         if (progress.from == BottomSheetValue.Collapsed) progress.fraction else (1 - progress.fraction)
     } else if (isCollapsed) 0f else 1f
-
 }
