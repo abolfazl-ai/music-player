@@ -27,6 +27,7 @@ import com.example.compose.ui.composables.icons.animated.ArrowToX2
 @ExperimentalAnimationApi
 @Composable
 fun LinearItem(
+    modifier: Modifier = Modifier,
     title: String,
     subtitle: String,
     description: String = "",
@@ -37,7 +38,7 @@ fun LinearItem(
     onExpand: (Boolean) -> Unit = {},
     onSelect: () -> Unit = {},
     onClick: () -> Unit = {},
-) = Box {
+) = Box(modifier) {
 
     val cardHeight = remember { 56.dp }
 
@@ -71,6 +72,6 @@ fun LinearItem(
         ArrowToX2(modifier = it
             .background(MaterialTheme.colors.onSurface.copy(0.05f))
             .clickable { onExpand(!expanded) }
-            .padding(8.dp),x = expanded)
+            .padding(8.dp), x = expanded)
     }
 }
