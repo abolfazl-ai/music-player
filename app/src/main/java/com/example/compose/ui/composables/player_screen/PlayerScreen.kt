@@ -56,13 +56,5 @@ fun PlayerScreen(
             songList = songs,
             onPageCreated = { i, c -> colorCache.put(i, c) }
         )
-
-        Surface(
-            Modifier
-                .fillMaxSize()
-                .padding(top = 88.dp)
-                .padding(horizontal = 24.dp),
-            shape = RoundedCornerShape(16.dp, 16.dp, 0.dp, 0.dp), elevation = 4.dp
-        ) {}
     }
 }

@@ -15,7 +15,7 @@ import com.bumptech.glide.load.model.ModelLoader
 import com.bumptech.glide.load.model.ModelLoaderFactory
 import com.bumptech.glide.load.model.MultiModelLoaderFactory
 import com.bumptech.glide.signature.ObjectKey
-import com.example.compose.utils.TAG
+import com.example.compose.utils.resources.TAG
 import com.example.compose.utils.default_pictures.AlbumAndSize
 import com.example.compose.utils.default_pictures.getDefaultCover
 

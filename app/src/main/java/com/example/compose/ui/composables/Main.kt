@@ -21,9 +21,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.compose.ui.Screen
-import com.example.compose.ui.composables.main_screens.*
+import com.example.compose.ui.composables.library_screens.*
 import com.example.compose.ui.composables.player_screen.PlayerScreen
 import com.example.compose.ui.screens
+import com.example.compose.utils.util_classes.FabState
 import com.example.compose.viewmodel.MainViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -41,7 +42,7 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 fun Main() {
     PermissionRequest(modifier = Modifier.fillMaxSize(),
         requestScreen = { RequestScreen(it) }) {
-        Home()
+        Home2()
     }
 }
 
@@ -132,11 +133,104 @@ fun Home(viewModel: MainViewModel = viewModel()) {
                 navController = navController,
                 startDestination = Screen.Home.route,
             ) {
-                composable(Screen.Home.route) { HomeScreen() }
-                composable(Screen.Songs.route) { SongsScreen() }
-                composable(Screen.Folders.route) { FoldersScreen() }
-                composable(Screen.Artists.route) { ArtistsScreen() }
-                composable(Screen.Albums.route) { AlbumsScreen() }
+                composable(Screen.Home.route) { HomeLibrary() }
+                composable(Screen.Songs.route) { SongsLibrary() }
+                composable(Screen.Folders.route) { FoldersLibrary() }
+                composable(Screen.Artists.route) { ArtistsLibrary() }
+                composable(Screen.Albums.route) { AlbumsLibrary() }
+            }
+        }
+    }
+}
+
+
+@ExperimentalPagerApi
+@ExperimentalAnimationGraphicsApi
+@ExperimentalAnimationApi
+@ExperimentalFoundationApi
+@ExperimentalComposeUiApi
+@ExperimentalMaterialApi
+@Composable
+fun Home2(viewModel: MainViewModel = viewModel()) {
+
+    val navController = rememberNavController()
+    var fabExpanded by remember { mutableStateOf(false) }
+    val backgroundAlpha by animateFloatAsState(targetValue = if (fabExpanded) 0.3f else 1f)
+
+    SheetLayout(
+        Modifier.fillMaxSize(),
+        playerContent = { PlayerScreen(Modifier.alpha(1 - 2 * it.coerceIn(0f, 0.5f))) },
+        queueContent = {},
+        bottomNav = {
+            BottomNavigation(
+                Modifier.padding(bottom = 48.dp),
+                backgroundColor = MaterialTheme.colors.surface,
+                elevation = 10.dp
+            ) {
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentDestination = navBackStackEntry?.destination
+                screens.forEach { screen ->
+                    BottomNavigationItem(
+                        icon = { Icon(screen.icon, contentDescription = null) },
+                        selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                        onClick = {
+                            navController.navigate(screen.route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                    )
+                }
+            }
+        },
+        appBar = {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(82.dp),
+                elevation = 4.dp,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 26.dp)
+                        .padding(horizontal = 16.dp),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Text(
+                        text = "Abolfazl is awesome",
+                        style = MaterialTheme.typography.h5
+                    )
+                }
+            }
+        },
+        fab = {
+            var isPlaying by remember { mutableStateOf(false) }
+            DraggableFab(
+                state = FabState.Menu,
+                expanded = fabExpanded,
+                onExpand = { fabExpanded = it },
+                isPlaying = isPlaying
+            )
+            { isPlaying = !isPlaying }
+        },
+    ) {
+        SwipeRefresh(modifier = Modifier
+            .alpha(backgroundAlpha),
+            state = rememberSwipeRefreshState(viewModel.isRefreshing.collectAsState().value),
+            onRefresh = { viewModel.refresh() }) {
+            NavHost(
+                navController = navController,
+                startDestination = Screen.Home.route,
+            ) {
+                composable(Screen.Home.route) { HomeLibrary() }
+                composable(Screen.Songs.route) { SongsLibrary() }
+                composable(Screen.Folders.route) { FoldersLibrary() }
+                composable(Screen.Artists.route) { ArtistsLibrary() }
+                composable(Screen.Albums.route) { AlbumsLibrary() }
             }
         }
     }

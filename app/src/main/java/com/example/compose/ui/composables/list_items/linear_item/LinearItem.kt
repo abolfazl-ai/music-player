@@ -21,7 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.compose.ui.composables.icons.animated.ArrowToX2
+import com.example.compose.ui.composables.icons.animated.ArrowToX
 
 @ExperimentalFoundationApi
 @ExperimentalAnimationApi
@@ -69,7 +69,7 @@ fun LinearItem(
             imageVector = Icons.Rounded.ExpandMore,
             contentDescription = "Expand")*/
 
-        ArrowToX2(modifier = it
+        ArrowToX(modifier = it
             .background(MaterialTheme.colors.onSurface.copy(0.05f))
             .clickable { onExpand(!expanded) }
             .padding(8.dp), x = expanded)

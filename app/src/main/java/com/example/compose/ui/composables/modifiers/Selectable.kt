@@ -2,6 +2,7 @@ package com.example.compose.ui.composables.modifiers
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -17,9 +18,12 @@ import kotlin.math.sqrt
 
 fun Modifier.selectable(
     selected: Boolean,
-    color: Color,
-    tint: Color,
+    color: Color? = null,
+    tint: Color? = null,
 ) = composed {
+
+    val finalColor = color ?: MaterialTheme.colors.primary
+    val finalTint = color ?: MaterialTheme.colors.onPrimary
 
     val progress by animateFloatAsState(
         if (selected) 1f else 0f,
@@ -40,12 +44,12 @@ fun Modifier.selectable(
         drawContent()
 
         drawCircle(
-            color = color.copy(alpha = progress.coerceIn(0f, 1f)),
+            color = finalColor.copy(alpha = progress.coerceIn(0f, 1f)),
             radius = progress * size.width / 5,
         )
 
         drawCircle(
-            color = color.copy(alpha = progress.coerceIn(0.5f, 1f)),
+            color = finalColor.copy(alpha = progress.coerceIn(0.5f, 1f)),
             radius = sqrt(0.5f) * size.width,
             style = Stroke(width = progress * 1.47f * size.width, size.height)
         )
@@ -57,7 +61,7 @@ fun Modifier.selectable(
         }) {
             drawPath(
                 path = path,
-                color = tint,
+                color = finalTint,
                 style = Stroke(
                     width = 1.5f,
                     cap = StrokeCap.Round,

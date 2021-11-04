@@ -30,6 +30,8 @@ import androidx.compose.ui.unit.dp
 import com.example.compose.R
 import com.example.compose.ui.composables.modifiers.drag
 import com.example.compose.utils.kotlin_extensions.toIntOffset
+import com.example.compose.utils.resources.FabSize
+import com.example.compose.utils.resources.MiniFabSize
 import com.example.compose.utils.util_classes.FabState
 import com.example.compose.utils.util_classes.FabState.*
 import kotlinx.coroutines.delay
@@ -87,7 +89,7 @@ fun DraggableFab(
                     offsets.minus(offsets[0]).reversed().forEachIndexed { index, anim ->
                         launch {
                             anim.animateTo(
-                                Offset(0f, -(60 + index * 56).dp.toPx()),
+                                Offset(0f, -(FabSize.times(index) + 60.dp).toPx()),
                                 spring(Spring.DampingRatioMediumBouncy)
                             )
                         }
@@ -117,7 +119,7 @@ fun DraggableFab(
                     modifier = Modifier
                         .offset { anim.value.toIntOffset() }
                         .padding(4.dp)
-                        .size(48.dp)
+                        .size(MiniFabSize)
                         .alpha(iconsAlpha.value),
                     onClick = {}, color = fabColor,
                     contentColor = fabTint, shape = CircleShape,
@@ -134,11 +136,12 @@ fun DraggableFab(
         Surface(
             modifier = Modifier
                 .offset { offsets[0].value.toIntOffset() }
-                .size(56.dp),
+                .size(FabSize),
             shape = CircleShape, color = color.first, contentColor = color.second, elevation = 6.dp,
             onClick = {
                 if (state != Menu && state !is MenuToPlay) onClick()
-                if (offsets[0].value.getDistance() == 0f) onExpand(!expanded) }
+                if (offsets[0].value.getDistance() == 0f) onExpand(!expanded)
+            }
         ) {
 
             if (state != Menu)

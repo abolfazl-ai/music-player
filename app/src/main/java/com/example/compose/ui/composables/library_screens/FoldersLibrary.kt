@@ -1,4 +1,4 @@
-package com.example.compose.ui.composables.main_screens
+package com.example.compose.ui.composables.library_screens
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
@@ -31,7 +31,7 @@ import com.example.compose.viewmodel.MainViewModel
 @ExperimentalAnimationGraphicsApi
 @ExperimentalMaterialApi
 @Composable
-fun FoldersScreen(modifier: Modifier = Modifier, viewModel: MainViewModel = viewModel()) {
+fun FoldersLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = viewModel()) {
 
     var expandIndex by remember { mutableStateOf(-1) }
     val selectList = remember { mutableStateListOf<Int>() }
