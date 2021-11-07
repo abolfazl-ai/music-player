@@ -2,9 +2,14 @@ package com.example.compose.ui.composables.list_items
 
 import android.util.Size
 import android.view.animation.OvershootInterpolator
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -12,9 +17,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.Layout
@@ -24,13 +29,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
+import androidx.compose.ui.unit.times
 import com.example.compose.ui.composables.icons.animated.ArrowToX
-import com.example.compose.ui.composables.list_items.linear_item.ItemOptions
+import com.example.compose.ui.composables.list_items.linear_item.LargeItemOptions
 import com.example.compose.ui.composables.modifiers.selectable
-import com.example.compose.utils.resources.LinearItemCornerRadius
-import com.example.compose.utils.resources.LinearItemHeight
-import com.example.compose.utils.resources.LinearItemPadding
-import com.example.compose.utils.resources.LinearItemSpacing
+import com.example.compose.utils.resources.*
 
 @ExperimentalFoundationApi
 @Composable
@@ -39,51 +42,59 @@ fun LinearItem2(
     title: String,
     subtitle: String,
     description: String = "",
-    picture: @Composable (modifier: Modifier, size: Size) -> Unit,
+    picture: @Composable BoxScope.(size: Size) -> Unit,
     expanded: Boolean = false,
-    itemOptions: @Composable BoxScope.() -> Unit = { ItemOptions() },
+    itemOptions: @Composable BoxScope.() -> Unit = { LargeItemOptions() },
+    itemOptionsHeight: Dp = LabeledOptionsHeight,
     selected: Boolean = false,
     onExpand: (Boolean) -> Unit = {},
     onSelect: () -> Unit = {},
     onClick: () -> Unit = {},
 ) {
-    val expandAnimator by animateIntAsState(
-        targetValue = if (expanded) 100 else 0,
-        tween(easing = { OvershootInterpolator(3f).getInterpolation(it) })
+    val animator by animateFloatAsState(
+        targetValue = if (expanded) 1f else 0f,
+        tween(250,/*
+            easing = { OvershootInterpolator(3 * (56 / itemOptionsHeight.value)).getInterpolation(it) }*/)
     )
 
-    Layout(modifier = modifier.clipToBounds(), content = {
+    Box(modifier) {
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .border(4.dp, MaterialTheme.colors.surface, RoundedCornerShape(6.dp))
-                .padding(top = 16.dp),
-            content = itemOptions
-        )
+        if (animator > 0)
+            Layout(modifier = Modifier
+                .height((LinearItemHeight + animator * itemOptionsHeight))
+                .clip(RoundedCornerShape(LinearItemCornerRadius)), content = {
+                Box(
+                    modifier = Modifier
+                        .border(
+                            4.dp,
+                            MaterialTheme.colors.surface,
+                            RoundedCornerShape(6.dp)
+                        )
+                        .padding(top = LinearItemHeight),
+                    contentAlignment = Alignment.BottomCenter, content = itemOptions
+                )
+            }) { m, c ->
+                val placeables = m.map {
+                    it.measure(
+                        c.copy(
+                            minHeight = 0,
+                            maxHeight = (itemOptionsHeight + LinearItemHeight).roundToPx()
+                        )
+                    )
+                }
+                layout(c.maxWidth, c.maxHeight) {
+                    placeables.forEach { it.place(0, c.maxHeight - it.height) }
+                }
+            }
 
         LinearItemCard(
-            title, subtitle, description, picture, selected, onClick, onSelect,
-            animateDpAsState(targetValue = (if (expanded) 2 else 0).dp).value
+            title, subtitle, description, picture, selected, onClick, onSelect, (2 * animator).dp
         ) {
             ArrowToX(modifier = it
                 .background(MaterialTheme.colors.onSurface.copy(0.05f))
                 .clickable { onExpand(!expanded) }
                 .padding(8.dp), x = expanded)
         }
-
-    }) { m, c ->
-
-        val (optionsPlaceable, cardPlaceable) = m.map { it.measure(c) }
-
-        val height = cardPlaceable.height + (optionsPlaceable.height - 16.dp.roundToPx()) *
-                expandAnimator.coerceAtLeast(0) / 100
-
-        layout(c.maxWidth, height) {
-            if (expandAnimator > 0) optionsPlaceable.place(0, height - optionsPlaceable.height)
-            cardPlaceable.place(0, 0)
-        }
-
     }
 }
 
@@ -93,7 +104,7 @@ internal fun LinearItemCard(
     title: String,
     subtitle: String,
     description: String = "",
-    picture: @Composable (modifier: Modifier, size: Size) -> Unit,
+    picture: @Composable BoxScope.(size: Size) -> Unit,
     selected: Boolean = false,
     onClick: () -> Unit = {},
     onSelect: () -> Unit = {},
@@ -111,10 +122,9 @@ internal fun LinearItemCard(
     }
 
     Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(LinearItemHeight),
+        Modifier.height(LinearItemHeight),
         shape = remember { RoundedCornerShape(LinearItemCornerRadius) },
+//        color = Color.Transparent,
         elevation = elevation, border = selectAnimator.let {
             if (it > 0f) BorderStroke((2.5 * it.coerceIn(0f, 1f)).dp, MaterialTheme.colors.primary)
             else null
@@ -125,14 +135,14 @@ internal fun LinearItemCard(
                 .combinedClickable(onLongClick = onSelect, onClick = onClick)
                 .padding(LinearItemPadding), content = {
 
-                picture(
+                Box(
                     Modifier
                         .scale(1 - selectAnimator / 15)
                         .clip(clipShape)
                         .background(MaterialTheme.colors.onSurface)
                         .selectable(selected)
-                        .clickable(onClick = onSelect), size
-                )
+                        .clickable(onClick = onSelect)
+                ) { picture(size) }
 
                 Text(
                     text = title,
@@ -179,26 +189,27 @@ internal fun LinearItemCard(
             with(c.copy(minWidth = 0)) {
                 val textWidth = maxWidth - 2 * size.width - 2 * LinearItemSpacing.roundToPx()
                 titleP = m[1].measure(copy(maxWidth = textWidth))
-                subtitleY = maxHeight / 2 + LinearItemSpacing.div(3).roundToPx()
+                subtitleY = (LinearItemHeight / 2 + LinearItemSpacing.div(3)).roundToPx()
                 subtitleP = m[2].measure(copy(maxWidth = textWidth - 100.dp.roundToPx()))
                 detailsP = m[3].measure(copy(maxWidth = 100.dp.roundToPx()))
             }
 
-            layout(c.maxWidth, c.maxHeight) {
+            layout(c.maxWidth, (LinearItemHeight - LinearItemPadding.times(2)).roundToPx()) {
+
                 pictureP.place(0, 0)
 
-                expandP.place(c.maxWidth - expandP.width, 0)
+                expandP.place(c.maxWidth - size.width, 0)
 
                 titleP.place(
-                    pictureP.width + LinearItemSpacing.roundToPx(),
-                    c.maxHeight / 2 - titleP[FirstBaseline] - LinearItemSpacing.div(3).roundToPx()
+                    size.width + LinearItemSpacing.roundToPx(),
+                    -titleP[FirstBaseline] + (LinearItemHeight / 2 - LinearItemSpacing.div(3)).roundToPx()
                 )
 
-                subtitleP.place(pictureP.width + LinearItemSpacing.roundToPx(), subtitleY)
+                subtitleP.place(size.width + LinearItemSpacing.roundToPx(), subtitleY)
 
                 detailsP.place(
-                    c.maxWidth - expandP.width - LinearItemSpacing.roundToPx() - detailsP.width,
-                    subtitleY + subtitleP.height - detailsP.height
+                    c.maxWidth - size.width - LinearItemSpacing.roundToPx() - detailsP.width,
+                    subtitleY
                 )
             }
         }

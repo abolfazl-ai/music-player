@@ -20,3 +20,5 @@ val LinearItemHeight = 56.dp
 val LinearItemPadding = 5.dp
 val LinearItemSpacing = 12.dp
 val LinearItemCornerRadius = 6.dp
+val IconOptionsHeight = 56.dp
+val LabeledOptionsHeight = 186.dp

@@ -23,7 +23,7 @@ fun Modifier.selectable(
 ) = composed {
 
     val finalColor = color ?: MaterialTheme.colors.primary
-    val finalTint = color ?: MaterialTheme.colors.onPrimary
+    val finalTint = tint ?: MaterialTheme.colors.onPrimary
 
     val progress by animateFloatAsState(
         if (selected) 1f else 0f,
