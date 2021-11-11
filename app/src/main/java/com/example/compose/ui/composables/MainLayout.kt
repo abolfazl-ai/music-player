@@ -32,7 +32,7 @@ fun MainLayout(
     queueContent: @Composable () -> Unit = {},
     bottomNav: @Composable () -> Unit = {},
     appBar: @Composable () -> Unit = {},
-    fab: @Composable (FabState) -> Unit = { },
+    fab: @Composable (Float) -> Unit = { },
     fabMargin: Dp = 16.dp,
     fabSize: Dp = 56.dp,
     playButtonMargin: Dp = 12.dp,
@@ -103,20 +103,6 @@ fun MainLayout(
                 }
             },
     ) {
-        fab(
-            when (scaffoldState.bottomSheetState.progress()) {
-                0f -> Menu
-                1f -> Play
-                else -> with(LocalDensity.current) {
-                    MenuToPlay(
-                        (1 - (scaffoldState.bottomSheetState.offset.value.coerceIn(
-                            startOffset.toPx(),
-                            maxOffset.toPx()
-                        ) - startOffset.toPx()) / fabMoveRange.toPx())
-                    )
-                }
-
-            }
-        )
+        fab(scaffoldState.bottomSheetState.progress())
     }
 }

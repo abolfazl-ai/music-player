@@ -111,10 +111,10 @@ fun Home(viewModel: MainViewModel = viewModel()) {
                 }
             }
         },
-        fab = { state ->
+        fab = { progress ->
             var isPlaying by remember { mutableStateOf(false) }
             DraggableFab(
-                state = state,
+                transProgress = {progress},
                 expanded = fabExpanded,
                 onExpand = { fabExpanded = it },
                 isPlaying = isPlaying
@@ -207,10 +207,10 @@ fun Home2(viewModel: MainViewModel = viewModel()) {
                 }
             }
         },
-        fab = {
+        fab = { progress ->
             var isPlaying by remember { mutableStateOf(false) }
             DraggableFab(
-                state = FabState.Menu,
+                transProgress = { progress },
                 expanded = fabExpanded,
                 onExpand = { fabExpanded = it },
                 isPlaying = isPlaying

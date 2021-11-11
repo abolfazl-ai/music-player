@@ -20,10 +20,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.compose.ui.composables.list_items.LinearItem2
 import com.example.compose.ui.composables.list_items.linear_item.LinearItem
 import com.example.compose.ui.theme.DarkGray
+import com.example.compose.utils.default_pictures.SongAndSize
 import com.example.compose.utils.kotlin_extensions.toTimeFormat
 import com.example.compose.viewmodel.MainViewModel
+import com.skydoves.landscapist.glide.GlideImage
 
 @ExperimentalFoundationApi
 @ExperimentalComposeUiApi
@@ -48,11 +51,11 @@ fun FoldersLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = vie
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         itemsIndexed(folders) { index, folder ->
-            LinearItem(
+            LinearItem2(
                 title = folder.title,
                 subtitle = "Contains ${folder.tracksNumber} tracks",
                 description = folder.totalDuration.toTimeFormat(),
-                picture = {
+                picture = { _, _ ->
                     Icon(
                         modifier = Modifier
                             .fillMaxSize()

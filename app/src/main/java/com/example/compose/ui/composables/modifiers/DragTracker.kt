@@ -23,25 +23,27 @@ fun Modifier.drag(active: Boolean, animators: List<Animatable<Offset, AnimationV
                 val velocityTracker = VelocityTracker()
 
                 awaitPointerEventScope {
+                    velocityTracker.resetTracking()
                     drag(pointerId) { input ->
                         launch {
                             animators.forEach {
                                 launch { it.snapTo(it.value + input.positionChange()) }
                                 delay(100)
                             }
-                            velocityTracker.addPosition(input.uptimeMillis, input.position)
                         }
+                        velocityTracker.addPosition(input.uptimeMillis, input.position)
                     }
                 }
 
                 val velocity = velocityTracker.calculateVelocity()
-                 launch {
+
+                launch {
                     animators.forEachIndexed { i, anim ->
                         launch {
                             anim.animateTo(
                                 Offset.Zero,
                                 spring(if (i == 0) 0.75f else 1f, 300f),
-                                Offset(5*velocity.x, 5*velocity.y)
+                                Offset(velocity.x, velocity.y)
                             )
                         }
                         delay(100)

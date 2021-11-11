@@ -32,7 +32,6 @@ import com.example.compose.ui.composables.modifiers.drag
 import com.example.compose.utils.kotlin_extensions.toIntOffset
 import com.example.compose.utils.resources.FabSize
 import com.example.compose.utils.resources.MiniFabSize
-import com.example.compose.utils.util_classes.FabState
 import com.example.compose.utils.util_classes.FabState.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -47,7 +46,7 @@ fun DraggableFab(
     fabTint: Color = MaterialTheme.colors.onSecondary,
     playButtonColor: Color = MaterialTheme.colors.surface,
     playButtonTint: Color = MaterialTheme.colors.onSurface,
-    state: FabState,
+    transProgress: () -> Float = { 0f },
     items: List<ImageVector> = MenuItems,
     expanded: Boolean = false,
     onExpand: (expanded: Boolean) -> Unit = {},
@@ -64,26 +63,21 @@ fun DraggableFab(
         }
     }
 
-    val color = remember(state) {
-        when (state) {
-            Menu -> fabColor to fabTint
-            is MenuToPlay -> {
-                state.progress.getMidColor(fabColor, playButtonColor) to
-                        state.progress.getMidColor(fabTint, playButtonTint)
+    val color = remember(transProgress()) {
+        transProgress().let {
+            when (it) {
+                0f -> fabColor to fabTint
+                1f -> playButtonColor to playButtonTint
+                else -> it.getMidColor(fabColor, playButtonColor) to
+                        it.getMidColor(fabTint, playButtonTint)
             }
-            Play -> playButtonColor to playButtonTint
-            is PlayToQueue -> {
-                state.progress.getMidColor(playButtonColor, fabColor) to
-                        state.progress.getMidColor(playButtonTint, fabTint)
-            }
-            Queue -> fabColor to fabTint
         }
     }
     val scope = rememberCoroutineScope()
 
     with(LocalDensity.current) {
-        LaunchedEffect(expanded, state) {
-            if (state == Menu) {
+        LaunchedEffect(expanded, transProgress()) {
+            if (transProgress() == 0f) {
                 if (expanded) {
                     iconsAlpha.snapTo(0f)
                     offsets.minus(offsets[0]).reversed().forEachIndexed { index, anim ->
@@ -113,7 +107,7 @@ fun DraggableFab(
 
     BoxWithConstraints(modifier) {
 
-        if (state == Menu || state is MenuToPlay)
+        if (transProgress() != 1f)
             offsets.minus(offsets[0]).reversed().forEachIndexed { index, anim ->
                 Surface(
                     modifier = Modifier
@@ -139,30 +133,25 @@ fun DraggableFab(
                 .size(FabSize),
             shape = CircleShape, color = color.first, contentColor = color.second, elevation = 6.dp,
             onClick = {
-                if (state != Menu && state !is MenuToPlay) onClick()
-                if (offsets[0].value.getDistance() == 0f) onExpand(!expanded)
+                if (transProgress() == 1f) onClick()
+                else if (transProgress() == 0f && offsets[0].value.getDistance() == 0f) onExpand(!expanded)
             }
         ) {
 
-            if (state != Menu)
+            if (transProgress() != 0f)
                 Icon(
                     modifier = Modifier
-                        .alpha(
-                            if (state is MenuToPlay) 2 * (state.progress.coerceIn(
-                                0.5f,
-                                1f
-                            ) - 0.5f) else 1f
-                        )
+                        .alpha(2 * (transProgress().coerceIn(0.5f, 1f) - 0.5f))
                         .padding(12.dp),
                     painter = animatedVectorResource(R.drawable.play_to_pause).painterFor(atEnd = isPlaying),
                     contentDescription = "PlayButton",
                 )
 
-            if (state == Menu || state is MenuToPlay)
+            if (transProgress() != 1f)
                 Icon(
                     modifier = Modifier
-                        .alpha(1 - 2 * state.progress.coerceIn(0f, 0.5f))
-                        .drag(!expanded && state == Menu, offsets)
+                        .alpha(1 - 2 * transProgress().coerceIn(0f, 0.5f))
+                        .drag(!expanded && transProgress() == 0f, offsets)
                         .padding(12.dp)
                         .rotate(
                             animateFloatAsState(

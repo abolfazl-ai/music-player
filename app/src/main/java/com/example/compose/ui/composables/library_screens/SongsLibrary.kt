@@ -3,8 +3,10 @@ package com.example.compose.ui.composables.library_screens
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -12,9 +14,13 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.compose.ui.composables.list_items.LinearItem2
+import com.example.compose.ui.composables.list_items.linear_item.LinearItem
 import com.example.compose.utils.default_pictures.SongAndSize
 import com.example.compose.utils.kotlin_extensions.toTimeFormat
 import com.example.compose.viewmodel.MainViewModel
@@ -49,7 +55,16 @@ fun SongsLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = viewM
                 title = song.title,
                 subtitle = song.artist.replace(";", " & "),
                 description = song.duration.toTimeFormat(),
-                picture = {GlideImage(imageModel = SongAndSize(song, it)) },
+                picture = { shape, size ->
+                    Spacer(
+                        Modifier
+                            .fillMaxSize()
+                            .scale(0.99f)
+                            .clip(shape)
+                            .background(Color.Black)
+                    )
+                    GlideImage(SongAndSize(song, size))
+                },
                 expanded = state.value.expandedIndex == index,
                 selected = selectList.contains(index),
                 onExpand = { viewModel.setExpandedSongIndex(it, index) },
