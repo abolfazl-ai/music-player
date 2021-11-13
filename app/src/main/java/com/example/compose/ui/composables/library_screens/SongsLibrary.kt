@@ -4,10 +4,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.ExperimentalMaterialApi
@@ -17,12 +14,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.compose.ui.composables.list_items.LinearItem2
-import com.example.compose.ui.composables.list_items.linear_item.LinearItem
+import com.example.compose.local.model.Song
+import com.example.compose.ui.composables.list_items.LinearItem
+import com.example.compose.ui.composables.list_items.ItemOptions
 import com.example.compose.utils.default_pictures.SongAndSize
 import com.example.compose.utils.kotlin_extensions.toTimeFormat
+import com.example.compose.utils.resources.IconOptionsHeight
 import com.example.compose.viewmodel.MainViewModel
 import com.skydoves.landscapist.glide.GlideImage
 
@@ -45,26 +45,17 @@ fun SongsLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = viewM
         { if (selectList.contains(it)) selectList.remove(it) else selectList.add(it) }
     }
 
+    val options: @Composable BoxScope.() -> Unit = { ItemOptions() }
+
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         itemsIndexed(songs) { index, song ->
-            LinearItem2(
-                title = song.title,
-                subtitle = song.artist.replace(";", " & "),
-                description = song.duration.toTimeFormat(),
-                picture = { shape, size ->
-                    Spacer(
-                        Modifier
-                            .fillMaxSize()
-                            .scale(0.99f)
-                            .clip(shape)
-                            .background(Color.Black)
-                    )
-                    GlideImage(SongAndSize(song, size))
-                },
+            SongItem(
+                song = song,
+                itemOptions = options,
                 expanded = state.value.expandedIndex == index,
                 selected = selectList.contains(index),
                 onExpand = { viewModel.setExpandedSongIndex(it, index) },
@@ -73,3 +64,31 @@ fun SongsLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = viewM
         }
     }
 }
+
+@ExperimentalFoundationApi
+@Composable
+fun SongItem(
+    song: Song,
+    itemOptions: @Composable BoxScope.() -> Unit = { ItemOptions() },
+    itemOptionsHeight: Dp = IconOptionsHeight,
+    expanded: Boolean = false,
+    selected: Boolean = false,
+    onExpand: (Boolean) -> Unit = {},
+    onSelect: () -> Unit = {},
+    onClick: () -> Unit = {},
+) = LinearItem(
+    title = song.title, subtitle = song.artist.replace(";", " & "),
+    description = song.duration.toTimeFormat(),
+    picture = { shape, size ->
+        Spacer(
+            Modifier
+                .fillMaxSize()
+                .scale(0.99f)
+                .clip(shape)
+                .background(Color.Black)
+        )
+        GlideImage(SongAndSize(song, size))
+    },
+    expanded = expanded, selected = selected, onExpand = onExpand, onSelect = onSelect,
+    onClick = onClick, itemOptions = itemOptions, itemOptionsHeight = itemOptionsHeight,
+)

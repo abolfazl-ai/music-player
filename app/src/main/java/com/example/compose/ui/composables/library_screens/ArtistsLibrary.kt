@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.compose.ui.composables.icons.Artist
-import com.example.compose.ui.composables.list_items.gird_item.GridItem
+import com.example.compose.ui.composables.list_items.GridItem
 import com.example.compose.viewmodel.MainViewModel
 
 @ExperimentalComposeUiApi

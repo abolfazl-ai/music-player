@@ -14,7 +14,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.compose.ui.composables.list_items.gird_item.GridItem
+import com.example.compose.ui.composables.list_items.GridItem
 import com.example.compose.utils.default_pictures.AlbumAndSize
 import com.example.compose.viewmodel.MainViewModel
 import com.skydoves.landscapist.glide.GlideImage

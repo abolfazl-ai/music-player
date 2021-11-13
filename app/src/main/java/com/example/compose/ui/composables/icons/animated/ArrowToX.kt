@@ -49,7 +49,7 @@ fun ArrowToX(
                 if (x) animators.forEachIndexed { i, a ->
                     launch {
                         a.animateTo(states[1], spring(stiffness = 2500f))
-                        a.animateTo(states[states.lastIndex - i], spring(0.4f, 2500f))
+                        a.animateTo(states[states.lastIndex - i], spring(0.4f, 2000f))
                     }
                 }
                 else animators.forEach {

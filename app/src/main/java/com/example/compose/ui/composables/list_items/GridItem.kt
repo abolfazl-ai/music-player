@@ -1,4 +1,4 @@
-package com.example.compose.ui.composables.list_items.gird_item
+package com.example.compose.ui.composables.list_items
 
 import android.util.Size
 import androidx.compose.animation.core.animateFloatAsState
