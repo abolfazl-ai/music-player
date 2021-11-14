@@ -1,7 +1,5 @@
 package com.example.compose.ui.composables.library_screens
 
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,13 +14,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Folder
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.compose.ui.composables.list_items.LinearItem
-import com.example.compose.ui.theme.DarkGray
 import com.example.compose.utils.kotlin_extensions.toTimeFormat
 import com.example.compose.viewmodel.MainViewModel
 

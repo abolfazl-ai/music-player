@@ -35,7 +35,6 @@ import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.times
 import com.example.compose.ui.composables.icons.animated.ArrowToX
 import com.example.compose.ui.composables.modifiers.selectable
-import com.example.compose.ui.theme.Red700
 import com.example.compose.utils.resources.*
 
 @ExperimentalFoundationApi
@@ -49,7 +48,7 @@ fun LinearItemPrev() {
             Spacer(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.primary)
+                    .background(MaterialTheme.colorScheme.secondary)
             )
         })
 }
@@ -72,7 +71,9 @@ fun LinearItem(
 ) {
     val expandAnimator by animateFloatAsState(
         targetValue = if (expanded) 1f else 0f,
-        tween(if (expanded) 400 else 300, easing = { OvershootInterpolator(2f).getInterpolation(it) })
+        tween(
+            if (expanded) 400 else 300,
+            easing = { OvershootInterpolator(2f).getInterpolation(it) })
     )
 
     Box(modifier) {
@@ -142,12 +143,12 @@ internal fun LinearItemCard(
 
     Surface(
         modifier = Modifier.height(LinearItemHeight),
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        color = MaterialTheme.colorScheme.surface,
         shape = remember { RoundedCornerShape(LinearItemCornerRadius) },
         shadowElevation = elevation(), border = selectAnimator.let {
-            if (it > 0f) BorderStroke(
-                (2.5 * it.coerceIn(0f, 1f)).dp,
-                MaterialTheme.colorScheme.secondary
-            )
+            if (it > 0f)
+                BorderStroke((2.5 * it.coerceIn(0f, 1f)).dp, MaterialTheme.colorScheme.secondary)
             else null
         }
     ) {
@@ -229,7 +230,7 @@ internal fun LinearItemCard(
 
                 detailsP.place(
                     c.maxWidth - pictureP.width - LinearItemSpacing.roundToPx() - detailsP.width,
-                    c.maxHeight / 2 + 2.dp.roundToPx()
+                    c.maxHeight / 2 + 4.dp.roundToPx()
                 )
             }
         }

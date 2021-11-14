@@ -4,14 +4,12 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -30,6 +28,8 @@ import com.example.compose.ui.composables.library_screens.*
 import com.example.compose.ui.composables.player_screen.PlayerScreen
 import com.example.compose.ui.screens
 import com.example.compose.viewmodel.MainViewModel
+import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -63,32 +63,44 @@ fun Home(viewModel: MainViewModel = viewModel()) {
 
     SheetLayout(
         Modifier.fillMaxSize(),
-        playerContent = { PlayerScreen(Modifier.alpha(1 - 2 * it.coerceIn(0f, 0.5f))) },
+        playerContent = { PlayerScreen(progress = { it }) },
         queueContent = {},
         bottomNav = {
-            BottomNavigation(
-                Modifier.padding(bottom = 48.dp),
-                backgroundColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                elevation = 10.dp
-            ) {
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination
-                screens.forEach { screen ->
-                    BottomNavigationItem(
-                        icon = { Icon(screen.icon, contentDescription = null) },
-                        selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
-                        onClick = {
-                            navController.navigate(screen.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
+            Column {
+                BottomNavigation(
+                    backgroundColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    elevation = 12.dp
+                ) {
+                    val navBackStackEntry by navController.currentBackStackEntryAsState()
+                    val currentDestination = navBackStackEntry?.destination
+                    screens.forEach { screen ->
+                        BottomNavigationItem(
+                            selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                            icon = {
+                                androidx.compose.material.Icon(
+                                    screen.icon,
+                                    contentDescription = null
+                                )
+                            },
+                            onClick = {
+                                navController.navigate(screen.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
-                                launchSingleTop = true
-                                restoreState = true
                             }
-                        }
-                    )
+                        )
+                    }
                 }
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .navigationBarsHeight()
+                        .background(MaterialTheme.colorScheme.primary)
+                )
             }
         },
         appBar = {

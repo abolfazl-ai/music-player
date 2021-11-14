@@ -159,7 +159,7 @@ fun SheetLayout(
                 playerSwipeable.fillMaxSize(),
                 shadowElevation = SheetElevation,
                 color = playerBackground,
-            ) { /*playerContent(it)*/ }
+            ) { playerContent(playerSheetState.myProgress) }
         },
         pSheetOffset = { playerSheetState.offset.value },
         pSheetProgress = playerSheetState.myProgress,
@@ -186,7 +186,7 @@ private fun BottomSheetScaffoldStack(
     width: Dp, height: Dp, pPeekHeight: Int,
     appBar: @Composable () -> Unit,
     bottomNav: @Composable () -> Unit,
-    pSheetContent: @Composable (progress: Float) -> Unit,
+    pSheetContent: @Composable () -> Unit,
     pSheetOffset: () -> Float,
     pSheetProgress: Float,
     qSheetContent: @Composable () -> Unit,
@@ -199,27 +199,25 @@ private fun BottomSheetScaffoldStack(
 ) {
     val fabRange = remember(width) { width + FabSize + FabMargin + PlayerScreenSpacing }
 
+    val transferProgress = with(LocalDensity.current) {
+        -(pSheetOffset().roundToInt().coerceIn(-pPeekHeight - fabRange.roundToPx(), -pPeekHeight) +
+                pPeekHeight) / fabRange.toPx()
+    }
+
     Layout(
         content = {
             body()
             appBar()
             Shadow(alpha = pSheetProgress / 1.5f)
-            pSheetContent(0f)
+            pSheetContent()
             bottomNav()
             qSheetContent()
-            fab(0f)
+            fab(transferProgress)
         }
     ) { m, c ->
 
-
         val sheetOffsetY = pSheetOffset().roundToInt()
         val qSheetOffsetY = qSheetOffset().roundToInt()
-
-
-        val transferProgress =
-            -(sheetOffsetY.coerceIn(-pPeekHeight - fabRange.roundToPx(), -pPeekHeight) +
-                    pPeekHeight) / fabRange.toPx()
-
 
         val appBarPlaceable = m[1].measure(c)
 
@@ -254,9 +252,7 @@ private fun BottomSheetScaffoldStack(
         with(c) {
             layout(maxWidth, maxHeight) {
 
-                bodyPlaceable.place(0, appBarPlaceable.height)
-
-                appBarPlaceable.place(0, 0)
+                bodyPlaceable.place(0, (appBarPlaceable.height * (1 - pSheetProgress)).roundToInt())
 
                 shadowPlaceable.place(0, 0)
 
@@ -266,8 +262,10 @@ private fun BottomSheetScaffoldStack(
 
                 bottomNavPlaceable.place(
                     0,
-                    (maxHeight - bottomNavPlaceable.height + pPeekHeight * transferProgress).roundToInt()
+                    (maxHeight - bottomNavPlaceable.height * (1 - transferProgress)).roundToInt()
                 )
+
+                appBarPlaceable.place(0, -(appBarPlaceable.height * pSheetProgress).roundToInt())
 
                 fabPlaceable.place(
                     (maxWidth - fabPlaceable.width) / 2 +

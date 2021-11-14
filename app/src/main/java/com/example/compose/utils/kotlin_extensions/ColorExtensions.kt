@@ -25,9 +25,8 @@ fun Palette?.getAccurateColor(): MainColors {
         } else {
             swatches.sortedByDescending { swatch -> swatch.population }
                 .firstOrNull { swatch ->
-                    Color(swatch.rgb).contrastAgainst(
-                        Color.White
-                    ) >= 1.4f
+                    Color(swatch.rgb).contrastAgainst(Color.White) >= 1.4f &&
+                            Color(swatch.rgb).contrastAgainst(Color.Black) >= 1.4f
                 }
                 ?.let { swatch ->
                     return MainColors(

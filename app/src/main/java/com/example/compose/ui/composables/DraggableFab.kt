@@ -119,7 +119,7 @@ fun DraggableFab(
                     elevation = if (anim.value.getDistance() > 24) 4.dp else 0.dp
                 ) {
                     Icon(
-                        modifier = Modifier.padding(12.dp),
+                        modifier = Modifier.padding(14.dp),
                         imageVector = items[items.lastIndex - index],
                         contentDescription = null
                     )

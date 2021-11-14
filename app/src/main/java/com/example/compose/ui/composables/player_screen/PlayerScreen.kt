@@ -12,6 +12,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -27,7 +28,8 @@ import com.google.accompanist.pager.rememberPagerState
 @Composable
 fun PlayerScreen(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel = viewModel()
+    viewModel: MainViewModel = viewModel(),
+    progress: () -> Float
 ) {
 
     val songs = viewModel.repository.getSongs().collectAsState(emptyList()).value
@@ -39,10 +41,11 @@ fun PlayerScreen(
 /*    LaunchedEffect(key1 = pageState.currentPage) {
         launch { viewModel.serviceController.seekTo(pageState.currentPage, 0L) }
     }*/
-
+    
     Column(
         modifier
             .fillMaxSize()
+            .alpha((progress().coerceAtLeast(0.5f) - 0.5f) * 2)
             .reveal(colorCache[pageState.currentPage]?.back ?: Color.Black, 404.dp, 750),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

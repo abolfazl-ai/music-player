@@ -12,7 +12,7 @@ val FabMargin = 16.dp
 
 val PlayerScreenSpacing = 12.dp
 
-val SheetElevation = 8.dp
+val SheetElevation = 12.dp
 val PlayerSheetPeekHeight = 56.dp
 val QueueMargin = 24.dp
 

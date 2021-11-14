@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -50,7 +51,7 @@ fun ArtistsLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = vie
                         modifier = Modifier.fillMaxSize(),
                         imageVector = Icons.Filled.Artist,
                         contentDescription = null,
-                        tint = Color.White
+                        tint = MaterialTheme.colorScheme.onTertiary
                     )
                 },
                 selected = selectList.contains(index),

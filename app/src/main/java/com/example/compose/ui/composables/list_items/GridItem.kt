@@ -7,11 +7,9 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -24,7 +22,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.compose.ui.composables.icons.Play
 import com.example.compose.ui.composables.modifiers.selectable
-import com.example.compose.ui.theme.DarkGray
 
 @ExperimentalFoundationApi
 @Composable
@@ -44,12 +41,13 @@ fun GridItem(
 
     Surface(
         shape = remember { RoundedCornerShape(6.dp) },
+        color = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface,
         border = if (selectAnimator > 0f) BorderStroke(
             (4 * selectAnimator.coerceIn(-1f, 1f)).dp,
             MaterialTheme.colorScheme.secondary
         ) else null,
     ) {
-
         Column(
             modifier = Modifier
                 .combinedClickable(onLongClick = onSelect, onClick = onClick)
@@ -62,7 +60,7 @@ fun GridItem(
                     .padding(bottom = 6.dp)
                     .fillMaxWidth()
                     .aspectRatio(1f)
-                    .clip(remember { RoundedCornerShape(4.dp) })
+                    .clip(remember { RoundedCornerShape(4.dp) }),
             ) {
 
                 Spacer(
@@ -73,9 +71,8 @@ fun GridItem(
                         .background(MaterialTheme.colorScheme.tertiary)
                 )
 
-                val density = LocalDensity.current
-                val size = remember {
-                    with(density) {
+                val size = with(LocalDensity.current) {
+                    remember {
                         (maxWidth - padding.times(2)).roundToPx().let { Size(it, it) }
                     }
                 }
@@ -110,16 +107,13 @@ fun GridItem(
                     modifier = Modifier
                         .size(35.dp)
                         .clip(RoundedCornerShape(4.dp))
-                        .selectable(
-                            selected,
-                            MaterialTheme.colorScheme.primary,
-                            MaterialTheme.colorScheme.onPrimary
-                        )
-                        .background(MaterialTheme.colorScheme.onSurface.copy(0.05f))
+                        .selectable(selected)
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
                         .clickable { if (selectAnimator > 0) onSelect() }
                         .padding(4.dp),
                     imageVector = Icons.Filled.Play,
-                    contentDescription = null
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
