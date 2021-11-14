@@ -27,9 +27,6 @@ import com.example.compose.utils.kotlin_extensions.toTimeFormat
 import com.example.compose.viewmodel.MainViewModel
 
 @ExperimentalFoundationApi
-@ExperimentalComposeUiApi
-@ExperimentalAnimationApi
-@ExperimentalAnimationGraphicsApi
 @ExperimentalMaterialApi
 @Composable
 fun FoldersLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = viewModel()) {

@@ -28,9 +28,6 @@ import com.example.compose.viewmodel.MainViewModel
 import com.skydoves.landscapist.glide.GlideImage
 
 @ExperimentalFoundationApi
-@ExperimentalComposeUiApi
-@ExperimentalAnimationApi
-@ExperimentalAnimationGraphicsApi
 @ExperimentalMaterialApi
 @Composable
 fun SongsLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = viewModel()) {

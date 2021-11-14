@@ -21,9 +21,7 @@ import com.example.compose.ui.composables.icons.Artist
 import com.example.compose.ui.composables.list_items.GridItem
 import com.example.compose.viewmodel.MainViewModel
 
-@ExperimentalComposeUiApi
 @ExperimentalFoundationApi
-@ExperimentalAnimationGraphicsApi
 @ExperimentalMaterialApi
 @Composable
 fun ArtistsLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = viewModel()) {

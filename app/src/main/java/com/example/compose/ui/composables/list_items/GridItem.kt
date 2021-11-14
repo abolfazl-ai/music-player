@@ -6,8 +6,11 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -24,7 +27,6 @@ import com.example.compose.ui.composables.modifiers.selectable
 import com.example.compose.ui.theme.DarkGray
 
 @ExperimentalFoundationApi
-@ExperimentalMaterialApi
 @Composable
 fun GridItem(
     title: String,
@@ -44,7 +46,7 @@ fun GridItem(
         shape = remember { RoundedCornerShape(6.dp) },
         border = if (selectAnimator > 0f) BorderStroke(
             (4 * selectAnimator.coerceIn(-1f, 1f)).dp,
-            MaterialTheme.colors.primary
+            MaterialTheme.colorScheme.secondary
         ) else null,
     ) {
 
@@ -68,7 +70,7 @@ fun GridItem(
                         .fillMaxSize()
                         .padding(0.25.dp)
                         .clip(RoundedCornerShape(4.dp))
-                        .background(DarkGray)
+                        .background(MaterialTheme.colorScheme.tertiary)
                 )
 
                 val density = LocalDensity.current
@@ -92,13 +94,13 @@ fun GridItem(
                 ) {
                     Text(
                         text = title,
-                        style = MaterialTheme.typography.subtitle1,
+                        style = MaterialTheme.typography.labelLarge,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                     Text(
                         text = subtitle,
-                        style = MaterialTheme.typography.subtitle2,
+                        style = MaterialTheme.typography.labelSmall,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -110,10 +112,10 @@ fun GridItem(
                         .clip(RoundedCornerShape(4.dp))
                         .selectable(
                             selected,
-                            MaterialTheme.colors.primary,
-                            MaterialTheme.colors.onPrimary
+                            MaterialTheme.colorScheme.primary,
+                            MaterialTheme.colorScheme.onPrimary
                         )
-                        .background(MaterialTheme.colors.onSurface.copy(0.05f))
+                        .background(MaterialTheme.colorScheme.onSurface.copy(0.05f))
                         .clickable { if (selectAnimator > 0) onSelect() }
                         .padding(4.dp),
                     imageVector = Icons.Filled.Play,

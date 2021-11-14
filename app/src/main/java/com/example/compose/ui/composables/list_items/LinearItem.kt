@@ -49,7 +49,7 @@ fun LinearItemPrev() {
             Spacer(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Red700)
+                    .background(MaterialTheme.colorScheme.primary)
             )
         })
 }

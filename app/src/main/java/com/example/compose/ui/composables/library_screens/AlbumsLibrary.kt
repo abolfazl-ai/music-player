@@ -19,9 +19,7 @@ import com.example.compose.utils.default_pictures.AlbumAndSize
 import com.example.compose.viewmodel.MainViewModel
 import com.skydoves.landscapist.glide.GlideImage
 
-@ExperimentalComposeUiApi
 @ExperimentalFoundationApi
-@ExperimentalAnimationGraphicsApi
 @ExperimentalMaterialApi
 @Composable
 fun AlbumsLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = viewModel()) {

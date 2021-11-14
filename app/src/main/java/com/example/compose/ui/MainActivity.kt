@@ -25,13 +25,12 @@ class MainActivity : ComponentActivity() {
 
     private var playerService: PlayerService? = null
 
-    @ExperimentalMaterialApi
-    @ExperimentalComposeUiApi
-    @ExperimentalFoundationApi
-    @ExperimentalAnimationApi
-    @ExperimentalAnimationGraphicsApi
-    @ExperimentalPagerApi
     @ExperimentalPermissionsApi
+    @ExperimentalFoundationApi
+    @ExperimentalPagerApi
+    @ExperimentalComposeUiApi
+    @ExperimentalAnimationGraphicsApi
+    @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //        bindService()

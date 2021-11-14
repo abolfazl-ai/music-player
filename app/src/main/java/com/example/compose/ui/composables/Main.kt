@@ -36,11 +36,10 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @ExperimentalPermissionsApi
-@ExperimentalPagerApi
-@ExperimentalAnimationGraphicsApi
-@ExperimentalAnimationApi
 @ExperimentalFoundationApi
+@ExperimentalPagerApi
 @ExperimentalComposeUiApi
+@ExperimentalAnimationGraphicsApi
 @ExperimentalMaterialApi
 @Composable
 fun Main() {
@@ -50,11 +49,10 @@ fun Main() {
     }
 }
 
-@ExperimentalPagerApi
-@ExperimentalAnimationGraphicsApi
-@ExperimentalAnimationApi
 @ExperimentalFoundationApi
+@ExperimentalPagerApi
 @ExperimentalComposeUiApi
+@ExperimentalAnimationGraphicsApi
 @ExperimentalMaterialApi
 @Composable
 fun Home(viewModel: MainViewModel = viewModel()) {
