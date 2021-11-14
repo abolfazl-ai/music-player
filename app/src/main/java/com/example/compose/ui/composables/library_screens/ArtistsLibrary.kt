@@ -37,7 +37,7 @@ fun ArtistsLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = vie
 
     LazyVerticalGrid(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(8.dp),
+        contentPadding = PaddingValues(6.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         cells = GridCells.Fixed(2)

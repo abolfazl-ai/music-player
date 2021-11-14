@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -47,7 +50,7 @@ fun SongsLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = viewM
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(8.dp),
+        contentPadding = PaddingValues(6.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         itemsIndexed(songs) { index, song ->
@@ -78,12 +81,16 @@ fun SongItem(
     title = song.title, subtitle = song.artist.replace(";", " & "),
     description = song.duration.toTimeFormat(),
     picture = { shape, size ->
-        Spacer(
-            Modifier
+        Icon(
+            modifier = Modifier
                 .fillMaxSize()
                 .scale(0.99f)
                 .clip(shape)
                 .background(MaterialTheme.colorScheme.tertiary)
+                .padding(8.dp),
+            imageVector = Icons.Default.MusicNote,
+            tint = MaterialTheme.colorScheme.onTertiary,
+            contentDescription = null
         )
         GlideImage(SongAndSize(song, size))
     },

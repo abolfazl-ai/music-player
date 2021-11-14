@@ -34,7 +34,7 @@ fun AlbumsLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = view
 
     LazyVerticalGrid(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(8.dp),
+        contentPadding = PaddingValues(6.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         cells = GridCells.Fixed(2)

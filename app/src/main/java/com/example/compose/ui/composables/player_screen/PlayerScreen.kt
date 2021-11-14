@@ -7,9 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -34,14 +32,14 @@ fun PlayerScreen(
 
     val songs = viewModel.repository.getSongs().collectAsState(emptyList()).value
 
-    val colorCache = remember { LruCache<Int, MainColors>(12) }
+    val colorCache by remember { mutableStateOf(LruCache<Int, MainColors>(20)) }
 
     val pageState = rememberPagerState()
 
 /*    LaunchedEffect(key1 = pageState.currentPage) {
         launch { viewModel.serviceController.seekTo(pageState.currentPage, 0L) }
     }*/
-    
+
     Column(
         modifier
             .fillMaxSize()
@@ -57,7 +55,7 @@ fun PlayerScreen(
                 .background(Color.Black),
             pagerState = pageState,
             songList = songs,
-            onPageCreated = { i, c -> colorCache.put(i, c) }
+            onPageCreated = { i, c -> if (colorCache[i] == null) colorCache.put(i, c) }
         )
     }
 }

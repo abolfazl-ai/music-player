@@ -21,9 +21,9 @@ val lightMinimalScheme = lightColorScheme(
 )
 
 val darkMinimalScheme = lightColorScheme(
-    primary = Color(0xFF2A3042),
-    onPrimary = Color(0xFFF2F0F5),
-    primaryContainer = Color(0xFF151B2C),
+    primary = Color(0xFF151B2C),
+    onPrimary = Color(0xFFEDF0FF),
+    primaryContainer = Color(0xFF111624),
     onPrimaryContainer = Color(0xFFEDF0FF),
     secondary = Color(0xFFB1C5FF),
     onSecondary = Color(0xFF002A77),

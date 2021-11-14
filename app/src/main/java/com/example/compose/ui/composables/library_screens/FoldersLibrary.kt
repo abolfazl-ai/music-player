@@ -37,7 +37,7 @@ fun FoldersLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = vie
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(8.dp),
+        contentPadding = PaddingValues(6.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         itemsIndexed(folders) { index, folder ->
