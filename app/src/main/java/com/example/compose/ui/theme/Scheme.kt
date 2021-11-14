@@ -4,7 +4,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
 val lightMinimalScheme = lightColorScheme(
-    primary = Color(0xFFFDFBFF),
+    primary = Color(0xFFF7F9FF),
     onPrimary = Color(0xFF2A3042),
     primaryContainer = Color(0xFFFFFFFF),
     onPrimaryContainer = Color(0xFF2E2E2E),

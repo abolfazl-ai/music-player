@@ -254,6 +254,8 @@ private fun BottomSheetScaffoldStack(
 
                 bodyPlaceable.place(0, (appBarPlaceable.height * (1 - pSheetProgress)).roundToInt())
 
+                appBarPlaceable.place(0, -(appBarPlaceable.height * pSheetProgress).roundToInt())
+
                 shadowPlaceable.place(0, 0)
 
                 playerSheetPlaceable.place(0, maxHeight + sheetOffsetY)
@@ -265,7 +267,6 @@ private fun BottomSheetScaffoldStack(
                     (maxHeight - bottomNavPlaceable.height * (1 - transferProgress)).roundToInt()
                 )
 
-                appBarPlaceable.place(0, -(appBarPlaceable.height * pSheetProgress).roundToInt())
 
                 fabPlaceable.place(
                     (maxWidth - fabPlaceable.width) / 2 +
