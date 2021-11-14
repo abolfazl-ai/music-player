@@ -2,7 +2,7 @@ package com.example.compose.ui.composables.modifiers
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -22,8 +22,8 @@ fun Modifier.selectable(
     tint: Color? = null,
 ) = composed {
 
-    val finalColor = color ?: MaterialTheme.colors.primary
-    val finalTint = tint ?: MaterialTheme.colors.onPrimary
+    val finalColor = color ?: MaterialTheme.colorScheme.secondary
+    val finalTint = tint ?: MaterialTheme.colorScheme.onSecondary
 
     val progress by animateFloatAsState(
         if (selected) 1f else 0f,

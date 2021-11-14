@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -85,7 +86,7 @@ fun SongItem(
                 .fillMaxSize()
                 .scale(0.99f)
                 .clip(shape)
-                .background(Color.Black)
+                .background(MaterialTheme.colorScheme.tertiary)
         )
         GlideImage(SongAndSize(song, size))
     },

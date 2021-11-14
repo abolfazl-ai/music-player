@@ -6,7 +6,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 fun ArrowToX(
     modifier: Modifier = Modifier,
     x: Boolean,
-    tint: Color = MaterialTheme.colors.onSurface
+    tint: Color = MaterialTheme.colorScheme.onSurfaceVariant
 ) {
 
     val states = remember {

@@ -12,7 +12,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.ui.ExperimentalComposeUiApi
 import com.example.compose.PlayerService
 import com.example.compose.ui.composables.Main
-import com.example.compose.ui.theme.ComposeTheme
+import com.example.compose.ui.theme.AppTheme
 import com.example.compose.viewmodel.MainViewModel
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 //        bindService()
         setContent {
-            ComposeTheme {
+            AppTheme {
                 ProvideWindowInsets {
                     Main()
                 }

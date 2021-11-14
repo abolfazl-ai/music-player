@@ -5,13 +5,18 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -24,7 +29,6 @@ import com.example.compose.ui.Screen
 import com.example.compose.ui.composables.library_screens.*
 import com.example.compose.ui.composables.player_screen.PlayerScreen
 import com.example.compose.ui.screens
-import com.example.compose.utils.util_classes.FabState
 import com.example.compose.viewmodel.MainViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -42,7 +46,7 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 fun Main() {
     PermissionRequest(modifier = Modifier.fillMaxSize(),
         requestScreen = { RequestScreen(it) }) {
-        Home2()
+        Home()
     }
 }
 
@@ -59,104 +63,6 @@ fun Home(viewModel: MainViewModel = viewModel()) {
     var fabExpanded by remember { mutableStateOf(false) }
     val backgroundAlpha by animateFloatAsState(targetValue = if (fabExpanded) 0.3f else 1f)
 
-    MainLayout(
-        Modifier.fillMaxSize(),
-        backgroundColor = MaterialTheme.colors.background,
-        sheetPeekHeight = 160.dp,
-        playerScreen = { PlayerScreen() },
-        miniPlayer = { Text(modifier = Modifier.alpha(it), text = "Mini Player") },
-        bottomNav = {
-            BottomNavigation(
-                Modifier.padding(bottom = 48.dp),
-                backgroundColor = Color.Transparent,
-                elevation = 0.dp
-            ) {
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination
-                screens.forEach { screen ->
-                    BottomNavigationItem(
-                        icon = { Icon(screen.icon, contentDescription = null) },
-                        selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
-                        onClick = {
-                            navController.navigate(screen.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
-                    )
-                }
-            }
-        },
-        appBar = {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(82.dp),
-                elevation = 4.dp,
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 26.dp)
-                        .padding(horizontal = 16.dp),
-                    contentAlignment = Alignment.CenterStart
-                ) {
-                    Text(
-                        text = "Abolfazl is awesome",
-                        style = MaterialTheme.typography.h5
-                    )
-                }
-            }
-        },
-        fab = { progress ->
-            var isPlaying by remember { mutableStateOf(false) }
-            DraggableFab(
-                transProgress = {progress},
-                expanded = fabExpanded,
-                onExpand = { fabExpanded = it },
-                isPlaying = isPlaying
-            )
-            { isPlaying = !isPlaying }
-        },
-        showDismissView = fabExpanded,
-        onDismiss = { fabExpanded = false }
-    ) {
-        SwipeRefresh(modifier = Modifier
-            .padding(it)
-            .alpha(backgroundAlpha),
-            state = rememberSwipeRefreshState(viewModel.isRefreshing.collectAsState().value),
-            onRefresh = { viewModel.refresh() }) {
-            NavHost(
-                navController = navController,
-                startDestination = Screen.Home.route,
-            ) {
-                composable(Screen.Home.route) { HomeLibrary() }
-                composable(Screen.Songs.route) { SongsLibrary() }
-                composable(Screen.Folders.route) { FoldersLibrary() }
-                composable(Screen.Artists.route) { ArtistsLibrary() }
-                composable(Screen.Albums.route) { AlbumsLibrary() }
-            }
-        }
-    }
-}
-
-
-@ExperimentalPagerApi
-@ExperimentalAnimationGraphicsApi
-@ExperimentalAnimationApi
-@ExperimentalFoundationApi
-@ExperimentalComposeUiApi
-@ExperimentalMaterialApi
-@Composable
-fun Home2(viewModel: MainViewModel = viewModel()) {
-
-    val navController = rememberNavController()
-    var fabExpanded by remember { mutableStateOf(false) }
-    val backgroundAlpha by animateFloatAsState(targetValue = if (fabExpanded) 0.3f else 1f)
-
     SheetLayout(
         Modifier.fillMaxSize(),
         playerContent = { PlayerScreen(Modifier.alpha(1 - 2 * it.coerceIn(0f, 0.5f))) },
@@ -164,7 +70,8 @@ fun Home2(viewModel: MainViewModel = viewModel()) {
         bottomNav = {
             BottomNavigation(
                 Modifier.padding(bottom = 48.dp),
-                backgroundColor = MaterialTheme.colors.surface,
+                backgroundColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
                 elevation = 10.dp
             ) {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -191,7 +98,9 @@ fun Home2(viewModel: MainViewModel = viewModel()) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(82.dp),
-                elevation = 4.dp,
+                shadowElevation = 4.dp,
+                color = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
                 Box(
                     modifier = Modifier
@@ -202,7 +111,7 @@ fun Home2(viewModel: MainViewModel = viewModel()) {
                 ) {
                     Text(
                         text = "Abolfazl is awesome",
-                        style = MaterialTheme.typography.h5
+                        style = MaterialTheme.typography.titleLarge
                     )
                 }
             }

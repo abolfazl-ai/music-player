@@ -8,12 +8,12 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -37,7 +37,6 @@ import com.example.compose.ui.composables.icons.animated.ArrowToX
 import com.example.compose.ui.composables.modifiers.selectable
 import com.example.compose.ui.theme.Red700
 import com.example.compose.utils.resources.*
-
 
 @ExperimentalFoundationApi
 @Preview
@@ -73,7 +72,7 @@ fun LinearItem(
 ) {
     val expandAnimator by animateFloatAsState(
         targetValue = if (expanded) 1f else 0f,
-        tween(400, easing = { OvershootInterpolator(2f).getInterpolation(it) })
+        tween(if (expanded) 400 else 300, easing = { OvershootInterpolator(2f).getInterpolation(it) })
     )
 
     Box(modifier) {
@@ -86,7 +85,7 @@ fun LinearItem(
                     modifier = Modifier
                         .border(
                             4.dp,
-                            MaterialTheme.colors.surface,
+                            MaterialTheme.colorScheme.surface,
                             RoundedCornerShape(6.dp)
                         )
                         .padding(top = LinearItemHeight),
@@ -107,17 +106,11 @@ fun LinearItem(
             }
 
         LinearItemCard(
-            title,
-            subtitle,
-            description,
-            picture,
-            selected,
-            onClick,
-            onSelect,
-            elevation = { (2 * expandAnimator).dp }
+            title, subtitle, description, picture,
+            selected, onClick, onSelect, elevation = { (4 * expandAnimator).dp }
         ) {
             ArrowToX(modifier = it
-                .background(MaterialTheme.colors.onSurface.copy(0.05f))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
                 .clickable { onExpand(!expanded) }
                 .padding(8.dp), x = expanded)
         }
@@ -148,10 +141,13 @@ internal fun LinearItemCard(
     }
 
     Surface(
-        Modifier.height(LinearItemHeight),
+        modifier = Modifier.height(LinearItemHeight),
         shape = remember { RoundedCornerShape(LinearItemCornerRadius) },
-        elevation = elevation(), border = selectAnimator.let {
-            if (it > 0f) BorderStroke((2.5 * it.coerceIn(0f, 1f)).dp, MaterialTheme.colors.primary)
+        shadowElevation = elevation(), border = selectAnimator.let {
+            if (it > 0f) BorderStroke(
+                (2.5 * it.coerceIn(0f, 1f)).dp,
+                MaterialTheme.colorScheme.secondary
+            )
             else null
         }
     ) {
@@ -170,21 +166,21 @@ internal fun LinearItemCard(
 
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.subtitle1,
+                    style = MaterialTheme.typography.labelLarge,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
 
                 Text(
                     text = subtitle,
-                    style = MaterialTheme.typography.subtitle2,
+                    style = MaterialTheme.typography.labelSmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
 
                 Text(
                     text = description,
-                    style = MaterialTheme.typography.body1,
+                    style = MaterialTheme.typography.labelSmall,
                 )
 
                 expandIcon(
@@ -256,21 +252,21 @@ fun ItemOptions() = Row(
     OptionItem(modifier, Icons.Rounded.ExitToApp)
     OptionItem(modifier, Icons.Rounded.Info)
     OptionItem(modifier, Icons.Rounded.Share, padding = 9.dp)
-    OptionItem(modifier, Icons.Rounded.Delete, tint = Red700)
+    OptionItem(modifier, Icons.Rounded.Delete, tint = MaterialTheme.colorScheme.error)
 }
 
 @Composable
 fun OptionItem(
     modifier: Modifier = Modifier,
     imageVector: ImageVector,
-    tint: Color = MaterialTheme.colors.onSurface,
+    tint: Color = MaterialTheme.colorScheme.onSurface,
     padding: Dp = 8.dp
 ) {
     Icon(
         modifier = modifier
             .height(40.dp)
             .clip(RoundedCornerShape(4.dp))
-            .background(MaterialTheme.colors.surface)
+            .background(MaterialTheme.colorScheme.surface)
             .clickable { }
             .padding(padding),
         imageVector = imageVector,
@@ -295,7 +291,7 @@ fun LargeItemOptions() = Row(
         LargeOptionItem(Icons.Rounded.SkipNext, "Play next", padding = 0.dp)
         LargeOptionItem(Icons.Rounded.AddBox, "Add to playlist")
         LargeOptionItem(Icons.Rounded.Share, "Share", padding = 5.dp)
-        LargeOptionItem(Icons.Rounded.Delete, "Delete", tint = Red700)
+        LargeOptionItem(Icons.Rounded.Delete, "Delete", tint = MaterialTheme.colorScheme.error)
     }
 }
 
@@ -303,7 +299,7 @@ fun LargeItemOptions() = Row(
 fun LargeOptionItem(
     imageVector: ImageVector,
     title: String,
-    tint: Color = MaterialTheme.colors.onSurface,
+    tint: Color = MaterialTheme.colorScheme.onSurface,
     padding: Dp = 4.dp
 ) {
     Row(
@@ -311,7 +307,7 @@ fun LargeOptionItem(
             .fillMaxWidth()
             .height(40.dp)
             .clip(RoundedCornerShape(4.dp))
-            .background(MaterialTheme.colors.surface)
+            .background(MaterialTheme.colorScheme.surface)
             .clickable { }
             .padding(5.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),

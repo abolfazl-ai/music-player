@@ -10,10 +10,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -32,7 +32,6 @@ import com.example.compose.ui.composables.modifiers.drag
 import com.example.compose.utils.kotlin_extensions.toIntOffset
 import com.example.compose.utils.resources.FabSize
 import com.example.compose.utils.resources.MiniFabSize
-import com.example.compose.utils.util_classes.FabState.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -42,10 +41,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun DraggableFab(
     modifier: Modifier = Modifier,
-    fabColor: Color = MaterialTheme.colors.secondary,
-    fabTint: Color = MaterialTheme.colors.onSecondary,
-    playButtonColor: Color = MaterialTheme.colors.surface,
-    playButtonTint: Color = MaterialTheme.colors.onSurface,
+    fabColor: Color = MaterialTheme.colorScheme.secondary,
+    fabTint: Color = MaterialTheme.colorScheme.onSecondary,
+    playButtonColor: Color = MaterialTheme.colorScheme.surface,
+    playButtonTint: Color = MaterialTheme.colorScheme.onSurface,
     transProgress: () -> Float = { 0f },
     items: List<ImageVector> = MenuItems,
     expanded: Boolean = false,

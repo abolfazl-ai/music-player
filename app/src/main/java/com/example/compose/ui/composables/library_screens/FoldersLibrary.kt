@@ -14,6 +14,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Folder
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -56,11 +57,11 @@ fun FoldersLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = vie
                     Icon(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(DarkGray)
+                            .background(MaterialTheme.colorScheme.tertiary)
                             .padding(8.dp),
                         imageVector = Icons.Rounded.Folder,
                         contentDescription = null,
-                        tint = Color.White
+                        tint = MaterialTheme.colorScheme.onTertiary
                     )
                 },
                 expanded = expandIndex == index,

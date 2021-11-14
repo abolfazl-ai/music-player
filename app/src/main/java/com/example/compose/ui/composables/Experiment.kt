@@ -10,7 +10,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.SwipeableDefaults
+import androidx.compose.material.SwipeableState
+import androidx.compose.material.swipeable
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
@@ -104,16 +109,16 @@ fun rememberSheetState(
 @Composable
 fun SheetLayout(
     modifier: Modifier = Modifier,
-    backgroundColor: Color = MaterialTheme.colors.background,
+    backgroundColor: Color = MaterialTheme.colorScheme.background,
     appBar: @Composable () -> Unit,
     bottomNav: @Composable () -> Unit,
     fab: @Composable (progress: Float) -> Unit,
     playerContent: @Composable (progress: Float) -> Unit,
-    playerBackground: Color = MaterialTheme.colors.surface,
+    playerBackground: Color = MaterialTheme.colorScheme.primaryContainer,
     playerSheetState: SheetState = rememberSheetState(SheetValue.Collapsed),
     queueContent: @Composable () -> Unit,
     queueSheetState: SheetState = rememberSheetState(SheetValue.Collapsed),
-    queueBackground: Color = MaterialTheme.colors.surface,
+    queueBackground: Color = MaterialTheme.colorScheme.surface,
     content: @Composable () -> Unit
 ) = BoxWithConstraints(modifier.fillMaxSize()) {
 
@@ -152,9 +157,9 @@ fun SheetLayout(
         pSheetContent = {
             Surface(
                 playerSwipeable.fillMaxSize(),
-                elevation = SheetElevation,
+                shadowElevation = SheetElevation,
                 color = playerBackground,
-            ) { playerContent(it) }
+            ) { /*playerContent(it)*/ }
         },
         pSheetOffset = { playerSheetState.offset.value },
         pSheetProgress = playerSheetState.myProgress,
@@ -163,7 +168,7 @@ fun SheetLayout(
                 queueSwipeable
                     .fillMaxSize()
                     .padding(horizontal = QueueMargin),
-                elevation = SheetElevation,
+                shadowElevation = SheetElevation,
                 color = queueBackground,
                 shape = RoundedCornerShape(8.dp, 8.dp, 0.dp, 0.dp),
                 content = queueContent
@@ -202,7 +207,7 @@ private fun BottomSheetScaffoldStack(
             pSheetContent(0f)
             bottomNav()
             qSheetContent()
-            fab(1f)
+            fab(0f)
         }
     ) { m, c ->
 
