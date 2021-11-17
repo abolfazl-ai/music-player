@@ -1,27 +1,19 @@
 package com.example.compose.ui.composables.player_screen
 
-import android.util.Log
 import androidx.collection.LruCache
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.PlayArrow
-import androidx.compose.material.icons.rounded.SkipNext
-import androidx.compose.material.icons.rounded.SkipPrevious
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.rounded.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,8 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.compose.ui.composables.modifiers.reveal
 import com.example.compose.utils.kotlin_extensions.compIn
-import com.example.compose.utils.resources.PlayerSheetPeekHeight
-import com.example.compose.utils.resources.TAG
+import com.example.compose.utils.resources.PlayerScreenSpacing
 import com.example.compose.utils.util_classes.MainColors
 import com.example.compose.viewmodel.MainViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -72,9 +63,52 @@ fun PlayerScreen(
             songList = songs,
             onPageCreated = { i, c -> if (colorCache[i] == null) colorCache.put(i, c) }
         )
+
+        CompositionLocalProvider(
+            LocalContentColor provides animateColorAsState(
+                colorCache[pageState.currentPage]?.front ?: Color.Black
+            ).value, LocalContentAlpha provides 1f
+        ) {
+            Row(
+                Modifier.padding(top = PlayerScreenSpacing),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(
+                        modifier = Modifier.size(30.dp),
+                        imageVector = Icons.Rounded.Repeat,
+                        contentDescription = null,
+                    )
+                }
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(
+                        modifier = Modifier.size(44.dp),
+                        imageVector = Icons.Rounded.ChevronLeft,
+                        contentDescription = null,
+                    )
+                }
+                Spacer(modifier = Modifier.size(56.dp))
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(
+                        modifier = Modifier.size(44.dp),
+                        imageVector = Icons.Rounded.ChevronRight,
+                        contentDescription = null,
+                    )
+                }
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(
+                        modifier = Modifier.size(30.dp),
+                        imageVector = Icons.Rounded.Shuffle,
+                        contentDescription = null,
+                    )
+                }
+            }
+        }
     }
+
     progress().let {
-        if (it < 1f) Surface(Modifier.alpha(1 - it.compIn(0.3f, 0.5f))) {
+        if (it < 1f) Surface(Modifier.alpha(1 - it.compIn(0.7f, 0.8f))) {
             MiniPlayer(Modifier.alpha(1 - it.compIn(end = 0.1f)))
         }
     }
@@ -85,8 +119,7 @@ fun PlayerScreen(
 fun MiniPlayer(modifier: Modifier = Modifier) = Box(modifier) {
     Row(
         modifier = Modifier.padding(start = 16.dp, end = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(2.dp)
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Column(
             Modifier.weight(1f),
@@ -105,42 +138,23 @@ fun MiniPlayer(modifier: Modifier = Modifier) = Box(modifier) {
                 maxLines = 1, overflow = TextOverflow.Ellipsis
             )
         }
-
-        Box(
-            modifier = Modifier
-                .requiredHeight(PlayerSheetPeekHeight)
-                .requiredWidth(PlayerSheetPeekHeight * 2.5f),
-            contentAlignment = Alignment.Center
-        ) {
+        IconButton(modifier = Modifier.size(56.dp), onClick = { /*TODO*/ }) {
             Icon(
-                modifier = Modifier
-                    .requiredSize(70.dp)
-                    .offset((-44).dp)
-                    .clip(CircleShape)
-                    .clickable { }
-                    .padding(20.dp),
                 imageVector = Icons.Rounded.SkipPrevious,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onPrimaryContainer
             )
+        }
+        IconButton(modifier = Modifier.height(56.dp).width(32.dp), onClick = { /*TODO*/ }) {
             Icon(
-                modifier = Modifier
-                    .requiredSize(70.dp)
-                    .offset(44.dp)
-                    .clip(CircleShape)
-                    .clickable { }
-                    .padding(20.dp),
-                imageVector = Icons.Rounded.SkipNext,
+                imageVector = Icons.Rounded.PlayArrow,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onPrimaryContainer
             )
+        }
+        IconButton(modifier = Modifier.size(56.dp), onClick = { /*TODO*/ }) {
             Icon(
-                modifier = Modifier
-                    .requiredSize(70.dp)
-                    .clip(CircleShape)
-                    .clickable { }
-                    .padding(20.dp),
-                imageVector = Icons.Rounded.PlayArrow,
+                imageVector = Icons.Rounded.SkipNext,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onPrimaryContainer
             )
