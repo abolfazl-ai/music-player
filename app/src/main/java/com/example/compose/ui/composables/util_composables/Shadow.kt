@@ -1,0 +1,17 @@
+package com.example.compose.ui.composables.util_composables
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
+
+@Composable
+fun Shadow(modifier: Modifier = Modifier, alpha: Float) = Spacer(
+    modifier
+        .fillMaxSize()
+        .alpha(alpha)
+        .background(Color.Black)
+)

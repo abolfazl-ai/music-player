@@ -1,5 +1,6 @@
 package com.example.compose.ui.composables.modifiers
 
+import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector2D
 import androidx.compose.animation.core.spring
@@ -10,12 +11,16 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.util.VelocityTracker
+import com.example.compose.utils.resources.TAG
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-fun Modifier.drag(active: Boolean, animators: List<Animatable<Offset, AnimationVector2D>>) =
-    if (active) pointerInput(Unit) {
+fun Modifier.drag(
+    active: Boolean,
+    animators: List<Animatable<Offset, AnimationVector2D>>,
+    onDrag: (isDragging:Boolean) -> Unit = {}
+) = if (active) pointerInput(Unit) {
         coroutineScope {
             while (true) {
 
@@ -24,6 +29,7 @@ fun Modifier.drag(active: Boolean, animators: List<Animatable<Offset, AnimationV
 
                 awaitPointerEventScope {
                     velocityTracker.resetTracking()
+                    onDrag(true)
                     drag(pointerId) { input ->
                         launch {
                             animators.forEach {
@@ -48,6 +54,7 @@ fun Modifier.drag(active: Boolean, animators: List<Animatable<Offset, AnimationV
                         }
                         delay(100)
                     }
+                    onDrag(false)
                 }
             }
         }

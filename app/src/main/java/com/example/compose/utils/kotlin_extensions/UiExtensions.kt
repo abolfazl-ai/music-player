@@ -8,6 +8,7 @@ import androidx.compose.ui.unit.IntOffset
 import kotlin.math.roundToInt
 
 fun Offset.toIntOffset() = IntOffset(x.roundToInt(), y.roundToInt())
+fun Offset.coerceAtLeast(distance: Int) = if (getDistance() < distance) Offset.Zero else this
 
 @ExperimentalMaterialApi
 fun BottomSheetState.progress(): Float {

@@ -1,5 +1,6 @@
 package com.example.compose.ui.composables
 
+import android.util.Log
 import androidx.compose.animation.core.*
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
@@ -29,9 +30,12 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.example.compose.R
 import com.example.compose.ui.composables.modifiers.drag
+import com.example.compose.utils.kotlin_extensions.coerceAtLeast
+import com.example.compose.utils.kotlin_extensions.getMidColor
 import com.example.compose.utils.kotlin_extensions.toIntOffset
 import com.example.compose.utils.resources.FabSize
 import com.example.compose.utils.resources.MiniFabSize
+import com.example.compose.utils.resources.TAG
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -50,6 +54,7 @@ fun DraggableFab(
     expanded: Boolean = false,
     onExpand: (expanded: Boolean) -> Unit = {},
     isPlaying: Boolean = false,
+    onDrag: (isDragging:Boolean) -> Unit = {},
     onClick: () -> Unit = {},
 ) {
 
@@ -106,11 +111,17 @@ fun DraggableFab(
 
     BoxWithConstraints(modifier) {
 
+        val minDistance = with(LocalDensity.current) { remember { 16.dp.roundToPx() } }
+
         if (transProgress() != 1f)
             offsets.minus(offsets[0]).reversed().forEachIndexed { index, anim ->
                 Surface(
                     modifier = Modifier
-                        .offset { anim.value.toIntOffset() }
+                        .offset {
+                            anim.value
+                                .coerceAtLeast(minDistance)
+                                .toIntOffset()
+                        }
                         .padding(4.dp)
                         .size(MiniFabSize)
                         .alpha(iconsAlpha.value),
@@ -128,12 +139,18 @@ fun DraggableFab(
 
         Surface(
             modifier = Modifier
-                .offset { offsets[0].value.toIntOffset() }
+                .offset {
+                    offsets[0].value
+                        .coerceAtLeast(minDistance)
+                        .toIntOffset()
+                }
                 .size(FabSize),
             shape = CircleShape, color = color.first, contentColor = color.second, elevation = 6.dp,
             onClick = {
-                if (transProgress() == 1f) onClick()
-                else if (transProgress() == 0f && offsets[0].value.getDistance() == 0f) onExpand(!expanded)
+                when (transProgress()) {
+                    1f -> onClick()
+                    0f -> if (offsets[0].value.getDistance() < minDistance) onExpand(!expanded)
+                }
             }
         ) {
 
@@ -150,7 +167,7 @@ fun DraggableFab(
                 Icon(
                     modifier = Modifier
                         .alpha(1 - 2 * transProgress().coerceIn(0f, 0.5f))
-                        .drag(!expanded && transProgress() == 0f, offsets)
+                        .drag(!expanded && transProgress() == 0f, offsets, onDrag)
                         .padding(12.dp)
                         .rotate(
                             animateFloatAsState(
@@ -162,14 +179,6 @@ fun DraggableFab(
                 )
         }
     }
-}
-
-fun Float.getMidColor(start: Color, end: Color): Color {
-    return Color(
-        red = start.red * (1 - this) + (end.red * this),
-        green = start.green * (1 - this) + (end.green * this),
-        blue = start.blue * (1 - this) + (end.blue * this)
-    )
 }
 
 val MenuItems: List<ImageVector> = listOf(

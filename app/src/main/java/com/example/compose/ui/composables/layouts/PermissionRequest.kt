@@ -1,4 +1,4 @@
-package com.example.compose.ui.composables
+package com.example.compose.ui.composables.layouts
 
 import android.Manifest
 import androidx.compose.foundation.layout.Box
