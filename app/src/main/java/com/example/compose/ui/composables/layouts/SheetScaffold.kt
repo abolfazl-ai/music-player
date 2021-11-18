@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.Layout
@@ -23,6 +24,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.compose.ui.composables.util_composables.Shadow
+import com.example.compose.utils.kotlin_extensions.compIn
 import com.example.compose.utils.resources.*
 import com.google.accompanist.insets.LocalWindowInsets
 import kotlin.math.roundToInt
@@ -89,10 +91,11 @@ fun SheetScaffold(
         pSheetProgress = playerSheetState.myProgress, qSheetContent = {
             Surface(
                 queueSwipeable
+                    .alpha(playerSheetState.myProgress.compIn(0.9f))
                     .fillMaxSize()
                     .padding(horizontal = QueueMargin),
                 shadowElevation = SheetElevation,
-                color = queueBackground,
+                color = playerBackground,
                 shape = RoundedCornerShape(8.dp, 8.dp, 0.dp, 0.dp),
                 content = queueContent
             )

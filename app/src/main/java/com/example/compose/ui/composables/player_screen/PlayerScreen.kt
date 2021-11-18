@@ -3,6 +3,7 @@ package com.example.compose.ui.composables.player_screen
 import androidx.collection.LruCache
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
+import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.ExperimentalMaterialApi
@@ -11,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -19,6 +21,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.compose.R
 import com.example.compose.ui.composables.modifiers.reveal
 import com.example.compose.utils.kotlin_extensions.compIn
 import com.example.compose.utils.resources.PlayerScreenSpacing
@@ -39,13 +42,9 @@ fun PlayerScreen(
 
     val songs = viewModel.repository.getSongs().collectAsState(emptyList()).value
 
-    val colorCache by remember { mutableStateOf(LruCache<Int, MainColors>(20)) }
+    val colorCache = remember { LruCache<Int, MainColors>(20) }
 
     val pageState = rememberPagerState()
-
-/*    LaunchedEffect(key1 = pageState.currentPage) {
-        launch { viewModel.serviceController.seekTo(pageState.currentPage, 0L) }
-    }*/
 
     Column(
         modifier
@@ -66,13 +65,15 @@ fun PlayerScreen(
 
         CompositionLocalProvider(
             LocalContentColor provides animateColorAsState(
-                colorCache[pageState.currentPage]?.front ?: Color.Black
+                colorCache[pageState.currentPage]?.front ?: Color.White
             ).value, LocalContentAlpha provides 1f
         ) {
             Row(
-                Modifier.padding(top = PlayerScreenSpacing),
+                Modifier
+                    .alpha(progress().compIn(0.75f, 0.9f))
+                    .padding(top = PlayerScreenSpacing),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 IconButton(onClick = { /*TODO*/ }) {
                     Icon(
@@ -108,17 +109,24 @@ fun PlayerScreen(
     }
 
     progress().let {
-        if (it < 1f) Surface(Modifier.alpha(1 - it.compIn(0.7f, 0.8f))) {
+        if (it < 1f) Surface(
+            Modifier.alpha(1 - it.compIn(0.3f, 0.4f)),
+            color = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+        ) {
             MiniPlayer(Modifier.alpha(1 - it.compIn(end = 0.1f)))
         }
     }
 }
 
+@ExperimentalAnimationGraphicsApi
 @Preview
 @Composable
 fun MiniPlayer(modifier: Modifier = Modifier) = Box(modifier) {
+    var isPlaying by remember { mutableStateOf(false) }
+
     Row(
-        modifier = Modifier.padding(start = 16.dp, end = 8.dp),
+        modifier = Modifier.padding(start = 16.dp, end = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(
@@ -128,13 +136,11 @@ fun MiniPlayer(modifier: Modifier = Modifier) = Box(modifier) {
             Text(
                 text = "The heart wants what it wants and i",
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
                 maxLines = 1, overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = "Selena Gomez",
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
                 maxLines = 1, overflow = TextOverflow.Ellipsis
             )
         }
@@ -142,21 +148,20 @@ fun MiniPlayer(modifier: Modifier = Modifier) = Box(modifier) {
             Icon(
                 imageVector = Icons.Rounded.SkipPrevious,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
-        IconButton(modifier = Modifier.height(56.dp).width(32.dp), onClick = { /*TODO*/ }) {
+        IconButton(modifier = Modifier
+            .height(56.dp)
+            .width(32.dp), onClick = { isPlaying = !isPlaying }) {
             Icon(
-                imageVector = Icons.Rounded.PlayArrow,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                painter = animatedVectorResource(R.drawable.play_to_pause).painterFor(atEnd = isPlaying),
+                contentDescription = "PlayButton",
             )
         }
         IconButton(modifier = Modifier.size(56.dp), onClick = { /*TODO*/ }) {
             Icon(
                 imageVector = Icons.Rounded.SkipNext,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
     }

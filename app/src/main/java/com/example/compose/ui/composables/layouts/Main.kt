@@ -72,6 +72,7 @@ fun Home(viewModel: MainViewModel = viewModel()) {
     ModalDrawer(
         drawerShape = RectangleShape,
         gesturesEnabled = !fabDragging,
+        drawerBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
         drawerContent = { }) {
         SheetScaffold(
             playerContent = { PlayerScreen(progress = { it }) },
