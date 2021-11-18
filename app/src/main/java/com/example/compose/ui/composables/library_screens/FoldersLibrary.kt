@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Folder
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -26,7 +27,7 @@ import com.example.compose.viewmodel.MainViewModel
 @Composable
 fun FoldersLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = viewModel()) {
 
-    var expandIndex by remember { mutableStateOf(-1) }
+    var expandIndex by rememberSaveable { mutableStateOf(-1) }
     val selectList = remember { mutableStateListOf<Int>() }
 
     val folders by viewModel.repository.allFolders.collectAsState(initial = emptyList())

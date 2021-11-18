@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,6 +38,7 @@ fun SongsLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = viewM
 
     val state = viewModel.songScreenState.collectAsState()
 
+    var expandIndex by rememberSaveable { mutableStateOf(-1) }
     val selectList = remember { mutableStateListOf<Int>() }
 
     val songs by viewModel.repository.getSongs(state.value.sortBy)
@@ -57,9 +59,9 @@ fun SongsLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = viewM
             SongItem(
                 song = song,
                 itemOptions = options,
-                expanded = state.value.expandedIndex == index,
+                expanded = expandIndex == index,
                 selected = selectList.contains(index),
-                onExpand = { viewModel.setExpandedSongIndex(it, index) },
+                onExpand = { if (it) expandIndex = index else if (expandIndex == index) expandIndex = -1 },
                 onSelect = { onSelect(index) }
             ) { if (selectList.isNotEmpty()) onSelect(index) }
         }

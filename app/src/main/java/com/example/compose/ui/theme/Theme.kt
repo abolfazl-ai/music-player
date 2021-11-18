@@ -1,17 +1,25 @@
 package com.example.compose.ui.theme
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun AppTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable() () -> Unit
 ) {
-    val colors = if (!useDarkTheme) lightMinimalScheme //lightSchemeGenerator(BlueScheme)
-    else darkMinimalScheme //darkSchemeGenerator(BlueScheme)
 
+    val colors = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        if (!useDarkTheme) lightSchemeGenerator(dynamicTonalPalette(LocalContext.current))
+        else darkSchemeGenerator(dynamicTonalPalette(LocalContext.current))
+    } else {
+        if (!useDarkTheme) lightMinimalScheme
+        else darkMinimalScheme
+    }
 
     androidx.compose.material.MaterialTheme() {
         MaterialTheme(

@@ -24,6 +24,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.compose.R
 import com.example.compose.ui.composables.modifiers.reveal
 import com.example.compose.utils.kotlin_extensions.compIn
+import com.example.compose.utils.resources.FabSize
 import com.example.compose.utils.resources.PlayerScreenSpacing
 import com.example.compose.utils.util_classes.MainColors
 import com.example.compose.viewmodel.MainViewModel
@@ -38,7 +39,7 @@ fun PlayerScreen(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = viewModel(),
     progress: () -> Float
-) {
+) = BoxWithConstraints(modifier.fillMaxSize()) {
 
     val songs = viewModel.repository.getSongs().collectAsState(emptyList()).value
 
@@ -47,9 +48,11 @@ fun PlayerScreen(
     val pageState = rememberPagerState()
 
     Column(
-        modifier
-            .fillMaxSize()
-            .reveal(colorCache[pageState.currentPage]?.back ?: Color.Black, 404.dp, 750),
+        Modifier
+            .reveal(
+                colorCache[pageState.currentPage]?.back ?: Color.Black,
+                maxWidth + FabSize / 2 + PlayerScreenSpacing, 750
+            ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -110,7 +113,7 @@ fun PlayerScreen(
 
     progress().let {
         if (it < 1f) Surface(
-            Modifier.alpha(1 - it.compIn(0.3f, 0.4f)),
+            Modifier.fillMaxSize().alpha(1 - it.compIn(0.3f, 0.4f)),
             color = MaterialTheme.colorScheme.primaryContainer,
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer
         ) {

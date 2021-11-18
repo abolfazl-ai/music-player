@@ -95,7 +95,7 @@ fun SheetScaffold(
                     .fillMaxSize()
                     .padding(horizontal = QueueMargin),
                 shadowElevation = SheetElevation,
-                color = playerBackground,
+                color = queueBackground,
                 shape = RoundedCornerShape(8.dp, 8.dp, 0.dp, 0.dp),
                 content = queueContent
             )
