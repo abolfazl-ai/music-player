@@ -32,7 +32,7 @@ interface ModificationDao {
     suspend fun insertAlbums(albums: List<Album>)
 
     @Query("SELECT * FROM songs")
-    suspend fun getSongsToModify(): List<Song>
+    fun getSongsToModify(): List<Song>
 
     @Delete
     suspend fun deleteSong(song: Song)

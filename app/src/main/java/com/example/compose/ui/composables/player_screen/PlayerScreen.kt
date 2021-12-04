@@ -1,10 +1,13 @@
 package com.example.compose.ui.composables.player_screen
 
+import android.util.Log
 import androidx.collection.LruCache
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.LocalContentAlpha
@@ -24,8 +27,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.compose.R
 import com.example.compose.ui.composables.modifiers.reveal
 import com.example.compose.utils.kotlin_extensions.compIn
-import com.example.compose.utils.resources.FabSize
-import com.example.compose.utils.resources.PlayerScreenSpacing
+import com.example.compose.utils.resources.*
 import com.example.compose.utils.util_classes.MainColors
 import com.example.compose.viewmodel.MainViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -37,21 +39,17 @@ import com.google.accompanist.pager.rememberPagerState
 @Composable
 fun PlayerScreen(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel = viewModel(),
     progress: () -> Float
 ) = BoxWithConstraints(modifier.fillMaxSize()) {
 
-    val songs = viewModel.repository.getSongs().collectAsState(emptyList()).value
-
     val colorCache = remember { LruCache<Int, MainColors>(20) }
-
     val pageState = rememberPagerState()
 
     Column(
         Modifier
             .reveal(
                 colorCache[pageState.currentPage]?.back ?: Color.Black,
-                maxWidth + FabSize / 2 + PlayerScreenSpacing, 750
+                maxWidth + ProgressBarHeight + FabSize / 2 + PlayerScreenSpacing, 750
             ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -62,110 +60,73 @@ fun PlayerScreen(
                 .aspectRatio(1f)
                 .background(Color.Black),
             pagerState = pageState,
-            songList = songs,
-            onPageCreated = { i, c -> if (colorCache[i] == null) colorCache.put(i, c) }
+            onPageCreated = remember { { i, c -> if (colorCache[i] == null) colorCache.put(i, c) } }
         )
 
-        CompositionLocalProvider(
-            LocalContentColor provides animateColorAsState(
-                colorCache[pageState.currentPage]?.front ?: Color.White
-            ).value, LocalContentAlpha provides 1f
-        ) {
+        PlaybackController(
+            alpha = { progress().compIn(0.75f, 0.9f) },
+            contentColor = colorCache[pageState.currentPage]?.front ?: Color.White
+        )
+    }
+
+    MiniPlayer(progress = progress())
+}
+
+
+@ExperimentalAnimationGraphicsApi
+@Composable
+fun MiniPlayer(modifier: Modifier = Modifier, progress: Float) {
+    if (progress < 1) Surface(
+        modifier
+            .fillMaxSize()
+            .alpha(1 - progress.compIn(0.2f, 0.3f)),
+        color = MaterialTheme.colorScheme.primaryContainer,
+        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+    ) {
+        var isPlaying by remember { mutableStateOf(false) }
+        Box {
             Row(
-                Modifier
-                    .alpha(progress().compIn(0.75f, 0.9f))
-                    .padding(top = PlayerScreenSpacing),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                modifier = Modifier
+                    .alpha(1 - progress.compIn(end = 0.05f))
+                    .padding(start = 16.dp, end = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { /*TODO*/ }) {
+                Column(
+                    Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    Text(
+                        text = "The heart wants what it wants and i",
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = "Selena Gomez",
+                        style = MaterialTheme.typography.labelSmall,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis
+                    )
+                }
+                IconButton(modifier = Modifier.size(56.dp), onClick = { /*TODO*/ }) {
                     Icon(
-                        modifier = Modifier.size(30.dp),
-                        imageVector = Icons.Rounded.Repeat,
+                        imageVector = Icons.Rounded.SkipPrevious,
                         contentDescription = null,
                     )
                 }
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(modifier = Modifier
+                    .height(56.dp)
+                    .width(32.dp), onClick = { isPlaying = !isPlaying }) {
                     Icon(
-                        modifier = Modifier.size(44.dp),
-                        imageVector = Icons.Rounded.ChevronLeft,
-                        contentDescription = null,
+                        painter = animatedVectorResource(R.drawable.play_to_pause).painterFor(atEnd = isPlaying),
+                        contentDescription = "PlayButton",
                     )
                 }
-                Spacer(modifier = Modifier.size(56.dp))
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(modifier = Modifier.size(56.dp), onClick = { /*TODO*/ }) {
                     Icon(
-                        modifier = Modifier.size(44.dp),
-                        imageVector = Icons.Rounded.ChevronRight,
-                        contentDescription = null,
-                    )
-                }
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(
-                        modifier = Modifier.size(30.dp),
-                        imageVector = Icons.Rounded.Shuffle,
+                        imageVector = Icons.Rounded.SkipNext,
                         contentDescription = null,
                     )
                 }
             }
-        }
-    }
-
-    progress().let {
-        if (it < 1f) Surface(
-            Modifier.fillMaxSize().alpha(1 - it.compIn(0.3f, 0.4f)),
-            color = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-        ) {
-            MiniPlayer(Modifier.alpha(1 - it.compIn(end = 0.1f)))
-        }
-    }
-}
-
-@ExperimentalAnimationGraphicsApi
-@Preview
-@Composable
-fun MiniPlayer(modifier: Modifier = Modifier) = Box(modifier) {
-    var isPlaying by remember { mutableStateOf(false) }
-
-    Row(
-        modifier = Modifier.padding(start = 16.dp, end = 4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(
-            Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(2.dp)
-        ) {
-            Text(
-                text = "The heart wants what it wants and i",
-                style = MaterialTheme.typography.titleMedium,
-                maxLines = 1, overflow = TextOverflow.Ellipsis
-            )
-            Text(
-                text = "Selena Gomez",
-                style = MaterialTheme.typography.labelSmall,
-                maxLines = 1, overflow = TextOverflow.Ellipsis
-            )
-        }
-        IconButton(modifier = Modifier.size(56.dp), onClick = { /*TODO*/ }) {
-            Icon(
-                imageVector = Icons.Rounded.SkipPrevious,
-                contentDescription = null,
-            )
-        }
-        IconButton(modifier = Modifier
-            .height(56.dp)
-            .width(32.dp), onClick = { isPlaying = !isPlaying }) {
-            Icon(
-                painter = animatedVectorResource(R.drawable.play_to_pause).painterFor(atEnd = isPlaying),
-                contentDescription = "PlayButton",
-            )
-        }
-        IconButton(modifier = Modifier.size(56.dp), onClick = { /*TODO*/ }) {
-            Icon(
-                imageVector = Icons.Rounded.SkipNext,
-                contentDescription = null,
-            )
         }
     }
 }

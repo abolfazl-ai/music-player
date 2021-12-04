@@ -72,7 +72,7 @@ fun LinearItem(
     val expandAnimator by animateFloatAsState(
         targetValue = if (expanded) 1f else 0f,
         tween(
-            if (expanded) 400 else 300,
+            if (expanded) 250 else 200,
             easing = { OvershootInterpolator(2f).getInterpolation(it) })
     )
 

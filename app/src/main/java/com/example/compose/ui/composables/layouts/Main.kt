@@ -39,6 +39,8 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @ExperimentalMaterial3Api
 @ExperimentalPermissionsApi
@@ -68,6 +70,18 @@ fun Home(viewModel: MainViewModel = viewModel()) {
     var fabExpanded by remember { mutableStateOf(false) }
     var fabDragging by remember { mutableStateOf(false) }
     val backgroundAlpha by animateFloatAsState(targetValue = if (fabExpanded) 0.3f else 1f)
+
+    var fabVisible by remember { mutableStateOf(true) }
+
+/*    LaunchedEffect(1) {
+        launch {
+            while (true) {
+                delay(2000)
+                fabVisible = !fabVisible
+                if (!fabVisible) delay(3000)
+            }
+        }
+    }*/
 
     ModalDrawer(
         drawerShape = RectangleShape,
@@ -145,7 +159,8 @@ fun Home(viewModel: MainViewModel = viewModel()) {
                     expanded = fabExpanded,
                     onExpand = { fabExpanded = it },
                     isPlaying = isPlaying,
-                    onDrag = { fabDragging = it }
+                    onDrag = { fabDragging = it },
+                    visible = fabVisible
                 ) { isPlaying = !isPlaying }
             }, showDismiss = fabExpanded, onDismiss = {
                 Log.e(TAG, "Home: ")

@@ -10,19 +10,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material3.Surface
+import androidx.compose.material3.contentColorFor
+import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -46,17 +45,21 @@ import kotlinx.coroutines.launch
 fun DraggableFab(
     modifier: Modifier = Modifier,
     fabColor: Color = MaterialTheme.colorScheme.secondary,
-    fabTint: Color = MaterialTheme.colorScheme.onSecondary,
     playButtonColor: Color = MaterialTheme.colorScheme.surface,
-    playButtonTint: Color = MaterialTheme.colorScheme.onSurface,
     transProgress: () -> Float = { 0f },
     items: List<ImageVector> = MenuItems,
+    visible: Boolean = true,
     expanded: Boolean = false,
     onExpand: (expanded: Boolean) -> Unit = {},
+    onDrag: (isDragging: Boolean) -> Unit = {},
     isPlaying: Boolean = false,
-    onDrag: (isDragging:Boolean) -> Unit = {},
     onClick: () -> Unit = {},
 ) {
+
+    val visibilityAnimator by animateFloatAsState(
+        if (visible) 1f else 0f,
+        tween(1000)
+    )
 
     val iconsAlpha = remember { Animatable(1f) }
     val offsets = remember(items) {
@@ -67,16 +70,15 @@ fun DraggableFab(
         }
     }
 
-    val color = remember(transProgress()) {
-        transProgress().let {
-            when (it) {
-                0f -> fabColor to fabTint
-                1f -> playButtonColor to playButtonTint
-                else -> it.getMidColor(fabColor, playButtonColor) to
-                        it.getMidColor(fabTint, playButtonTint)
-            }
+    val color = transProgress().let {
+        when (it) {
+            0f -> fabColor to contentColorFor(fabColor)
+            1f -> playButtonColor to contentColorFor(playButtonColor)
+            else -> it.getMidColor(fabColor, playButtonColor) to
+                    it.getMidColor(contentColorFor(fabColor), contentColorFor(playButtonColor))
         }
     }
+
     val scope = rememberCoroutineScope()
 
     with(LocalDensity.current) {
@@ -109,11 +111,14 @@ fun DraggableFab(
         }
     }
 
-    BoxWithConstraints(modifier) {
+    BoxWithConstraints(
+        modifier
+//            .scale((10 * transProgress() + visibilityAnimator).coerceIn(0.5f, 1f))
+            .alpha((10 * transProgress() + visibilityAnimator).coerceIn(0f, 1f))) {
 
         val minDistance = with(LocalDensity.current) { remember { 16.dp.roundToPx() } }
 
-        if (transProgress() != 1f)
+/*        if (transProgress() != 1f && visibilityAnimator == 1f)
             offsets.minus(offsets[0]).reversed().forEachIndexed { index, anim ->
                 Surface(
                     modifier = Modifier
@@ -126,7 +131,7 @@ fun DraggableFab(
                         .size(MiniFabSize)
                         .alpha(iconsAlpha.value),
                     onClick = {}, color = fabColor,
-                    contentColor = fabTint, shape = CircleShape,
+                    contentColor = contentColorFor(fabColor), shape = CircleShape,
                     elevation = if (anim.value.getDistance() > 24) 4.dp else 0.dp
                 ) {
                     Icon(
@@ -135,7 +140,7 @@ fun DraggableFab(
                         contentDescription = null
                     )
                 }
-            }
+            }*/
 
         Surface(
             modifier = Modifier
@@ -145,7 +150,7 @@ fun DraggableFab(
                         .toIntOffset()
                 }
                 .size(FabSize),
-            shape = CircleShape, color = color.first, contentColor = color.second, elevation = 6.dp,
+            shape = CircleShape, color = color.first, contentColor = color.second, /*shadowElevation = 6.dp,*/
             onClick = {
                 when (transProgress()) {
                     1f -> onClick()

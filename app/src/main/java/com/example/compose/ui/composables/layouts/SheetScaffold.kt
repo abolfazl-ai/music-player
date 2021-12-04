@@ -1,6 +1,7 @@
 package com.example.compose.ui.composables.layouts
 
 import android.util.Log
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -43,7 +44,10 @@ fun SheetScaffold(
     onDismiss: () -> Unit = {},
     playerContent: @Composable (progress: Float) -> Unit,
     playerBackground: Color = MaterialTheme.colorScheme.primaryContainer,
-    playerSheetState: SheetState = rememberSheetState(SheetValue.Collapsed),
+    playerSheetState: SheetState = rememberSheetState(
+        SheetValue.Collapsed,
+        spring(stiffness = 2000f)
+    ),
     queueContent: @Composable () -> Unit,
     queueSheetState: SheetState = rememberSheetState(SheetValue.Collapsed),
     queueBackground: Color = MaterialTheme.colorScheme.surface,
@@ -67,7 +71,7 @@ fun SheetScaffold(
 
     val queueAnchors = with(LocalDensity.current) {
         mapOf(
-            (maxWidth + PlayerScreenSpacing.times(2) + FabSize).toPx() to SheetValue.Collapsed,
+            (maxWidth + PlayerScreenSpacing.times(2) + FabSize + ProgressBarHeight).toPx() to SheetValue.Collapsed,
             LocalWindowInsets.current.statusBars.top + QueueMargin.toPx() to SheetValue.Expanded
         )
     }
@@ -91,7 +95,7 @@ fun SheetScaffold(
         pSheetProgress = playerSheetState.myProgress, qSheetContent = {
             Surface(
                 queueSwipeable
-                    .alpha(playerSheetState.myProgress.compIn(0.9f))
+                    .alpha(playerSheetState.myProgress.compIn(0.8f))
                     .fillMaxSize()
                     .padding(horizontal = QueueMargin),
                 shadowElevation = SheetElevation,
@@ -124,7 +128,8 @@ private fun SheetScaffoldStack(
     onDismiss: () -> Unit,
     body: @Composable () -> Unit,
 ) {
-    val fabRange = remember(width) { width + FabSize + FabMargin + PlayerScreenSpacing }
+    val fabRange =
+        remember(width) { width + FabSize + FabMargin + PlayerScreenSpacing + ProgressBarHeight }
 
     val transferProgress = with(LocalDensity.current) {
         -(pSheetOffset().roundToInt().coerceIn(-pPeekHeight - fabRange.roundToPx(), -pPeekHeight) +
@@ -174,9 +179,6 @@ private fun SheetScaffoldStack(
             )
         )
 
-
-        Log.e(TAG, "SheetLayout: $transferProgress")
-
         with(c) {
             layout(maxWidth, maxHeight) {
 
@@ -199,7 +201,8 @@ private fun SheetScaffoldStack(
                 fabPlaceable.place(
                     (maxWidth - fabPlaceable.width) / 2 +
                             ((1 - transferProgress) * (maxWidth / 2 - fabPlaceable.width / 2 - FabMargin.toPx())).toInt(),
-                    maxHeight + sheetOffsetY.coerceAtMost(-(pPeekHeight + fabRange.roundToPx())) + maxWidth + PlayerScreenSpacing.roundToPx()
+                    maxHeight + sheetOffsetY.coerceAtMost(-(pPeekHeight + fabRange.roundToPx())) + maxWidth +
+                            (PlayerScreenSpacing + ProgressBarHeight).roundToPx()
                 )
 
                 queueSheetPlaceable.place(0, maxHeight + sheetOffsetY + qSheetOffsetY)

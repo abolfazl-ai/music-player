@@ -18,20 +18,21 @@ import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalPermissionsApi::class,
+    ExperimentalFoundationApi::class,
+    ExperimentalPagerApi::class,
+    ExperimentalComposeUiApi::class,
+    ExperimentalAnimationGraphicsApi::class,
+    ExperimentalMaterialApi::class,
+)
 class MainActivity : ComponentActivity() {
 
-    @ExperimentalMaterialApi
     private val viewModel: MainViewModel by viewModels()
 
     private var playerService: PlayerService? = null
 
-    @ExperimentalMaterial3Api
-    @ExperimentalPermissionsApi
-    @ExperimentalFoundationApi
-    @ExperimentalPagerApi
-    @ExperimentalComposeUiApi
-    @ExperimentalAnimationGraphicsApi
-    @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //        bindService()
@@ -44,7 +45,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @ExperimentalMaterialApi
     private fun bindService() {
         if (this.applicationContext != null) {
 
