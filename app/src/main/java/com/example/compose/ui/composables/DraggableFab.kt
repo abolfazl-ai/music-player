@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.compose.animation.core.*
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
+import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
+import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -162,14 +164,16 @@ fun DraggableFab(
             }
         ) {
 
-            if (transProgress() != 0f)
+            if (transProgress() != 0f) {
+                val a = AnimatedImageVector.animatedVectorResource(R.drawable.play_to_pause)
                 Icon(
                     modifier = Modifier
                         .alpha(2 * (transProgress().coerceIn(0.5f, 1f) - 0.5f))
                         .padding(12.dp),
-                    painter = animatedVectorResource(R.drawable.play_to_pause).painterFor(atEnd = isPlaying),
+                    painter = rememberAnimatedVectorPainter(a, isPlaying),
                     contentDescription = "PlayButton",
                 )
+            }
 
             if (transProgress() != 1f)
                 Icon(

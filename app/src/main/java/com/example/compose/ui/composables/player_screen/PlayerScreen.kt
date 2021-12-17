@@ -6,6 +6,8 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
+import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
+import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -112,11 +114,12 @@ fun MiniPlayer(modifier: Modifier = Modifier, progress: Float) {
                         contentDescription = null,
                     )
                 }
+                val a = AnimatedImageVector.animatedVectorResource(R.drawable.play_to_pause)
                 IconButton(modifier = Modifier
                     .height(56.dp)
                     .width(32.dp), onClick = { isPlaying = !isPlaying }) {
                     Icon(
-                        painter = animatedVectorResource(R.drawable.play_to_pause).painterFor(atEnd = isPlaying),
+                        painter = rememberAnimatedVectorPainter(a, isPlaying),
                         contentDescription = "PlayButton",
                     )
                 }
