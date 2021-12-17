@@ -1,43 +1,57 @@
 package com.example.compose.ui.composables.player_screen
 
-import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
-import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Favorite
-import androidx.compose.material.icons.outlined.KeyboardArrowLeft
-import androidx.compose.material.icons.outlined.KeyboardArrowRight
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.rounded.ChevronLeft
 import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.Repeat
 import androidx.compose.material.icons.rounded.Shuffle
-import androidx.compose.material3.IconButton
+import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.compose.R
 import com.example.compose.utils.resources.PlayerScreenSpacing
 import com.example.compose.utils.resources.ProgressBarHeight
-import com.example.compose.utils.resources.TAG
-import com.example.compose.utils.util_classes.PlaybackAction.*
-import com.example.compose.viewmodel.MainViewModel
+
+@Composable
+fun IconButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    content: @Composable BoxScope.() -> Unit
+) {
+    Box(
+        modifier =
+        modifier
+            .clickable(
+                onClick = onClick,
+                enabled = enabled,
+                role = Role.Button,
+                interactionSource = interactionSource,
+                indication = rememberRipple(bounded = false, radius = 32.dp)
+            ),
+        contentAlignment = Alignment.Center,
+        content = content
+    )
+}
+
 
 @ExperimentalMaterialApi
 @ExperimentalAnimationGraphicsApi
@@ -64,30 +78,30 @@ fun PlaybackController(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             IconButton(onClick = { }) {
-                androidx.compose.material3.Icon(
-                    modifier = Modifier.size(30.dp),
+                Icon(
+                    modifier = Modifier.size(44.dp).padding(6.dp),
                     imageVector = Icons.Rounded.Repeat,
                     contentDescription = null,
                 )
             }
             IconButton(onClick = { }) {
-                androidx.compose.material3.Icon(
+                Icon(
                     modifier = Modifier.size(44.dp),
                     imageVector = Icons.Rounded.ChevronLeft,
                     contentDescription = null,
                 )
             }
-            Spacer(modifier = Modifier.size(56.dp))
+            Spacer(modifier = Modifier.height(56.dp).width(52.dp))
             IconButton(onClick = { }) {
-                androidx.compose.material3.Icon(
+                Icon(
                     modifier = Modifier.size(44.dp),
                     imageVector = Icons.Rounded.ChevronRight,
                     contentDescription = null,
                 )
             }
             IconButton(onClick = { }) {
-                androidx.compose.material3.Icon(
-                    modifier = Modifier.size(30.dp),
+                Icon(
+                    modifier = Modifier.size(44.dp).padding(6.dp),
                     imageVector = Icons.Rounded.Shuffle,
                     contentDescription = null,
                 )

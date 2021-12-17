@@ -114,11 +114,12 @@ fun DraggableFab(
     BoxWithConstraints(
         modifier
 //            .scale((10 * transProgress() + visibilityAnimator).coerceIn(0.5f, 1f))
-            .alpha((10 * transProgress() + visibilityAnimator).coerceIn(0f, 1f))) {
+            .alpha((10 * transProgress() + visibilityAnimator).coerceIn(0f, 1f))
+    ) {
 
         val minDistance = with(LocalDensity.current) { remember { 16.dp.roundToPx() } }
 
-/*        if (transProgress() != 1f && visibilityAnimator == 1f)
+        if (transProgress() != 1f && visibilityAnimator == 1f)
             offsets.minus(offsets[0]).reversed().forEachIndexed { index, anim ->
                 Surface(
                     modifier = Modifier
@@ -132,7 +133,7 @@ fun DraggableFab(
                         .alpha(iconsAlpha.value),
                     onClick = {}, color = fabColor,
                     contentColor = contentColorFor(fabColor), shape = CircleShape,
-                    elevation = if (anim.value.getDistance() > 24) 4.dp else 0.dp
+                    shadowElevation = if (anim.value.getDistance() > 24) 4.dp else 0.dp
                 ) {
                     Icon(
                         modifier = Modifier.padding(14.dp),
@@ -140,7 +141,7 @@ fun DraggableFab(
                         contentDescription = null
                     )
                 }
-            }*/
+            }
 
         Surface(
             modifier = Modifier
@@ -150,7 +151,9 @@ fun DraggableFab(
                         .toIntOffset()
                 }
                 .size(FabSize),
-            shape = CircleShape, color = color.first, contentColor = color.second, /*shadowElevation = 6.dp,*/
+            shape = CircleShape,
+            color = color.first,
+            contentColor = color.second, shadowElevation = (6 * (1 - transProgress())).dp,
             onClick = {
                 when (transProgress()) {
                     1f -> onClick()
