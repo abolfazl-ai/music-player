@@ -1,6 +1,5 @@
 package com.example.compose.ui.composables
 
-import android.util.Log
 import androidx.compose.animation.core.*
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
@@ -23,7 +22,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -36,7 +34,6 @@ import com.example.compose.utils.kotlin_extensions.getMidColor
 import com.example.compose.utils.kotlin_extensions.toIntOffset
 import com.example.compose.utils.resources.FabSize
 import com.example.compose.utils.resources.MiniFabSize
-import com.example.compose.utils.resources.TAG
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
