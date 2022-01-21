@@ -10,7 +10,7 @@ val FabSize = 56.dp
 val MiniFabSize = 48.dp
 val FabMargin = 16.dp
 
-val PlayerScreenSpacing = 12.dp
+val PlayerScreenSpacing = 24.dp
 val ProgressBarHeight = 20.dp
 
 val SheetElevation = 12.dp

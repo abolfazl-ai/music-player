@@ -152,7 +152,7 @@ fun DraggableFab(
                 .size(FabSize),
             shape = CircleShape,
             color = color.first,
-            contentColor = color.second, shadowElevation = (6 * (1 - transProgress())).dp,
+            contentColor = color.second, shadowElevation = (2 + 4 * (1 - transProgress())).dp,
             onClick = {
                 when (transProgress()) {
                     1f -> onClick()

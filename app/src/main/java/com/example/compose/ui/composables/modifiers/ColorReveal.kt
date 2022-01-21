@@ -1,6 +1,7 @@
 package com.example.compose.ui.composables.modifiers
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
@@ -27,7 +28,7 @@ fun Modifier.reveal(color: Color, y: Dp, duration: Int = 1000) = composed {
             (color to Animatable(0f)).let {
                 colors.add(it)
                 scope.launch {
-                    it.second.animateTo(1f, tween(duration))
+                    it.second.animateTo(1f, tween(duration, easing = FastOutSlowInEasing))
                 }.invokeOnCompletion {
                     if (colors.size > 1 && colors[1].second.value == 1f) colors.removeFirst()
                 }

@@ -56,56 +56,46 @@ fun IconButton(
 @ExperimentalMaterialApi
 @ExperimentalAnimationGraphicsApi
 @Composable
-fun PlaybackController(
-    alpha: () -> Float,
-    contentColor: Color,
-) = CompositionLocalProvider(
-    LocalContentColor provides animateColorAsState(contentColor, tween(1000)).value,
-    LocalContentAlpha provides 1f
+fun PlaybackController(alpha: () -> Float) = Row(
+    Modifier.alpha(alpha()),
+    verticalAlignment = Alignment.CenterVertically,
+    horizontalArrangement = Arrangement.spacedBy(12.dp)
 ) {
-    Column(Modifier.alpha(alpha()), horizontalAlignment = Alignment.CenterHorizontally) {
-
-        Spacer(
+    IconButton(onClick = { }) {
+        Icon(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(ProgressBarHeight)
-                .background(LocalContentColor.current)
+                .size(44.dp)
+                .padding(6.dp),
+            imageVector = Icons.Rounded.Repeat,
+            contentDescription = null,
         )
-
-        Row(
-            Modifier.padding(top = PlayerScreenSpacing),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            IconButton(onClick = { }) {
-                Icon(
-                    modifier = Modifier.size(44.dp).padding(6.dp),
-                    imageVector = Icons.Rounded.Repeat,
-                    contentDescription = null,
-                )
-            }
-            IconButton(onClick = { }) {
-                Icon(
-                    modifier = Modifier.size(44.dp),
-                    imageVector = Icons.Rounded.ChevronLeft,
-                    contentDescription = null,
-                )
-            }
-            Spacer(modifier = Modifier.height(56.dp).width(52.dp))
-            IconButton(onClick = { }) {
-                Icon(
-                    modifier = Modifier.size(44.dp),
-                    imageVector = Icons.Rounded.ChevronRight,
-                    contentDescription = null,
-                )
-            }
-            IconButton(onClick = { }) {
-                Icon(
-                    modifier = Modifier.size(44.dp).padding(6.dp),
-                    imageVector = Icons.Rounded.Shuffle,
-                    contentDescription = null,
-                )
-            }
-        }
+    }
+    IconButton(onClick = { }) {
+        Icon(
+            modifier = Modifier.size(44.dp),
+            imageVector = Icons.Rounded.ChevronLeft,
+            contentDescription = null,
+        )
+    }
+    Spacer(
+        modifier = Modifier
+            .height(56.dp)
+            .width(52.dp)
+    )
+    IconButton(onClick = { }) {
+        Icon(
+            modifier = Modifier.size(44.dp),
+            imageVector = Icons.Rounded.ChevronRight,
+            contentDescription = null,
+        )
+    }
+    IconButton(onClick = { }) {
+        Icon(
+            modifier = Modifier
+                .size(44.dp)
+                .padding(6.dp),
+            imageVector = Icons.Rounded.Shuffle,
+            contentDescription = null,
+        )
     }
 }

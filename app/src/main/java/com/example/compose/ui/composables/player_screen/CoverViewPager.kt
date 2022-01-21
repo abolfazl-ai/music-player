@@ -1,7 +1,7 @@
 package com.example.compose.ui.composables.player_screen
 
-import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
@@ -13,11 +13,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.palette.graphics.Palette
-import com.example.compose.local.model.Song
 import com.example.compose.ui.composables.modifiers.crossFade
+import com.example.compose.utils.kotlin_extensions.PALETTE_TARGET_PRIMARY
+import com.example.compose.utils.kotlin_extensions.PALETTE_TARGET_SECONDARY
 import com.example.compose.utils.util_classes.MainColors
 import com.example.compose.utils.kotlin_extensions.getAccurateColor
-import com.example.compose.utils.resources.TAG
 import com.example.compose.viewmodel.MainViewModel
 import com.google.accompanist.pager.*
 import com.skydoves.landscapist.glide.GlideImage
@@ -30,6 +30,7 @@ fun CoverViewPager(
     modifier: Modifier = Modifier,
     pagerState: PagerState = rememberPagerState(),
     onPageCreated: (index: Int, colors: MainColors) -> Unit = { _, _ -> },
+    isDarkTheme: Boolean = isSystemInDarkTheme(),
     viewModel: MainViewModel = viewModel()
 ) {
 
@@ -45,9 +46,8 @@ fun CoverViewPager(
                     LaunchedEffect(success) {
                         launch {
                             Palette.Builder(success.drawable!!.toBitmap())
-                                .resizeBitmapArea(0)
-                                .clearFilters()
-                                .maximumColorCount(8)
+                                .addTarget(PALETTE_TARGET_PRIMARY)
+                                .addTarget(PALETTE_TARGET_SECONDARY)
                                 .generate { onPageCreated(page, it.getAccurateColor()) }
                         }
                     }

@@ -4,40 +4,43 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.luminance
 import androidx.palette.graphics.Palette
+import androidx.palette.graphics.Target
 import com.example.compose.utils.util_classes.MainColors
 
-fun Color.contrastAgainst(background: Color): Float {
-    val fg = if (alpha < 1f) compositeOver(background) else this
+val PALETTE_TARGET_PRIMARY = Target.Builder()
+    .setSaturationWeight(3f)
+    .setPopulationWeight(2f)
+    .setLightnessWeight(1f)
+    .setTargetSaturation(1f)
+    .setTargetLightness(0.5f)
+    .setMinimumLightness(0.15f)
+    .setMaximumLightness(0.85f)
+    .build()
 
-    val fgLuminance = fg.luminance() + 0.05f
-    val bgLuminance = background.luminance() + 0.05f
+val PALETTE_TARGET_SECONDARY = Target.Builder()
+    .setPopulationWeight(3f)
+    .setSaturationWeight(2f)
+    .setLightnessWeight(1f)
+    .setTargetSaturation(1f)
+    .setTargetLightness(0.5f)
+    .build()
 
-    return kotlin.math.max(fgLuminance, bgLuminance) / kotlin.math.min(fgLuminance, bgLuminance)
-}
 
 fun Palette?.getAccurateColor(): MainColors {
-    if (this != null)
-        if (vibrantSwatch != null) {
-            return MainColors(
-                Color(vibrantSwatch!!.rgb),
-                Color(vibrantSwatch!!.titleTextColor)
-            )
-        } else {
-            swatches.sortedByDescending { swatch -> swatch.population }
-                .firstOrNull { swatch ->
-                    Color(swatch.rgb).contrastAgainst(Color.White) >= 1.4f &&
-                            Color(swatch.rgb).contrastAgainst(Color.Black) >= 1.4f
-                }
-                ?.let { swatch ->
-                    return MainColors(
-                        Color(swatch.rgb),
-                        Color(swatch.titleTextColor)
-                    )
-                }
+    this?.run {
+        getSwatchForTarget(PALETTE_TARGET_PRIMARY)?.let {
+            return MainColors(Color(it.rgb), Color(it.titleTextColor))
         }
+        getSwatchForTarget(PALETTE_TARGET_SECONDARY)?.let {
+            return MainColors(Color(it.rgb), Color(it.titleTextColor))
+        }
+        swatches.maxByOrNull { swatch -> swatch.population }?.let {
+            return MainColors(Color(it.rgb), Color(it.titleTextColor))
+        }
+
+    }
     return MainColors(Color.Black, Color.White)
 }
-
 
 fun Float.getMidColor(start: Color, end: Color): Color {
     return Color(

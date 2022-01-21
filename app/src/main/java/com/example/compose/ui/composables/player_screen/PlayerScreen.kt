@@ -47,28 +47,49 @@ fun PlayerScreen(
     val colorCache = remember { LruCache<Int, MainColors>(20) }
     val pageState = rememberPagerState()
 
-    Column(
-        Modifier
-            .reveal(
-                colorCache[pageState.currentPage]?.back ?: Color.Black,
-                maxWidth + ProgressBarHeight + FabSize / 2 + PlayerScreenSpacing, 750
-            ),
-        horizontalAlignment = Alignment.CenterHorizontally
+    CompositionLocalProvider(
+        LocalContentColor provides animateColorAsState(
+            colorCache[pageState.currentPage]?.front ?: Color.White,
+            tween(1000)
+        ).value,
+        LocalContentAlpha provides 1f
     ) {
+        Column(
+            Modifier
+                .reveal(
+                    colorCache[pageState.currentPage]?.back ?: Color.Black,
+                    maxWidth + ProgressBarHeight + FabSize / 2 + PlayerScreenSpacing//, 750
+                ),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
-        CoverViewPager(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f)
-                .background(Color.Black),
-            pagerState = pageState,
-            onPageCreated = remember { { i, c -> if (colorCache[i] == null) colorCache.put(i, c) } }
-        )
+            CoverViewPager(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f)
+                    .background(Color.Black),
+                pagerState = pageState,
+                onPageCreated = remember {
+                    { i, c ->
+                        if (colorCache[i] == null) colorCache.put(
+                            i,
+                            c
+                        )
+                    }
+                }
+            )
 
-        PlaybackController(
-            alpha = { progress().compIn(0.75f, 0.9f) },
-            contentColor = colorCache[pageState.currentPage]?.front ?: Color.White
-        )
+            Spacer(
+                modifier = Modifier
+                    .padding(bottom = PlayerScreenSpacing)
+                    .alpha(0.5f)
+                    .fillMaxWidth()
+                    .height(ProgressBarHeight)
+                    .background(LocalContentColor.current)
+            )
+
+            PlaybackController(alpha = { progress().compIn(0.75f, 0.9f) })
+        }
     }
 
     MiniPlayer(progress = progress())

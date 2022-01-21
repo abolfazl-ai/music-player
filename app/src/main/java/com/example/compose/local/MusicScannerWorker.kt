@@ -230,7 +230,7 @@ class MusicScannerWorker(context: Context, params: WorkerParameters) :
         applicationContext.contentResolver.query(collection, projection, null, null, null)
             ?.use { cursor ->
 
-                val columns = projection.map { it to cursor.getColumnIndexOrThrow(it) }.toMap()
+                val columns = projection.associateWith { cursor.getColumnIndexOrThrow(it) }
 
                 while (cursor.moveToNext()) {
 
