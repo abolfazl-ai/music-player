@@ -59,6 +59,7 @@ fun PlayerScreen(
                 .reveal(
                     colorCache[pageState.currentPage]?.back ?: Color.Black,
                     maxWidth + ProgressBarHeight + FabSize / 2 + PlayerScreenSpacing//, 750
+//                    , startRadius = 24.dp
                 ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

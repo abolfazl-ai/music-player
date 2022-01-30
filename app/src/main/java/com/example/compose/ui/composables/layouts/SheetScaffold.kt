@@ -3,7 +3,8 @@ package com.example.compose.ui.composables.layouts
 import android.util.Log
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
-import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.*
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +20,8 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.motionEventSpy
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
@@ -28,6 +31,7 @@ import com.example.compose.ui.composables.util_composables.Shadow
 import com.example.compose.utils.kotlin_extensions.compIn
 import com.example.compose.utils.resources.*
 import com.google.accompanist.insets.LocalWindowInsets
+import kotlinx.coroutines.coroutineScope
 import kotlin.math.roundToInt
 
 @ExperimentalComposeUiApi
@@ -144,7 +148,14 @@ private fun SheetScaffoldStack(
             pSheetContent()
             bottomNav()
             qSheetContent()
-            Spacer(modifier = Modifier.pointerInteropFilter { onDismiss(); true })
+            Spacer(Modifier.pointerInput(showDismiss) {
+                if (showDismiss) forEachGesture {
+                    awaitPointerEventScope {
+                        awaitFirstDown(requireUnconsumed = false)
+                        onDismiss()
+                    }
+                }
+            })
             fab(transferProgress)
         }
     ) { m, c ->

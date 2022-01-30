@@ -29,7 +29,7 @@ fun ArtistsLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = vie
 
     val selectList = remember { mutableStateListOf<Int>() }
 
-    val artists by viewModel.repository.allArtists.collectAsState(initial = emptyList())
+    val artists by viewModel.repository.getArtists().collectAsState(initial = emptyList())
 
     val onSelect: (Int) -> Unit = remember {
         { if (selectList.contains(it)) selectList.remove(it) else selectList.add(it) }

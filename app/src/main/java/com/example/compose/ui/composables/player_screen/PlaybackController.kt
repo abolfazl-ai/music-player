@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.compose.utils.resources.PlayerScreenSpacing
 import com.example.compose.utils.resources.ProgressBarHeight
@@ -36,55 +37,56 @@ fun IconButton(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable BoxScope.() -> Unit
-) {
-    Box(
-        modifier =
-        modifier
-            .clickable(
-                onClick = onClick,
-                enabled = enabled,
-                role = Role.Button,
-                interactionSource = interactionSource,
-                indication = rememberRipple(bounded = false, radius = 32.dp)
-            ),
-        contentAlignment = Alignment.Center,
-        content = content
-    )
-}
+) = Box(
+    modifier
+        .clickable(
+            onClick = onClick,
+            enabled = enabled,
+            role = Role.Button,
+            interactionSource = interactionSource,
+            indication = rememberRipple(bounded = false, radius = 32.dp)
+        ),
+    contentAlignment = Alignment.Center,
+    content = content
+)
 
+@OptIn(ExperimentalMaterialApi::class, ExperimentalAnimationGraphicsApi::class)
+@Preview
+@Composable
+fun controls() {
+    PlaybackController { 1f }
+}
 
 @ExperimentalMaterialApi
 @ExperimentalAnimationGraphicsApi
 @Composable
 fun PlaybackController(alpha: () -> Float) = Row(
-    Modifier.alpha(alpha()),
-    verticalAlignment = Alignment.CenterVertically,
-    horizontalArrangement = Arrangement.spacedBy(12.dp)
+    Modifier.alpha(alpha()), verticalAlignment = Alignment.CenterVertically
 ) {
     IconButton(onClick = { }) {
         Icon(
             modifier = Modifier
-                .size(44.dp)
-                .padding(6.dp),
+                .size(56.dp)
+                .padding(16.dp),
             imageVector = Icons.Rounded.Repeat,
             contentDescription = null,
         )
     }
     IconButton(onClick = { }) {
         Icon(
-            modifier = Modifier.size(44.dp),
+            modifier = Modifier
+                .size(56.dp)
+                .padding(12.dp),
             imageVector = Icons.Rounded.ChevronLeft,
             contentDescription = null,
         )
     }
-    Spacer(
-        modifier = Modifier
-            .height(56.dp)
-            .width(52.dp)
-    )
+    Spacer(modifier = Modifier.size(60.dp))
     IconButton(onClick = { }) {
         Icon(
-            modifier = Modifier.size(44.dp),
+            modifier = Modifier
+                .size(56.dp)
+                .padding(12.dp),
             imageVector = Icons.Rounded.ChevronRight,
             contentDescription = null,
         )
@@ -92,8 +94,8 @@ fun PlaybackController(alpha: () -> Float) = Row(
     IconButton(onClick = { }) {
         Icon(
             modifier = Modifier
-                .size(44.dp)
-                .padding(6.dp),
+                .size(56.dp)
+                .padding(16.dp),
             imageVector = Icons.Rounded.Shuffle,
             contentDescription = null,
         )

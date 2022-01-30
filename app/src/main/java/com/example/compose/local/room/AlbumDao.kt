@@ -8,10 +8,56 @@ import com.example.compose.local.model.AlbumWithSongs
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface AlbumDao {
+interface AlbumDao : SortInterface<Album> {
 
-    @Query("SELECT * FROM ALBUMS ORDER BY ALBUM_NAME")
-    fun getAlbums(): Flow<List<Album>>
+    @Query("SELECT * FROM ALBUMS ORDER BY ALBUM_NAME ASC")
+    override fun getByTitleASC(): Flow<List<Album>>
+
+    @Query("SELECT * FROM ALBUMS ORDER BY ALBUM_NAME DESC")
+    override fun getByTitleDESC(): Flow<List<Album>>
+
+    @Query("SELECT * FROM ALBUMS ORDER BY ALBUM_ARTIST ASC")
+    override fun getByArtistASC(): Flow<List<Album>>
+
+    @Query("SELECT * FROM ALBUMS ORDER BY ALBUM_ARTIST DESC")
+    override fun getByArtistDESC(): Flow<List<Album>>
+
+    @Query("SELECT * FROM ALBUMS ORDER BY ALBUM_NAME ASC")
+    override fun getByAlbumASC(): Flow<List<Album>>
+
+    @Query("SELECT * FROM ALBUMS ORDER BY ALBUM_NAME DESC")
+    override fun getByAlbumDESC(): Flow<List<Album>>
+
+    @Query("SELECT * FROM ALBUMS ORDER BY ALBUM_NAME ASC")
+    override fun getByFileSizeASC(): Flow<List<Album>>
+
+    @Query("SELECT * FROM ALBUMS ORDER BY ALBUM_NAME DESC")
+    override fun getByFileSizeDESC(): Flow<List<Album>>
+
+    @Query("SELECT * FROM ALBUMS ORDER BY ALBUM_NAME ASC")
+    override fun getByFolderPathASC(): Flow<List<Album>>
+
+    @Query("SELECT * FROM ALBUMS ORDER BY ALBUM_NAME DESC")
+    override fun getByFolderPathDESC(): Flow<List<Album>>
+
+    @Query("SELECT * FROM ALBUMS ORDER BY ALBUM_TRACKS_NUMBER ASC")
+    override fun getByDurationASC(): Flow<List<Album>>
+
+    @Query("SELECT * FROM ALBUMS ORDER BY ALBUM_TRACKS_NUMBER DESC")
+    override fun getByDurationDESC(): Flow<List<Album>>
+
+    @Query("SELECT * FROM ALBUMS ORDER BY ALBUM_MODIFY_DATE ASC")
+    override fun getByDateASC(): Flow<List<Album>>
+
+    @Query("SELECT * FROM ALBUMS ORDER BY ALBUM_MODIFY_DATE DESC")
+    override fun getByDateDESC(): Flow<List<Album>>
+
+    @Query("SELECT * FROM ALBUMS ORDER BY ALBUM_TRACKS_NUMBER ASC")
+    override fun getBySongsCountASC(): Flow<List<Album>>
+
+    @Query("SELECT * FROM ALBUMS ORDER BY ALBUM_TRACKS_NUMBER DESC")
+    override fun getBySongsCountDESC(): Flow<List<Album>>
+
 
     @Transaction
     @Query("SELECT * FROM albums ORDER BY ALBUM_NAME")

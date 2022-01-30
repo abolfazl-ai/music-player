@@ -3,6 +3,10 @@ package com.example.compose.local.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.compose.local.preferences.SortOrder
+import com.example.compose.local.preferences.SortOrder.*
+import com.example.compose.local.room.SongDao
+import kotlinx.coroutines.flow.Flow
 
 @Entity(tableName = "SONGS")
 data class Song(
@@ -23,7 +27,7 @@ data class Song(
     @ColumnInfo(name = "SONG_YEAR") val year: Int,
     @ColumnInfo(name = "SONG_TRACK_NUMBER") val trackNumber: Int,
     @ColumnInfo(name = "SONG_MODIFY_DATE") val modifyDate: Long
-) {
+) /*{
     sealed class Sort(val sort: String, val asc: Boolean) {
         object TitleASC : Sort("SONG_TITLE", true)
         object TitleDESC : Sort("SONG_TITLE", false)
@@ -41,3 +45,4 @@ data class Song(
         object ModifyDateDESC : Sort("SONG_MODIFY_DATE", false)
     }
 }
+*/

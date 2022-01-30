@@ -71,18 +71,6 @@ fun Home(viewModel: MainViewModel = viewModel()) {
     var fabDragging by remember { mutableStateOf(false) }
     val backgroundAlpha by animateFloatAsState(targetValue = if (fabExpanded) 0.3f else 1f)
 
-    var fabVisible by remember { mutableStateOf(true) }
-
-/*    LaunchedEffect(1) {
-        launch {
-            while (true) {
-                delay(2000)
-                fabVisible = !fabVisible
-                if (!fabVisible) delay(3000)
-            }
-        }
-    }*/
-
     ModalDrawer(
         drawerShape = RectangleShape,
         gesturesEnabled = !fabDragging,
@@ -159,8 +147,7 @@ fun Home(viewModel: MainViewModel = viewModel()) {
                     expanded = fabExpanded,
                     onExpand = { fabExpanded = it },
                     isPlaying = isPlaying,
-                    onDrag = { fabDragging = it },
-                    visible = fabVisible
+                    onDrag = { fabDragging = it }
                 ) { isPlaying = !isPlaying }
             }, showDismiss = fabExpanded, onDismiss = {
                 Log.e(TAG, "Home: ")

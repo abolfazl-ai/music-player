@@ -47,18 +47,12 @@ fun DraggableFab(
     playButtonColor: Color = MaterialTheme.colorScheme.surface,
     transProgress: () -> Float = { 0f },
     items: List<ImageVector> = MenuItems,
-    visible: Boolean = true,
     expanded: Boolean = false,
     onExpand: (expanded: Boolean) -> Unit = {},
     onDrag: (isDragging: Boolean) -> Unit = {},
     isPlaying: Boolean = false,
     onClick: () -> Unit = {},
 ) {
-
-    val visibilityAnimator by animateFloatAsState(
-        if (visible) 1f else 0f,
-        tween(1000)
-    )
 
     val iconsAlpha = remember { Animatable(1f) }
     val offsets = remember(items) {
@@ -110,15 +104,11 @@ fun DraggableFab(
         }
     }
 
-    BoxWithConstraints(
-        modifier
-//            .scale((10 * transProgress() + visibilityAnimator).coerceIn(0.5f, 1f))
-            .alpha((10 * transProgress() + visibilityAnimator).coerceIn(0f, 1f))
-    ) {
+    BoxWithConstraints() {
 
         val minDistance = with(LocalDensity.current) { remember { 16.dp.roundToPx() } }
 
-        if (transProgress() != 1f && visibilityAnimator == 1f)
+        if (transProgress() != 1f)
             offsets.minus(offsets[0]).reversed().forEachIndexed { index, anim ->
                 Surface(
                     modifier = Modifier
@@ -166,7 +156,7 @@ fun DraggableFab(
                 Icon(
                     modifier = Modifier
                         .alpha(2 * (transProgress().coerceIn(0.5f, 1f) - 0.5f))
-                        .padding(12.dp),
+                        .padding(16.dp),
                     painter = rememberAnimatedVectorPainter(a, isPlaying),
                     contentDescription = "PlayButton",
                 )

@@ -29,13 +29,13 @@ val PALETTE_TARGET_SECONDARY = Target.Builder()
 fun Palette?.getAccurateColor(): MainColors {
     this?.run {
         getSwatchForTarget(PALETTE_TARGET_PRIMARY)?.let {
-            return MainColors(Color(it.rgb), Color(it.titleTextColor))
+            return MainColors(Color(it.rgb), Color(it.bodyTextColor))
         }
         getSwatchForTarget(PALETTE_TARGET_SECONDARY)?.let {
-            return MainColors(Color(it.rgb), Color(it.titleTextColor))
+            return MainColors(Color(it.rgb), Color(it.bodyTextColor))
         }
         swatches.maxByOrNull { swatch -> swatch.population }?.let {
-            return MainColors(Color(it.rgb), Color(it.titleTextColor))
+            return MainColors(Color(it.rgb), Color(it.bodyTextColor))
         }
 
     }

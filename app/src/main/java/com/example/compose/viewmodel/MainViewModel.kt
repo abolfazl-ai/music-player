@@ -5,6 +5,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.compose.local.model.Song
+import com.example.compose.local.preferences.SortOrder
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -40,7 +41,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _songScreenState = MutableStateFlow(SongScreenState())
     val songScreenState: StateFlow<SongScreenState> get() = _songScreenState
-    private val _sortBy = MutableStateFlow(Song.Sort.TitleASC)
+    private val _sortBy = MutableStateFlow(SortOrder.TitleASC)
 
     private val _expandedSongIndex = MutableStateFlow(-1)
     fun setExpandedSongIndex(expanded: Boolean, index: Int) = viewModelScope.launch {

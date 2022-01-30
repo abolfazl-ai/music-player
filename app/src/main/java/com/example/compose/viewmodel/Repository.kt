@@ -1,14 +1,14 @@
 package com.example.compose.viewmodel
 
 import android.content.Context
-import androidx.lifecycle.LiveData
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.example.compose.local.MusicScannerWorker
 import com.example.compose.local.model.Song
+import com.example.compose.local.preferences.SortOrder
 import com.example.compose.local.room.DataBase
+import com.example.compose.local.room.getBySortOrder
 
 class Repository(private val context: Context) {
 
@@ -27,23 +27,23 @@ class Repository(private val context: Context) {
     }
 
     // Song Repository
-    fun getSongs(sort: Song.Sort = Song.Sort.TitleASC) = songDao.getSongs(sort.sort, sort.asc)
+    fun getSongs(sort: SortOrder = SortOrder.TitleASC) = getBySortOrder(songDao, sort)
     suspend fun getSongById(id: Long) = songDao.getSongById(id)
     suspend fun getSongByPath(path: String) = songDao.getSongByPath(path)
     suspend fun deleteSong(song: Song) = songDao.deleteSong(song)
 
     // Folder Repository
-    val allFolders = folderDao.getFolders()
+    fun getFolders(sort: SortOrder = SortOrder.TitleASC) = getBySortOrder(folderDao, sort)
     fun getFoldersWithSongs() = folderDao.getFoldersWithSongs()
     suspend fun getFolderByPath(path: String) = folderDao.getFolderByPath(path)
 
     // Artist Repository
-    val allArtists = artistDao.getArtists()
+    fun getArtists(sort: SortOrder = SortOrder.TitleASC) = getBySortOrder(artistDao, sort)
     fun getArtistsWithAlbumsAndSongs() = artistDao.getArtistsWithAlbumsAndSongs()
     suspend fun getArtistById(id: Long) = artistDao.getArtistById(id)
 
     // Album Repository
-    val allAlbums = albumDao.getAlbums()
+    fun getAlbums(sort: SortOrder = SortOrder.TitleASC) = getBySortOrder(albumDao, sort)
     fun getAlbumsWithSongs() = albumDao.getAlbumsWithSongs()
     suspend fun getAlbumWithSongs(id: Long) = albumDao.getAlbumWithSongs(id)
     suspend fun getAlbumById(id: Long) = albumDao.getAlbumById(id)

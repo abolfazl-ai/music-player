@@ -23,6 +23,7 @@ fun Modifier.drag(
 ) = if (active) pointerInput(Unit) {
         coroutineScope {
             while (true) {
+                onDrag(false)
 
                 val pointerId = awaitPointerEventScope { awaitFirstDown().id }
                 val velocityTracker = VelocityTracker()
