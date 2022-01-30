@@ -57,8 +57,8 @@ fun DraggableFab(
     onExpand: (expanded: Boolean) -> Unit = {},
     onDrag: (isDragging: Boolean) -> Unit = {},
     isPlaying: Boolean = false,
+    viewModel: MainViewModel = viewModel(),
     onClick: () -> Unit = {},
-    viewModel: MainViewModel = viewModel()
 ) {
 
     val iconsAlpha = remember { Animatable(1f) }
