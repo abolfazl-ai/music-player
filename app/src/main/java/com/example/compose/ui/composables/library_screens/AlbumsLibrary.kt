@@ -27,7 +27,7 @@ fun AlbumsLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = view
 
     val selectList = remember { mutableStateListOf<Int>() }
 
-    val albums by viewModel.repository.getAlbums().collectAsState(initial = emptyList())
+    val albums by viewModel.repository.allAlbums.collectAsState(initial = emptyList())
 
     val onSelect: (Int) -> Unit = remember {
         { if (selectList.contains(it)) selectList.remove(it) else selectList.add(it) }

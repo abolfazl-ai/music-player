@@ -30,7 +30,7 @@ fun FoldersLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = vie
     var expandIndex by rememberSaveable { mutableStateOf(-1) }
     val selectList = remember { mutableStateListOf<Int>() }
 
-    val folders by viewModel.repository.getFolders().collectAsState(initial = emptyList())
+    val folders by viewModel.repository.allFolders.collectAsState(initial = emptyList())
 
     val onSelect: (Int) -> Unit = remember {
         { if (selectList.contains(it)) selectList.remove(it) else selectList.add(it) }

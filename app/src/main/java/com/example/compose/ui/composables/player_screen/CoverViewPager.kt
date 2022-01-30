@@ -34,7 +34,7 @@ fun CoverViewPager(
     viewModel: MainViewModel = viewModel()
 ) {
 
-    val songList = viewModel.repository.getSongs().collectAsState(emptyList()).value
+    val songList = viewModel.repository.allSongs.collectAsState(emptyList()).value
 
     HorizontalPager(modifier = modifier, state = pagerState, count = songList.size) { page ->
 

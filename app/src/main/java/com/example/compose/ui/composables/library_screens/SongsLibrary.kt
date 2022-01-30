@@ -37,7 +37,7 @@ fun SongsLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = viewM
     var expandIndex by rememberSaveable { mutableStateOf(-1) }
     val selectList = remember { mutableStateListOf<Int>() }
 
-    val songs by viewModel.repository.getSongs()
+    val songs by viewModel.repository.allSongs
         .collectAsState(initial = emptyList())
 
     val onSelect: (Int) -> Unit = remember {

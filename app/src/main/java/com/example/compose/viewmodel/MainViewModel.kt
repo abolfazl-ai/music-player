@@ -4,7 +4,9 @@ import android.app.Application
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.compose.local.dataStore
 import com.example.compose.local.model.Song
+import com.example.compose.local.preferences.PreferencesRepository
 import com.example.compose.local.preferences.SortOrder
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +18,9 @@ import kotlinx.coroutines.launch
 @ExperimentalMaterialApi
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    val repository = Repository(application)
+    val preferences = PreferencesRepository(application.dataStore)
+
+    val repository = Repository(application, preferences.sortOrdersFlow)
 
     val serviceController = ServiceController()
 

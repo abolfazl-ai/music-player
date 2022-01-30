@@ -25,15 +25,21 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.compose.R
+import com.example.compose.local.dataStore
+import com.example.compose.local.preferences.PreferencesRepository
+import com.example.compose.local.preferences.SortOrder
 import com.example.compose.ui.composables.modifiers.drag
 import com.example.compose.utils.kotlin_extensions.coerceAtLeast
 import com.example.compose.utils.kotlin_extensions.getMidColor
 import com.example.compose.utils.kotlin_extensions.toIntOffset
 import com.example.compose.utils.resources.FabSize
 import com.example.compose.utils.resources.MiniFabSize
+import com.example.compose.viewmodel.MainViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -52,6 +58,7 @@ fun DraggableFab(
     onDrag: (isDragging: Boolean) -> Unit = {},
     isPlaying: Boolean = false,
     onClick: () -> Unit = {},
+    viewModel: MainViewModel = viewModel()
 ) {
 
     val iconsAlpha = remember { Animatable(1f) }
@@ -120,7 +127,11 @@ fun DraggableFab(
                         .padding(4.dp)
                         .size(MiniFabSize)
                         .alpha(iconsAlpha.value),
-                    onClick = {}, color = fabColor,
+                    onClick = {
+                        scope.launch {
+                            viewModel.preferences.saveSongsSortOrder(SortOrder.ArtistASC)
+                        }
+                    }, color = fabColor,
                     contentColor = contentColorFor(fabColor), shape = CircleShape,
                     shadowElevation = if (anim.value.getDistance() > 24) 4.dp else 0.dp
                 ) {
