@@ -44,8 +44,8 @@ fun Palette?.getAccurateColor(): MainColors {
 
 fun Float.getMidColor(start: Color, end: Color): Color {
     return Color(
-        red = start.red * (1 - this) + (end.red * this),
-        green = start.green * (1 - this) + (end.green * this),
-        blue = start.blue * (1 - this) + (end.blue * this)
+        red = (start.red * (1 - this) + (end.red * this)).coerceIn(0f, 1f),
+        green = (start.green * (1 - this) + (end.green * this)).coerceIn(0f, 1f),
+        blue = (start.blue * (1 - this) + (end.blue * this)).coerceIn(0f, 1f)
     )
 }
