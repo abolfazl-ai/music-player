@@ -64,6 +64,7 @@ fun Main() {
 @Composable
 fun Home(viewModel: MainViewModel = viewModel()) {
 
+    val scope = rememberCoroutineScope()
     val navController = rememberNavController()
     var fabExpanded by remember { mutableStateOf(false) }
     var fabDragging by remember { mutableStateOf(false) }
@@ -154,8 +155,10 @@ fun Home(viewModel: MainViewModel = viewModel()) {
         ) {
             SwipeRefresh(modifier = Modifier
                 .alpha(backgroundAlpha),
-                state = rememberSwipeRefreshState(viewModel.isRefreshing.collectAsState().value),
-                onRefresh = { viewModel.refresh() }) {
+                state = rememberSwipeRefreshState(
+                    viewModel.preferences.isScanning.collectAsState(initial = false).value
+                ),
+                onRefresh = { scope.launch { viewModel.repository.scan() } }) {
                 NavHost(
                     navController = navController,
                     startDestination = Screen.Home.route,

@@ -17,7 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.compose.local.model.Song
 import com.example.compose.ui.composables.list_items.ItemOptions
 import com.example.compose.ui.composables.list_items.LinearItem
@@ -30,9 +30,7 @@ import com.skydoves.landscapist.glide.GlideImage
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
-fun SongsLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = viewModel()) {
-
-    val state = viewModel.songScreenState.collectAsState()
+fun SongsLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = hiltViewModel()) {
 
     var expandIndex by rememberSaveable { mutableStateOf(-1) }
     val selectList = remember { mutableStateListOf<Int>() }

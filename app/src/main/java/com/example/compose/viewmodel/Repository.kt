@@ -5,53 +5,58 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.compose.local.MusicScannerWorker
-import com.example.compose.local.dataStore
 import com.example.compose.local.model.Album
 import com.example.compose.local.model.Artist
 import com.example.compose.local.model.Folder
 import com.example.compose.local.model.Song
-import com.example.compose.local.preferences.PreferencesRepository
-import com.example.compose.local.preferences.SortOrder
+import com.example.compose.local.preferences.AppPreferences
 import com.example.compose.local.preferences.SortOrders
 import com.example.compose.local.room.DataBase
 import com.example.compose.local.room.getBySortOrder
-import kotlinx.coroutines.flow.*
+import dagger.Lazy
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapMerge
+import javax.inject.Inject
 
-class Repository(private val context: Context, private val sortOrders: Flow<SortOrders>) {
+class Repository @Inject constructor(
+    @ApplicationContext private val context: Context,
+    dataBase: DataBase,
+    val preferences: AppPreferences,
+) {
 
-    private val dataBase = DataBase.getDataBase(context.applicationContext)
     private val songDao = dataBase.songDao
     private val folderDao = dataBase.folderDao
     private val artistDao = dataBase.artistDao
     private val albumDao = dataBase.albumDao
     private val playlistDao = dataBase.playlistDao
 
-    private val workManager by lazy { WorkManager.getInstance(context.applicationContext) }
-
-    fun scan() {
+    suspend fun scan() {
+        preferences.updateScanState(true)
         val request = OneTimeWorkRequestBuilder<MusicScannerWorker>().build()
-        workManager.enqueueUniqueWork("MusicScan", ExistingWorkPolicy.KEEP, request)
+        WorkManager.getInstance(context)
+            .enqueueUniqueWork("MusicScan", ExistingWorkPolicy.KEEP, request)
     }
 
     // Song Repository
     suspend fun getSongById(id: Long) = songDao.getSongById(id)
     suspend fun getSongByPath(path: String) = songDao.getSongByPath(path)
     suspend fun deleteSong(song: Song) = songDao.deleteSong(song)
-    val allSongs: Flow<List<Song>> = sortOrders.flatMapMerge {
+    val allSongs: Flow<List<Song>> = preferences.sortOrdersFlow.flatMapMerge {
         getBySortOrder(songDao, it.songsOrder)
     }
 
     // Folder Repository
     fun getFoldersWithSongs() = folderDao.getFoldersWithSongs()
     suspend fun getFolderByPath(path: String) = folderDao.getFolderByPath(path)
-    val allFolders: Flow<List<Folder>> = sortOrders.flatMapMerge {
+    val allFolders: Flow<List<Folder>> = preferences.sortOrdersFlow.flatMapMerge {
         getBySortOrder(folderDao, it.foldersOrder)
     }
 
     // Artist Repository
     fun getArtistsWithAlbumsAndSongs() = artistDao.getArtistsWithAlbumsAndSongs()
     suspend fun getArtistById(id: Long) = artistDao.getArtistById(id)
-    val allArtists: Flow<List<Artist>> = sortOrders.flatMapMerge {
+    val allArtists: Flow<List<Artist>> = preferences.sortOrdersFlow.flatMapMerge {
         getBySortOrder(artistDao, it.artistsOrder)
     }
 
@@ -59,7 +64,7 @@ class Repository(private val context: Context, private val sortOrders: Flow<Sort
     fun getAlbumsWithSongs() = albumDao.getAlbumsWithSongs()
     suspend fun getAlbumWithSongs(id: Long) = albumDao.getAlbumWithSongs(id)
     suspend fun getAlbumById(id: Long) = albumDao.getAlbumById(id)
-    val allAlbums: Flow<List<Album>> = sortOrders.flatMapMerge {
+    val allAlbums: Flow<List<Album>> = preferences.sortOrdersFlow.flatMapMerge {
         getBySortOrder(albumDao, it.albumsOrder)
     }
 

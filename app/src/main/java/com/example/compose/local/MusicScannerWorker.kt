@@ -7,198 +7,40 @@ import android.provider.MediaStore
 import android.provider.MediaStore.Audio.*
 import android.util.Log
 import androidx.core.database.getStringOrNull
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.compose.local.model.Album
 import com.example.compose.local.model.Artist
 import com.example.compose.local.model.Folder
 import com.example.compose.local.model.Song
+import com.example.compose.local.preferences.AppPreferences
 import com.example.compose.local.room.DataBase
+import com.example.compose.local.room.ModificationDao
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
+import javax.inject.Inject
 import kotlin.system.measureTimeMillis
 
-class MusicScannerWorker(context: Context, params: WorkerParameters) :
-    CoroutineWorker(context, params) {
+@HiltWorker
+class MusicScannerWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters,
+    val dao: ModificationDao,
+    val preferences: AppPreferences,
+) : CoroutineWorker(context, params) {
 
-    private val dao by lazy { DataBase.getDataBase(context.applicationContext).modificationDao }
     private val date = Calendar.getInstance().timeInMillis
 
     override suspend fun doWork(): Result {
         measureTimeMillis {
-//            if (MediaStore.getVersion(applicationContext)=="")
             querySongs()
             queryAlbums()
             queryArtists()
         }.also { Log.d("Abolfazl", "Scan finished in $it ms") }
+        preferences.updateScanState(false)
         return Result.success()
-
-/*        val state = Environment.getExternalStorageState()
-        return if (state == Environment.MEDIA_MOUNTED || state == Environment.MEDIA_MOUNTED_READ_ONLY) {
-            measureTimeMillis {
-                scanFolder(Environment.getExternalStorageDirectory())
-                removeDeletedItems()
-            }.also { Log.d("AbolfazlDoWork", "Scan finished in $it ms") }
-            Result.success()
-        } else Result.failure()*/
     }
-
-/*
-    private suspend fun removeDeletedItems() = coroutineScope {
-        val oldSongs = ArrayList<Song>()
-        dao.getSongsToModify().map {
-            async {
-                if (!File(it.path).exists()) {
-                    oldSongs.add(it)
-                }
-            }
-        }.awaitAll()
-        dao.deleteSongs(oldSongs)
-    }
-
-    private suspend fun scanFolder(dir: File) {
-
-        if (!File(dir.absolutePath + "/.nomedia").exists()) {
-
-            coroutineScope {
-
-                val files = ArrayList<File>()
-
-                dir.listFiles()?.forEach {
-                    when {
-                        it.isDirectory -> launch { scanFolder(it) }
-                        it.isFile -> if (it.path.endsWith("mp3", ignoreCase = true)) files.add(it)
-                    }
-                }
-
-                if (files.isNotEmpty()) {
-
-                    val folder = Folder(dir.path, dir.name)
-
-//                    withContext(Dispatchers.IO) {
-                    with(files.map { songFile ->
-                        async { scanSongAsync(songFile, folder) }
-                    }.awaitAll()) {
-                        dao.apply {
-                            insertFolder(folder)
-                            insertSongs(map { it.song })
-                            insertAlbums(map { it.album })
-                            insertArtists(map { it.artists }.flatten())
-                            insertArtistsWithSong(map { it.artistAndSong }.flatten())
-//                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun scanSongAsync(songFile: File, folder: Folder): ScanResponse {
-
-        val mediaExtractor = MediaExtractor()
-        val mediaMetadataRetriever = MediaMetadataRetriever()
-
-        try {
-            mediaExtractor.setDataSource(songFile.absolutePath)
-            mediaMetadataRetriever.setDataSource(songFile.absolutePath)
-        } catch (e: IOException) {
-        }
-
-        val fileName = songFile.name
-        val fileSize = songFile.length() / 1048576f
-        var format: String
-        val channel: Int
-        val sampleRate: Int
-        val bitRate: Int
-        val duration: Long
-        val title: String
-        val artistName: String
-        val albumName: String
-        val albumArtist: String
-        val genre: String
-        val year: String
-        val composer: String
-        val trackNumber: String
-
-        with(mediaExtractor.getTrackFormat(0)) {
-            format = getString(KEY_MIME) ?: "Unknown"
-            channel = getInteger(KEY_CHANNEL_COUNT)
-            sampleRate = getInteger(KEY_SAMPLE_RATE)
-            bitRate = getInteger(KEY_BIT_RATE)
-            duration = getLong(KEY_DURATION)
-        }
-        with(mediaMetadataRetriever) {
-            title =
-                (extractMetadata(METADATA_KEY_TITLE)
-                    ?: fileName).trim()
-            artistName = (extractMetadata(METADATA_KEY_ARTIST)
-                ?: "Unknown").trim()
-            albumName =
-                (extractMetadata(METADATA_KEY_ALBUM)
-                    ?: "Single").trim()
-            albumArtist =
-                (extractMetadata(METADATA_KEY_ALBUMARTIST)
-                    ?: "Unknown").trim()
-            genre = (extractMetadata(METADATA_KEY_GENRE)
-                ?: "Unknown Genre").trim()
-            year =
-                (extractMetadata(METADATA_KEY_YEAR) ?: "0").trim()
-            composer = extractMetadata(METADATA_KEY_COMPOSER) ?: ""
-            trackNumber =
-                (extractMetadata(METADATA_KEY_CD_TRACK_NUMBER)
-                    ?: "0").trim()
-        }
-
-        val artists = with(artistName) {
-            when {
-                contains(".Ft", true) -> split(
-                    ".Ft",
-                    ignoreCase = true
-                )
-                contains("Ft", true) -> split(
-                    "Ft",
-                    ignoreCase = true
-                )
-                contains(';', true) -> split(';', ignoreCase = true)
-                else -> arrayListOf(this)
-            }
-        }.map { Artist(name = it) }
-
-        val album = Album(albumName, albumArtist)
-
-        val song = Song(
-            title = title,
-            album = album.name,
-            artist = artistName,
-            albumArtist = album.artist,
-            composer = composer,
-            folderPath = folder.path,
-            path = songFile.path,
-            albumId = album.id,
-            duration = duration,
-            genre = genre,
-            fileSize = fileSize,
-            format = format,
-            year = year,
-            trackNumber = trackNumber,
-            channel = channel,
-            bitRate = bitRate,
-            sampleRate = sampleRate,
-            fileName = fileName,
-            modifyDate = date
-        )
-
-        mediaMetadataRetriever.release()
-        mediaExtractor.release()
-
-        return ScanResponse(song, album, artists, artists.map { ArtistAndSong(it.name, song.id) })
-    }
-
-    internal data class ScanResponse(
-        val song: Song,
-        val album: Album,
-        val artists: List<Artist>,
-        val artistAndSong: List<ArtistAndSong>
-    )
-*/
 
     private suspend fun querySongs() {
 
@@ -247,7 +89,8 @@ class MusicScannerWorker(context: Context, params: WorkerParameters) :
                         val year = cursor.getInt(columns[Media.YEAR]!!)
                         val composer = cursor.getStringOrNull(columns[Media.COMPOSER]!!) ?: ""
                         val trackNumber = cursor.getInt(columns[Media.TRACK]!!)
-                        val title = (cursor.getStringOrNull(columns[Media.TITLE]!!) ?: fileName).trim()
+                        val title =
+                            (cursor.getStringOrNull(columns[Media.TITLE]!!) ?: fileName).trim()
                         val artist = cursor.getStringOrNull(columns[Media.ARTIST]!!) ?: "Unknown"
                         val artistId = cursor.getLong(columns[Media.ARTIST_ID]!!)
                         val album = cursor.getStringOrNull(columns[Media.ALBUM]!!) ?: "Unknown"

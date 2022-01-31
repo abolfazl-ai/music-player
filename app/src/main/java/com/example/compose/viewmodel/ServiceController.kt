@@ -10,8 +10,9 @@ import com.example.compose.utils.util_classes.PlaybackAction
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import kotlinx.coroutines.flow.MutableStateFlow
+import javax.inject.Inject
 
-class ServiceController {
+class ServiceController @Inject constructor() {
 
     val binder: MutableLiveData<PlayerService.PlayerBinder?> = MutableLiveData()
 

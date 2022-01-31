@@ -73,7 +73,7 @@ fun LinearItem(
         targetValue = if (expanded) 1f else 0f,
 //        spring(if (expanded) 0.4f else 1f,if (expanded) 1500f else Spring.StiffnessHigh )
         tween(
-            if (expanded) 300 else 200,
+            if (expanded) 250 else 200,
             easing = { OvershootInterpolator(3f).getInterpolation(it) })
     )
 

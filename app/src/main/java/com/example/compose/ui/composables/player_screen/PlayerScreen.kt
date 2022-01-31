@@ -1,6 +1,5 @@
 package com.example.compose.ui.composables.player_screen
 
-import android.util.Log
 import androidx.collection.LruCache
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
@@ -9,7 +8,6 @@ import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.LocalContentAlpha
@@ -17,21 +15,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.compose.R
 import com.example.compose.ui.composables.modifiers.reveal
 import com.example.compose.utils.kotlin_extensions.compIn
 import com.example.compose.utils.resources.*
 import com.example.compose.utils.util_classes.MainColors
-import com.example.compose.viewmodel.MainViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.rememberPagerState
 

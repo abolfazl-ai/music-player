@@ -2,13 +2,19 @@ package com.example.compose
 
 import android.app.Application
 import android.content.Intent
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
+import dagger.hilt.android.HiltAndroidApp
+import javax.inject.Inject
 
-class ComposeApplication : Application() {
+@HiltAndroidApp
+class ComposeApplication : Application(), Configuration.Provider {
 
-    override fun onCreate() {
-//        val i = Intent(this@ComposeApplication, PlayerService::class.java)
-//        startService(i)
-        super.onCreate()
-    }
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
 
+    override fun getWorkManagerConfiguration() =
+        Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
 }

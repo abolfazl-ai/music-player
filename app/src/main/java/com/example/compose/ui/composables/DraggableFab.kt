@@ -25,13 +25,10 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.compose.R
-import com.example.compose.local.dataStore
-import com.example.compose.local.preferences.PreferencesRepository
 import com.example.compose.local.preferences.SortOrder
 import com.example.compose.ui.composables.modifiers.drag
 import com.example.compose.utils.kotlin_extensions.coerceAtLeast
@@ -133,7 +130,7 @@ fun DraggableFab(
                         }
                     }, color = fabColor,
                     contentColor = contentColorFor(fabColor), shape = CircleShape,
-                    shadowElevation = if (anim.value.getDistance() > 24) 4.dp else 0.dp
+                    shadowElevation = if (anim.value.getDistance() > 24) 2.dp else 0.dp
                 ) {
                     Icon(
                         modifier = Modifier.padding(14.dp),
@@ -153,7 +150,7 @@ fun DraggableFab(
                 .size(FabSize),
             shape = CircleShape,
             color = color.first,
-            contentColor = color.second, shadowElevation = (2 + 4 * (1 - transProgress())).dp,
+            contentColor = color.second, shadowElevation = (2 + 2 * (1 - transProgress())).dp,
             onClick = {
                 when (transProgress()) {
                     1f -> onClick()

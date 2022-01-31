@@ -1,6 +1,5 @@
 package com.example.compose.ui.composables.library_screens
 
-import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -8,13 +7,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.*
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.compose.ui.composables.list_items.GridItem
 import com.example.compose.utils.default_pictures.AlbumAndSize
 import com.example.compose.viewmodel.MainViewModel
@@ -23,7 +20,7 @@ import com.skydoves.landscapist.glide.GlideImage
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
-fun AlbumsLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = viewModel()) {
+fun AlbumsLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = hiltViewModel()) {
 
     val selectList = remember { mutableStateListOf<Int>() }
 

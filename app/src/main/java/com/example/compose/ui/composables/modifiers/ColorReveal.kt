@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import kotlin.math.hypot
 import kotlin.math.max
 
-fun Modifier.reveal(color: Color, y: Dp, duration: Int = 600, startRadius: Dp = 0.dp) = composed {
+fun Modifier.reveal(color: Color, y: Dp, duration: Int = 500, startRadius: Dp = 0.dp) = composed {
 
     val colors = remember { mutableStateListOf(color to Animatable(1f)) }
     val scope = rememberCoroutineScope()

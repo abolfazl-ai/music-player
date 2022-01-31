@@ -1,6 +1,5 @@
 package com.example.compose.ui.composables.library_screens
 
-import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,11 +12,9 @@ import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.compose.ui.composables.icons.Artist
 import com.example.compose.ui.composables.list_items.GridItem
 import com.example.compose.viewmodel.MainViewModel
@@ -25,7 +22,7 @@ import com.example.compose.viewmodel.MainViewModel
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
-fun ArtistsLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = viewModel()) {
+fun ArtistsLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = hiltViewModel()) {
 
     val selectList = remember { mutableStateListOf<Int>() }
 

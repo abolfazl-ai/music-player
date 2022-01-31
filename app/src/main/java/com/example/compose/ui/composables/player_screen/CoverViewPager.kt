@@ -11,13 +11,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.core.graphics.drawable.toBitmap
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.palette.graphics.Palette
 import com.example.compose.ui.composables.modifiers.crossFade
 import com.example.compose.utils.kotlin_extensions.PALETTE_TARGET_PRIMARY
 import com.example.compose.utils.kotlin_extensions.PALETTE_TARGET_SECONDARY
-import com.example.compose.utils.util_classes.MainColors
 import com.example.compose.utils.kotlin_extensions.getAccurateColor
+import com.example.compose.utils.util_classes.MainColors
 import com.example.compose.viewmodel.MainViewModel
 import com.google.accompanist.pager.*
 import com.skydoves.landscapist.glide.GlideImage
@@ -30,8 +30,7 @@ fun CoverViewPager(
     modifier: Modifier = Modifier,
     pagerState: PagerState = rememberPagerState(),
     onPageCreated: (index: Int, colors: MainColors) -> Unit = { _, _ -> },
-    isDarkTheme: Boolean = isSystemInDarkTheme(),
-    viewModel: MainViewModel = viewModel()
+    viewModel: MainViewModel = hiltViewModel()
 ) {
 
     val songList = viewModel.repository.allSongs.collectAsState(emptyList()).value

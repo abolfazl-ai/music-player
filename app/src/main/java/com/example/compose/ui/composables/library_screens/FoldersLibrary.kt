@@ -17,7 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.compose.ui.composables.list_items.LinearItem
 import com.example.compose.utils.kotlin_extensions.toTimeFormat
 import com.example.compose.viewmodel.MainViewModel
@@ -25,7 +25,7 @@ import com.example.compose.viewmodel.MainViewModel
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
-fun FoldersLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = viewModel()) {
+fun FoldersLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = hiltViewModel()) {
 
     var expandIndex by rememberSaveable { mutableStateOf(-1) }
     val selectList = remember { mutableStateListOf<Int>() }

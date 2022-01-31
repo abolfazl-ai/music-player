@@ -17,6 +17,7 @@ import com.example.compose.viewmodel.MainViewModel
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import dagger.hilt.android.AndroidEntryPoint
 
 @OptIn(
     ExperimentalMaterial3Api::class,
@@ -27,6 +28,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
     ExperimentalAnimationGraphicsApi::class,
     ExperimentalMaterialApi::class,
 )
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val viewModel: MainViewModel by viewModels()

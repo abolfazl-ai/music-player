@@ -1,17 +1,27 @@
 package com.example.compose.local.preferences
 
+import android.content.Context
 import android.util.Log
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.emptyPreferences
-import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.SharedPreferencesMigration
+import androidx.datastore.preferences.core.*
+import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import java.io.IOException
+import javax.inject.Inject
 
-class PreferencesRepository(private val dataStore: DataStore<Preferences>) {
+private const val MUSIC_PREFERENCES_NAME = "user_preferences"
+val Context.dataStore by preferencesDataStore(
+    name = MUSIC_PREFERENCES_NAME,
+    produceMigrations = { context ->
+        listOf(SharedPreferencesMigration(context, MUSIC_PREFERENCES_NAME))
+    }
+)
+
+
+class AppPreferences @Inject constructor(private val dataStore: DataStore<Preferences>) {
 
     private val TAG: String = "PreferencesRepo"
 
@@ -23,6 +33,9 @@ class PreferencesRepository(private val dataStore: DataStore<Preferences>) {
         val PLAYLISTS_SORT_ORDER = stringPreferencesKey("playlists_sort_order")
 
         val PLAYING_STATE = stringPreferencesKey("playing_state")
+
+        val IS_SCANNING = booleanPreferencesKey("is_scanning")
+
     }
 
     val playingStateFlow: Flow<PlayingState> = dataStore.data
@@ -38,6 +51,20 @@ class PreferencesRepository(private val dataStore: DataStore<Preferences>) {
     suspend fun updatePlayingState(state: PlayingState) = dataStore.edit { preferences ->
         preferences[PrefKeys.PLAYING_STATE] = state.name
     }
+
+
+    val isScanning: Flow<Boolean> = dataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                Log.e(TAG, "Error reading preferences.", exception)
+                emit(emptyPreferences())
+            } else throw exception
+        }.map { preferences -> preferences[PrefKeys.IS_SCANNING] ?: false }
+
+    suspend fun updateScanState(isScanning: Boolean) = dataStore.edit { preferences ->
+        preferences[PrefKeys.IS_SCANNING] = isScanning
+    }
+
 
     val sortOrdersFlow: Flow<SortOrders> = dataStore.data
         .catch { exception ->

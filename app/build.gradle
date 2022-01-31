@@ -29,8 +29,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
-            jniDebuggable true
-            debuggable true
+            jniDebuggable false
+            debuggable false
         }
     }
     compileOptions {
@@ -95,6 +95,9 @@ dependencies {
     def hilt_version = '2.40.5'
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
+    implementation 'androidx.hilt:hilt-work:1.0.0'
+    kapt 'androidx.hilt:hilt-compiler:1.0.0'
+    implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
 
     //ExoPlayer
     def exo_version = '2.16.1'
