@@ -32,24 +32,24 @@ class AppPreferences @Inject constructor(private val dataStore: DataStore<Prefer
         val FOLDERS_SORT_ORDER = stringPreferencesKey("folders_sort_order")
         val PLAYLISTS_SORT_ORDER = stringPreferencesKey("playlists_sort_order")
 
-        val PLAYING_STATE = stringPreferencesKey("playing_state")
+        val PLAYING_STATE = booleanPreferencesKey("playing_state")
 
         val IS_SCANNING = booleanPreferencesKey("is_scanning")
 
     }
 
-    val playingStateFlow: Flow<PlayingState> = dataStore.data
+    val playStateFlow: Flow<Boolean> = dataStore.data
         .catch { exception ->
             if (exception is IOException) {
                 Log.e(TAG, "Error reading preferences.", exception)
                 emit(emptyPreferences())
             } else throw exception
         }.map { preferences ->
-            PlayingState.valueOf(preferences[PrefKeys.PLAYING_STATE] ?: PlayingState.PAUSE.name)
+            preferences[PrefKeys.PLAYING_STATE] ?: false
         }
 
-    suspend fun updatePlayingState(state: PlayingState) = dataStore.edit { preferences ->
-        preferences[PrefKeys.PLAYING_STATE] = state.name
+    suspend fun updatePlayingState(isPlaying: Boolean) = dataStore.edit { preferences ->
+        preferences[PrefKeys.PLAYING_STATE] = isPlaying
     }
 
 

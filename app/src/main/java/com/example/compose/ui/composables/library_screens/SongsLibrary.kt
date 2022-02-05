@@ -30,19 +30,38 @@ import com.skydoves.landscapist.glide.GlideImage
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
-fun SongsLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = hiltViewModel()) {
+fun SongsLibrary(
+    modifier: Modifier = Modifier,
+    viewModel: MainViewModel = hiltViewModel()
+) {
 
-    var expandIndex by rememberSaveable { mutableStateOf(-1) }
     val selectList = remember { mutableStateListOf<Int>() }
-
-    val songs by viewModel.repository.allSongs
-        .collectAsState(initial = emptyList())
-
     val onSelect: (Int) -> Unit = remember {
         { if (selectList.contains(it)) selectList.remove(it) else selectList.add(it) }
     }
 
-    val options: @Composable BoxScope.() -> Unit = { ItemOptions() }
+    val songs by viewModel.repository.allSongs.collectAsState(initial = emptyList())
+
+    SongList(
+        modifier = modifier,
+        songs = songs,
+        selectList = selectList,
+        onSelect = onSelect,
+        onItemClick = { if (selectList.isNotEmpty()) onSelect(it) }
+    )
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun SongList(
+    modifier: Modifier = Modifier,
+    songs: List<Song>,
+    options: @Composable BoxScope.() -> Unit = { ItemOptions() },
+    selectList: List<Int>,
+    onSelect: (index: Int) -> Unit,
+    onItemClick: (index: Int) -> Unit
+) {
+    var expandIndex by rememberSaveable { mutableStateOf(-1) }
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -56,10 +75,12 @@ fun SongsLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = hiltV
                 expanded = expandIndex == index,
                 selected = selectList.contains(index),
                 onExpand = {
-                    if (it) expandIndex = index else if (expandIndex == index) expandIndex = -1
+                    if (it) expandIndex = index
+                    else if (expandIndex == index) expandIndex = -1
                 },
-                onSelect = { onSelect(index) }
-            ) { if (selectList.isNotEmpty()) onSelect(index) }
+                onSelect = { onSelect(index) },
+                onClick = { onItemClick(index) }
+            )
         }
     }
 }

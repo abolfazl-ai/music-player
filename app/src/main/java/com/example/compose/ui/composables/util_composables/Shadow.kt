@@ -9,9 +9,9 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 
 @Composable
-fun Shadow(modifier: Modifier = Modifier, alpha: Float) = Spacer(
+fun Shadow(modifier: Modifier = Modifier, alpha: Float,color: Color= Color.Black) = Spacer(
     modifier
         .fillMaxSize()
         .alpha(alpha)
-        .background(Color.Black)
+        .background(color)
 )

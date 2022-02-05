@@ -18,14 +18,39 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.*
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.compose.ui.composables.list_items.LinearItem
 import com.example.compose.utils.kotlin_extensions.toTimeFormat
 import com.example.compose.viewmodel.MainViewModel
 
-@ExperimentalFoundationApi
-@ExperimentalMaterialApi
+@OptIn(ExperimentalMaterialApi::class)
+fun NavGraphBuilder.foldersLibrary(viewModel: MainViewModel, navController: NavHostController) {
+
+    composable(route = "folders") { FoldersLibrary(navController, viewModel) }
+
+    composable("folders/{folderPath}", listOf(navArgument("folderPath") { type = NavType.StringType })) {
+
+        val songs by viewModel.repository.getSongsByFolderPath(
+            (it.arguments?.getString("folderPath") ?: "")
+                .replace("=A=", "/")
+        ).collectAsState(initial = emptyList())
+
+        SongList(
+            songs = songs,
+            selectList = emptyList(),
+            onSelect = {},
+        ) {}
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun FoldersLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = hiltViewModel()) {
+private fun FoldersLibrary(
+    navController: NavController = rememberNavController(),
+    viewModel: MainViewModel = hiltViewModel()
+) {
 
     var expandIndex by rememberSaveable { mutableStateOf(-1) }
     val selectList = remember { mutableStateListOf<Int>() }
@@ -37,7 +62,7 @@ fun FoldersLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = hil
     }
 
     LazyColumn(
-        modifier = modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(6.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
@@ -63,7 +88,10 @@ fun FoldersLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = hil
                     if (it) expandIndex = index else if (expandIndex == index) expandIndex = -1
                 },
                 onSelect = { onSelect(index) }
-            ) { if (selectList.isNotEmpty()) onSelect(index) }
+            ) {
+                if (selectList.isNotEmpty()) onSelect(index)
+                else navController.navigate("folders/${folders[index].path.replace("/", "=A=")}")
+            }
         }
     }
 }

@@ -19,6 +19,7 @@ import com.example.compose.local.room.DataBase
 import com.example.compose.local.room.ModificationDao
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import java.io.File
 import javax.inject.Inject
 import kotlin.system.measureTimeMillis
 
@@ -70,32 +71,30 @@ class MusicScannerWorker @AssistedInject constructor(
         )
 
         applicationContext.contentResolver.query(collection, projection, null, null, null)
-            ?.use { cursor ->
+            ?.use { c ->
+                val columns = projection.associateWith { c.getColumnIndexOrThrow(it) }
 
-                val columns = projection.associateWith { cursor.getColumnIndexOrThrow(it) }
+                while (c.moveToNext()) {
 
-                while (cursor.moveToNext()) {
+                    val path = c.getStringOrNull(columns[Media.DATA]!!)
+                    if (c.getInt(columns[Media.IS_MUSIC]!!) == 1 && path != null) {
 
-                    val path = cursor.getStringOrNull(columns[Media.DATA]!!)
-                    if (cursor.getInt(columns[Media.IS_MUSIC]!!) == 1 && path != null) {
-
-                        val id = cursor.getLong(columns[Media._ID]!!)
+                        val id = c.getLong(columns[Media._ID]!!)
                         val fileName = path.substring(path.lastIndexOf("/") + 1)
-                        val fileSize = cursor.getInt(columns[Media.SIZE]!!) / 1048576f
+                        val fileSize = c.getInt(columns[Media.SIZE]!!) / 1048576f
                         val folderPath = path.substring(0, path.lastIndexOf("/"))
                         val folderName = folderPath.substring(folderPath.lastIndexOf("/") + 1)
-                        val mimeType = cursor.getStringOrNull(columns[Media.MIME_TYPE]!!) ?: ""
-                        val duration = cursor.getLong(columns[Media.DURATION]!!)
-                        val year = cursor.getInt(columns[Media.YEAR]!!)
-                        val composer = cursor.getStringOrNull(columns[Media.COMPOSER]!!) ?: ""
-                        val trackNumber = cursor.getInt(columns[Media.TRACK]!!)
-                        val title =
-                            (cursor.getStringOrNull(columns[Media.TITLE]!!) ?: fileName).trim()
-                        val artist = cursor.getStringOrNull(columns[Media.ARTIST]!!) ?: "Unknown"
-                        val artistId = cursor.getLong(columns[Media.ARTIST_ID]!!)
-                        val album = cursor.getStringOrNull(columns[Media.ALBUM]!!) ?: "Unknown"
-                        val albumId = cursor.getLong(columns[Media.ALBUM_ID]!!)
-                        val albumArtist = cursor.getStringOrNull(columns[Albums.ARTIST]!!) ?: artist
+                        val mimeType = c.getStringOrNull(columns[Media.MIME_TYPE]!!) ?: ""
+                        val duration = c.getLong(columns[Media.DURATION]!!)
+                        val year = c.getInt(columns[Media.YEAR]!!)
+                        val composer = c.getStringOrNull(columns[Media.COMPOSER]!!) ?: ""
+                        val trackNumber = c.getInt(columns[Media.TRACK]!!)
+                        val title = (c.getStringOrNull(columns[Media.TITLE]!!) ?: fileName).trim()
+                        val artist = c.getStringOrNull(columns[Media.ARTIST]!!) ?: "Unknown"
+                        val artistId = c.getLong(columns[Media.ARTIST_ID]!!)
+                        val album = c.getStringOrNull(columns[Media.ALBUM]!!) ?: "Unknown"
+                        val albumId = c.getLong(columns[Media.ALBUM_ID]!!)
+                        val albumArtist = c.getStringOrNull(columns[Albums.ARTIST]!!) ?: artist
 
                         Folder(folderPath, folderName).also { folders.add(it) }
 

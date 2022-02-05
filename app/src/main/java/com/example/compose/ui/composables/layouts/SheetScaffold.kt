@@ -1,37 +1,40 @@
 package com.example.compose.ui.composables.layouts
 
-import android.util.Log
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.Spring.DampingRatioNoBouncy
+import androidx.compose.animation.core.Spring.StiffnessMediumLow
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.*
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.forEachGesture
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.swipeable
+import androidx.compose.material.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.motionEventSpy
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.compose.ui.composables.util_composables.Shadow
 import com.example.compose.utils.kotlin_extensions.compIn
 import com.example.compose.utils.resources.*
+import com.example.compose.viewmodel.MainScaffoldState
+import com.example.compose.viewmodel.MainViewModel
 import com.google.accompanist.insets.LocalWindowInsets
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @ExperimentalComposeUiApi
@@ -39,185 +42,176 @@ import kotlin.math.roundToInt
 @ExperimentalMaterialApi
 @Composable
 fun SheetScaffold(
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier, viewModel: MainViewModel = hiltViewModel(),
     backgroundColor: Color = MaterialTheme.colorScheme.background,
-    appBar: @Composable () -> Unit,
-    bottomNav: @Composable () -> Unit,
-    fab: @Composable (progress: Float) -> Unit,
-    showDismiss: Boolean = false,
-    onDismiss: () -> Unit = {},
-    playerContent: @Composable (progress: Float) -> Unit,
-    playerBackground: Color = MaterialTheme.colorScheme.primaryContainer,
-    playerSheetState: SheetState = rememberSheetState(
-        SheetValue.Collapsed,
-        spring(stiffness = 2000f)
-    ),
-    queueContent: @Composable () -> Unit,
+    appBar: @Composable () -> Unit, bottomNav: @Composable () -> Unit, fab: @Composable () -> Unit,
+    drawerContent: @Composable ColumnScope.() -> Unit = {}, drawerBackground: Color = MaterialTheme.colorScheme.primaryContainer,
+    stageContent: @Composable () -> Unit, stageBackground: Color = MaterialTheme.colorScheme.primaryContainer,
+    stageSheetState: SheetState = rememberSheetState(SheetValue.Collapsed, spring(1f, 750f)),
+    queueContent: @Composable () -> Unit, queueBackground: Color = MaterialTheme.colorScheme.surface,
     queueSheetState: SheetState = rememberSheetState(SheetValue.Collapsed),
-    queueBackground: Color = MaterialTheme.colorScheme.surface,
     content: @Composable () -> Unit
 ) = BoxWithConstraints(modifier.fillMaxSize()) {
 
-    val realPeekHeight = with(LocalDensity.current) {
-        (PlayerSheetPeekHeight + BottomNavHeight).roundToPx()
-    } + LocalWindowInsets.current.navigationBars.bottom
+    val state by viewModel.mainScaffoldState.collectAsState()
+    val scope = rememberCoroutineScope()
+    val density = LocalDensity.current
 
-    val playerSwipeable = Modifier
-        .swipeable(
-            state = playerSheetState,
-            anchors = mapOf(
-                -realPeekHeight.toFloat() to SheetValue.Collapsed,
-                -constraints.maxHeight.toFloat() to SheetValue.Expanded,
-            ),
-            orientation = Orientation.Vertical,
-            resistance = null
-        )
+    val realPeekHeight = getRealPeekHeight(density, state.showBottomNav, LocalWindowInsets.current.navigationBars.bottom)
 
-    val queueAnchors = with(LocalDensity.current) {
-        mapOf(
-            (maxWidth + PlayerScreenSpacing.times(2) + FabSize + ProgressBarHeight).toPx() to SheetValue.Collapsed,
-            LocalWindowInsets.current.statusBars.top + QueueMargin.toPx() to SheetValue.Expanded
-        )
-    }
+    val stageAnchors = mapOf(-realPeekHeight.toFloat() to SheetValue.Collapsed, -constraints.maxHeight.toFloat() to SheetValue.Expanded)
+    val stageSwipeable = Modifier.swipeable(stageSheetState, stageAnchors, Orientation.Vertical, resistance = null)
 
-    val queueSwipeable = Modifier
-        .swipeable(
-            state = queueSheetState,
-            anchors = queueAnchors,
-            orientation = Orientation.Vertical,
-        )
+    val queueAnchors = getQueueAnchors(density, maxWidth, LocalWindowInsets.current.statusBars.top)
+    val queueSwipeable = Modifier.swipeable(queueSheetState, queueAnchors, Orientation.Vertical)
 
     SheetScaffoldStack(
-        width = maxWidth, height = maxHeight, pPeekHeight = realPeekHeight,
-        appBar = appBar, bottomNav = bottomNav, pSheetContent = {
+        viewModel = viewModel, state = state, width = maxWidth,
+        appBar = appBar, bottomNav = bottomNav, fab = fab,
+        drawerContent = drawerContent, drawerBackground = drawerBackground,
+        stageContent = {
+            Surface(stageSwipeable.fillMaxSize(), shadowElevation = SheetElevation, color = stageBackground) {
+                stageContent()
+                if (stageSheetState.isCollapsed) Spacer(modifier = Modifier.clickable { scope.launch { stageSheetState.expand() } })
+            }
+        },
+        stagePeekHeight = realPeekHeight, stageSheetState = stageSheetState,
+        queueContent = {
             Surface(
-                playerSwipeable.fillMaxSize(),
-                shadowElevation = SheetElevation,
-                color = playerBackground,
-            ) { playerContent(playerSheetState.myProgress) }
-        }, pSheetOffset = { playerSheetState.offset.value },
-        pSheetProgress = playerSheetState.myProgress, qSheetContent = {
-            Surface(
-                queueSwipeable
-                    .alpha(playerSheetState.myProgress.compIn(0.8f))
+                modifier = queueSwipeable
+                    .alpha(stageSheetState.myProgress.compIn(0.8f))
                     .fillMaxSize()
                     .padding(horizontal = QueueMargin),
-                shadowElevation = SheetElevation,
-                color = queueBackground,
-                shape = RoundedCornerShape(8.dp, 8.dp, 0.dp, 0.dp),
+                shadowElevation = SheetElevation, color = queueBackground,
+                shape = RoundedCornerShape(QueueRadius, QueueRadius, 0.dp, 0.dp),
                 content = queueContent
             )
-        }, qSheetOffset = { queueSheetState.offset.value },
-        qSheetMaxOffset = constraints.maxWidth,
-        fab = fab, showDismiss = showDismiss, onDismiss = onDismiss
+        },
+        queueSheetState = queueSheetState,
     ) { Surface(color = backgroundColor, content = content) }
-
 }
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @ExperimentalComposeUiApi
 @Composable
 private fun SheetScaffoldStack(
-    width: Dp, height: Dp, pPeekHeight: Int,
-    appBar: @Composable () -> Unit,
-    bottomNav: @Composable () -> Unit,
-    pSheetContent: @Composable () -> Unit,
-    pSheetOffset: () -> Float,
-    pSheetProgress: Float,
-    qSheetContent: @Composable () -> Unit,
-    qSheetOffset: () -> Float,
-    qSheetMaxOffset: Int,
-    fab: @Composable (progress: Float) -> Unit,
-    showDismiss: Boolean,
-    onDismiss: () -> Unit,
+    viewModel: MainViewModel, state: MainScaffoldState, width: Dp,
+    appBar: @Composable () -> Unit, bottomNav: @Composable () -> Unit, fab: @Composable () -> Unit,
+    drawerContent: @Composable ColumnScope.() -> Unit, drawerBackground: Color,
+    stageContent: @Composable () -> Unit, stagePeekHeight: Int, stageSheetState: SheetState,
+    queueContent: @Composable () -> Unit, queueSheetState: SheetState,
     body: @Composable () -> Unit,
 ) {
-    val fabRange =
-        remember(width) { width + FabSize + FabMargin + PlayerScreenSpacing + ProgressBarHeight }
+    val scope = rememberCoroutineScope()
 
-    val transferProgress = with(LocalDensity.current) {
-        -(pSheetOffset().roundToInt().coerceIn(-pPeekHeight - fabRange.roundToPx(), -pPeekHeight) +
-                pPeekHeight) / fabRange.toPx()
+    var showNav by remember { mutableStateOf(state.showBottomNav) }
+    val navAnimator by animateFloatAsState(if (state.showBottomNav) 1f else 0f) { showNav = state.showBottomNav }
+
+    val fabRange = remember(width) { width + FabSize + FabMargin + StageSpacing + TimeLineHeight }
+
+    with(LocalDensity.current) {
+        LaunchedEffect(stageSheetState.myProgress) {
+            if (showNav == state.showBottomNav) {
+                launch {
+                    val transferProgress = (-(stageSheetState.offset.value.roundToInt()
+                        .coerceIn(-stagePeekHeight - fabRange.roundToPx(), -stagePeekHeight) +
+                            stagePeekHeight) / fabRange.toPx()).coerceIn(0f, 1f)
+
+                    viewModel.setSheetState(transferProgress, stageSheetState.myProgress)
+                }
+            }
+        }
     }
 
-    Layout(
-        content = {
-            body()
-            appBar()
-            Shadow(alpha = pSheetProgress / 1.5f)
-            pSheetContent()
-            bottomNav()
-            qSheetContent()
-            Spacer(Modifier.pointerInput(showDismiss) {
-                if (showDismiss) forEachGesture {
-                    awaitPointerEventScope {
-                        awaitFirstDown(requireUnconsumed = false)
-                        onDismiss()
-                    }
-                }
-            })
-            fab(transferProgress)
+    val fabShadowAnimator by animateFloatAsState(if (state.isFabExpanded) 0.5f else 0f)
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    ModalDrawer(
+        drawerShape = RectangleShape, gesturesEnabled = !state.isFabDragging && stageSheetState.myProgress == 0f,
+        drawerBackgroundColor = drawerBackground, drawerContent = drawerContent, drawerState = drawerState
+    ) {
+        BackHandler(
+            (stageSheetState.myProgress > 0) ||
+                    (queueSheetState.myProgress > 0) ||
+                    state.isFabExpanded ||
+                    drawerState.isOpen
+        ) {
+            scope.launch {
+                if (drawerState.isOpen) drawerState.close()
+                else if (state.isFabExpanded) viewModel.setFabState(false)
+                else if (queueSheetState.myProgress > 0) queueSheetState.collapse()
+                else if (stageSheetState.myProgress > 0)
+                    stageSheetState.animateTo(SheetValue.Collapsed, spring(DampingRatioNoBouncy, StiffnessMediumLow))
+            }
         }
-    ) { m, c ->
 
-        val sheetOffsetY = pSheetOffset().roundToInt()
-        val qSheetOffsetY = qSheetOffset().roundToInt()
+        Layout(
+            content = {
+                body()
+                Shadow(alpha = fabShadowAnimator, color = MaterialTheme.colorScheme.background)
+                appBar()
+                Shadow(alpha = state.progress / 1.5f)
+                stageContent()
+                bottomNav()
+                queueContent()
+                Dismiss(state.isFabExpanded) { viewModel.setFabState(false) }
+                fab()
+            }
+        ) { m, c ->
 
-        val appBarPlaceable = m[1].measure(c)
+            val stageOffset = stageSheetState.offset.value.roundToInt()
+            val queueOffset = queueSheetState.offset.value.roundToInt()
 
-        val bodyPlaceable = m[0].measure(
-            c.copy(minHeight = 0, maxHeight = c.maxHeight - appBarPlaceable.height - pPeekHeight)
-        )
+            val appBarPlc = m[2].measure(c)
+            val bodyPlc = m.first().measure(c.copy(minHeight = 0, maxHeight = c.maxHeight - appBarPlc.height - stagePeekHeight))
+            val fabShadowPlc = m[1].measure(c)
+            val sheetShadowPlc = m[3].measure(c)
+            val stagePlc = m[4].measure(c.copy(minHeight = c.maxHeight, maxHeight = c.maxHeight))
+            val botNavPlc = m[5].measure(c)
+            val queuePlc = m[6].measure(c)
+            val fabPlc = FabSize.roundToPx().let { m.last().measure(c.copy(it, it, it, it)) }
 
-        val shadowPlaceable = m[2].measure(
-            c.copy(minHeight = c.maxHeight - pPeekHeight, maxHeight = c.maxHeight - pPeekHeight)
-        )
+            with(c) {
+                layout(maxWidth, maxHeight) {
 
-        val playerSheetPlaceable = m[3].measure(
-            c.copy(minHeight = c.maxHeight, maxHeight = c.maxHeight)
-        )
-
-        val bottomNavPlaceable = m[4].measure(c)
-
-        val queueSheetPlaceable = m[5].measure(c)
-
-        val fabPlaceable = m.last().measure(
-            c.copy(
-                minWidth = FabSize.roundToPx(),
-                maxWidth = FabSize.roundToPx(),
-                minHeight = FabSize.roundToPx(),
-                maxHeight = FabSize.roundToPx()
-            )
-        )
-
-        with(c) {
-            layout(maxWidth, maxHeight) {
-
-                bodyPlaceable.place(0, (appBarPlaceable.height * (1 - pSheetProgress)).roundToInt())
-
-                appBarPlaceable.place(0, -(appBarPlaceable.height * pSheetProgress).roundToInt())
-
-                shadowPlaceable.place(0, 0)
-
-                playerSheetPlaceable.place(0, maxHeight + sheetOffsetY)
-
-                bottomNavPlaceable.place(
-                    0,
-                    (maxHeight - bottomNavPlaceable.height * (1 - transferProgress)).roundToInt()
-                )
-
-                if (showDismiss)
-                    m[6].measure(c.copy(minWidth = c.maxWidth, minHeight = c.maxHeight)).place(0, 0)
-
-                fabPlaceable.place(
-                    (maxWidth - fabPlaceable.width) / 2 +
-                            ((1 - transferProgress) * (maxWidth / 2 - fabPlaceable.width / 2 - FabMargin.toPx())).toInt(),
-                    maxHeight + sheetOffsetY.coerceAtMost(-(pPeekHeight + fabRange.roundToPx())) + maxWidth +
-                            (PlayerScreenSpacing + ProgressBarHeight).roundToPx()
-                )
-
-                queueSheetPlaceable.place(0, maxHeight + sheetOffsetY + qSheetOffsetY)
+                    bodyPlc.place(0, (appBarPlc.height * (1 - state.progress)).toInt())
+                    if (fabShadowAnimator > 0) fabShadowPlc.place(0, 0)
+                    appBarPlc.place(0, -(appBarPlc.height * state.progress).toInt())
+                    if (state.progress > 0) sheetShadowPlc.place(0, 0)
+                    stagePlc.place(0, maxHeight + stageOffset)
+                    botNavPlc.place(0, (maxHeight - navAnimator * botNavPlc.height * (1 - state.transProgress)).toInt())
+                    if (state.isFabExpanded) m[7].measure(c.copy(minWidth = c.maxWidth, minHeight = c.maxHeight)).place(0, 0)
+                    fabPlc.place(
+                        (maxWidth - fabPlc.width) / 2 +
+                                ((1 - state.transProgress) * (maxWidth / 2 - fabPlc.width / 2 - FabMargin.toPx())).toInt(),
+                        maxHeight + stageOffset.coerceAtMost(-(stagePeekHeight + fabRange.roundToPx()))
+                                + maxWidth + (StageSpacing + TimeLineHeight).roundToPx()
+                    )
+                    queuePlc.place(0, maxHeight + stageOffset + queueOffset)
+                }
             }
         }
     }
 }
+
+private fun getQueueAnchors(density: Density, width: Dp, statusBarHeight: Int) = with(density) {
+    mapOf(
+        (width + StageSpacing.times(2) + FabSize + TimeLineHeight).toPx() to SheetValue.Collapsed,
+        statusBarHeight + QueueMargin.toPx() to SheetValue.Expanded
+    )
+}
+
+private fun getRealPeekHeight(density: Density, showBottomNav: Boolean, navBarHeight: Int) = with(density) {
+    (StagePeekHeight + BottomNavHeight.times(if (showBottomNav) 1f else 0f)).roundToPx() + navBarHeight
+}
+
+@Composable
+private fun Dismiss(active: Boolean = false, onDismiss: () -> Unit) =
+    Spacer(Modifier.pointerInput(active) {
+        if (active) forEachGesture {
+            awaitPointerEventScope {
+                awaitFirstDown(requireUnconsumed = false)
+                onDismiss()
+            }
+        }
+    })

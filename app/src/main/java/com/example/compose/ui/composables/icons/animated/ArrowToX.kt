@@ -1,5 +1,3 @@
-@file:JvmName("ArrowToXKt")
-
 package com.example.compose.ui.composables.icons.animated
 
 import androidx.compose.animation.core.Animatable
@@ -22,11 +20,7 @@ import com.example.compose.utils.util_classes.Path4dVector
 import kotlinx.coroutines.launch
 
 @Composable
-fun ArrowToX(
-    modifier: Modifier = Modifier,
-    x: Boolean,
-    tint: Color = MaterialTheme.colorScheme.onSurfaceVariant
-) {
+fun ArrowToX(modifier: Modifier = Modifier, x: Boolean, tint: Color = MaterialTheme.colorScheme.onSurfaceVariant) {
 
     val states = remember {
         listOf(
@@ -48,14 +42,14 @@ fun ArrowToX(
             if ((x && animators[0].value != states[3]) || (!x && animators[0].value != states[0]))
                 if (x) animators.forEachIndexed { i, a ->
                     launch {
-                        a.animateTo(states[1], spring(stiffness = 2000f))
-                        a.animateTo(states[states.lastIndex - i], spring(0.4f, 1800f))
+                        a.animateTo(states[1], spring(stiffness = 2500f))
+                        a.animateTo(states[states.lastIndex - i], spring(0.4f, 2000f))
                     }
                 }
                 else animators.forEach {
                     launch {
-                        it.animateTo(states[1], spring(stiffness = 2000f))
-                        it.animateTo(states[0], spring(0.5f, 1800f))
+                        it.animateTo(states[1], spring(stiffness = 2500f))
+                        it.animateTo(states[0], spring(0.5f, 3000f))
                     }
                 }
         }
@@ -75,12 +69,7 @@ fun ArrowToX(
 
     Canvas(modifier = modifier.fillMaxSize()) {
         scale(size.minDimension / 24f, Offset.Zero) {
-            drawPath(
-                path, tint, style = Stroke(
-                    1.8f,
-                    cap = StrokeCap.Round, join = StrokeJoin.Round
-                ), alpha = 0.8f
-            )
+            drawPath(path, tint, style = Stroke(1.8f, cap = StrokeCap.Round, join = StrokeJoin.Round), alpha = 0.8f)
         }
     }
 }

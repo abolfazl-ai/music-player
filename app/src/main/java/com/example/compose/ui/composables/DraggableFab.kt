@@ -48,15 +48,11 @@ fun DraggableFab(
     modifier: Modifier = Modifier,
     fabColor: Color = MaterialTheme.colorScheme.secondary,
     playButtonColor: Color = MaterialTheme.colorScheme.surface,
-    transProgress: () -> Float = { 0f },
     items: List<ImageVector> = MenuItems,
-    expanded: Boolean = false,
-    onExpand: (expanded: Boolean) -> Unit = {},
-    onDrag: (isDragging: Boolean) -> Unit = {},
-    isPlaying: Boolean = false,
     viewModel: MainViewModel = viewModel(),
-    onClick: () -> Unit = {},
 ) {
+
+    val state by viewModel.fabState.collectAsState()
 
     val iconsAlpha = remember { Animatable(1f) }
     val offsets = remember(items) {
@@ -67,7 +63,7 @@ fun DraggableFab(
         }
     }
 
-    val color = transProgress().let {
+    val color = state.fabTransProgress.let {
         when (it) {
             0f -> fabColor to contentColorFor(fabColor)
             1f -> playButtonColor to contentColorFor(playButtonColor)
@@ -79,9 +75,9 @@ fun DraggableFab(
     val scope = rememberCoroutineScope()
 
     with(LocalDensity.current) {
-        LaunchedEffect(expanded, transProgress()) {
-            if (transProgress() == 0f) {
-                if (expanded) {
+        LaunchedEffect(state.isFabExpanded, state.fabTransProgress) {
+            if (state.fabTransProgress == 0f) {
+                if (state.isFabExpanded) {
                     iconsAlpha.snapTo(0f)
                     offsets.minus(offsets[0]).reversed().forEachIndexed { index, anim ->
                         launch {
@@ -108,11 +104,11 @@ fun DraggableFab(
         }
     }
 
-    BoxWithConstraints() {
+    BoxWithConstraints(modifier) {
 
         val minDistance = with(LocalDensity.current) { remember { 16.dp.roundToPx() } }
 
-        if (transProgress() != 1f)
+        if (state.fabTransProgress != 1f)
             offsets.minus(offsets[0]).reversed().forEachIndexed { index, anim ->
                 Surface(
                     modifier = Modifier
@@ -150,35 +146,43 @@ fun DraggableFab(
                 .size(FabSize),
             shape = CircleShape,
             color = color.first,
-            contentColor = color.second, shadowElevation = (2 + 2 * (1 - transProgress())).dp,
+            contentColor = color.second,
+            shadowElevation = (2 + 2 * (1 - state.fabTransProgress)).dp,
             onClick = {
-                when (transProgress()) {
-                    1f -> onClick()
-                    0f -> if (offsets[0].value.getDistance() < minDistance) onExpand(!expanded)
+                when (state.fabTransProgress) {
+                    1f -> {
+                        scope.launch {
+                            viewModel.preferences.updatePlayingState(!state.isPlaying)
+                        }
+                    }
+                    0f -> {
+                        if (offsets[0].value.getDistance() < minDistance) viewModel.setFabState(!state.isFabExpanded)
+                    }
                 }
             }
         ) {
 
-            if (transProgress() != 0f) {
+            if (state.fabTransProgress != 0f) {
                 val a = AnimatedImageVector.animatedVectorResource(R.drawable.play_to_pause)
                 Icon(
                     modifier = Modifier
-                        .alpha(2 * (transProgress().coerceIn(0.5f, 1f) - 0.5f))
+                        .alpha(2 * (state.fabTransProgress.coerceIn(0.5f, 1f) - 0.5f))
                         .padding(16.dp),
-                    painter = rememberAnimatedVectorPainter(a, isPlaying),
+                    painter = rememberAnimatedVectorPainter(a, state.isPlaying),
                     contentDescription = "PlayButton",
                 )
             }
 
-            if (transProgress() != 1f)
+            if (state.fabTransProgress != 1f)
                 Icon(
                     modifier = Modifier
-                        .alpha(1 - 2 * transProgress().coerceIn(0f, 0.5f))
-                        .drag(!expanded && transProgress() == 0f, offsets, onDrag)
+                        .alpha(1 - 2 * state.fabTransProgress.coerceIn(0f, 0.5f))
+                        .drag(!state.isFabExpanded && state.fabTransProgress == 0f, offsets)
+                        { viewModel.setFabState(isDragging = it) }
                         .padding(12.dp)
                         .rotate(
                             animateFloatAsState(
-                                if (expanded) 135f else 0f,
+                                if (state.isFabExpanded) 135f else 0f,
                                 spring(0.5f)
                             ).value
                         ),

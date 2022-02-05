@@ -41,6 +41,7 @@ class Repository @Inject constructor(
     // Song Repository
     suspend fun getSongById(id: Long) = songDao.getSongById(id)
     suspend fun getSongByPath(path: String) = songDao.getSongByPath(path)
+    fun getSongsByFolderPath(folderPath: String) = songDao.getSongByFolderPath(folderPath)
     suspend fun deleteSong(song: Song) = songDao.deleteSong(song)
     val allSongs: Flow<List<Song>> = preferences.sortOrdersFlow.flatMapMerge {
         getBySortOrder(songDao, it.songsOrder)

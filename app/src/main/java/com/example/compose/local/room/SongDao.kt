@@ -64,6 +64,9 @@ interface SongDao : SortInterface<Song> {
     @Query("SELECT * FROM SONGS WHERE SONG_PATH = :path")
     suspend fun getSongByPath(path: String): Song
 
+    @Query("SELECT * FROM SONGS WHERE SONG_FOLDER_PATH = :folderPath ORDER BY SONG_TITLE ASC")
+    fun getSongByFolderPath(folderPath: String): Flow<List<Song>>
+
     @Delete
     suspend fun deleteSong(song: Song)
 

@@ -5,6 +5,7 @@ import androidx.compose.animation.core.TwoWayConverter
 import androidx.compose.ui.graphics.Color
 
 data class MainColors(val back: Color, val front: Color)
+val DefaultMainColors = MainColors(back = Color(0xFF243144), front = Color(0xBEFFFFFF))
 
 data class Path4dVector(val v1: Float, val v2: Float, val v3: Float, val v4: Float) {
     companion object {

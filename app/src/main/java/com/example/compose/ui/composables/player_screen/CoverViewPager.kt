@@ -7,6 +7,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -29,11 +30,14 @@ import kotlinx.coroutines.launch
 fun CoverViewPager(
     modifier: Modifier = Modifier,
     pagerState: PagerState = rememberPagerState(),
-    onPageCreated: (index: Int, colors: MainColors) -> Unit = { _, _ -> },
     viewModel: MainViewModel = hiltViewModel()
 ) {
 
-    val songList = viewModel.repository.allSongs.collectAsState(emptyList()).value
+    val songList by viewModel.queue.collectAsState(initial = emptyList())
+
+    LaunchedEffect(pagerState.currentPage) {
+        viewModel.updateCurrentSongIndex(pagerState.currentPage)
+    }
 
     HorizontalPager(modifier = modifier, state = pagerState, count = songList.size) { page ->
 
@@ -47,7 +51,7 @@ fun CoverViewPager(
                             Palette.Builder(success.drawable!!.toBitmap())
                                 .addTarget(PALETTE_TARGET_PRIMARY)
                                 .addTarget(PALETTE_TARGET_SECONDARY)
-                                .generate { onPageCreated(page, it.getAccurateColor()) }
+                                .generate { viewModel.addColorToCache(page, it.getAccurateColor()) }
                         }
                     }
 
