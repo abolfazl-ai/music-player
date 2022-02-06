@@ -20,7 +20,7 @@ import androidx.navigation.compose.*
 import com.example.compose.ui.Screen
 import com.example.compose.ui.composables.DraggableFab
 import com.example.compose.ui.composables.library_screens.*
-import com.example.compose.ui.composables.player_screen.Stage
+import com.example.compose.ui.composables.stage.Stage
 import com.example.compose.ui.screens
 import com.example.compose.viewmodel.MainViewModel
 import com.google.accompanist.insets.navigationBarsHeight

@@ -3,15 +3,19 @@ package com.example.compose.viewmodel
 import android.util.Log
 import androidx.collection.LruCache
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.compose.local.model.Song
 import com.example.compose.local.preferences.AppPreferences
+import com.example.compose.ui.composables.layouts.SheetState
+import com.example.compose.ui.composables.layouts.SheetValue
 import com.example.compose.utils.kotlin_extensions.compIn
 import com.example.compose.utils.util_classes.DefaultMainColors
 import com.example.compose.utils.util_classes.MainColors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,7 +32,8 @@ data class StageState(
     val isPlaying: Boolean = false,
     val currentIndex: Int = 0,
     val queue: List<Song> = emptyList(),
-    val color: MainColors = DefaultMainColors
+    val animateColor: Boolean = false,
+    val color: MainColors = DefaultMainColors,
 )
 
 data class MainScaffoldState(
@@ -55,18 +60,20 @@ class MainViewModel @Inject constructor(
     private val queue = repository.allSongs
     private val currentSongIndex = preferences.currentIndexFlow
 
-    suspend fun updateCurrentSongIndex(index: Int) = preferences.updateCurrentIndex(index)
+    suspend fun updateCurrentIndex(index: Int) = preferences.updateCurrentIndex(index)
 
 
     //UI related
 
     private val colorCache = LruCache<Int, MainColors>(100)
+    private val colorFlow = MutableStateFlow(DefaultMainColors)
 
     private val isFabExpanded = MutableStateFlow(false)
     private val isFabDragging = MutableStateFlow(false)
 
+    private val stageSheetValue = MutableStateFlow(SheetValue.Collapsed)
     val stageSheetProgress = MutableStateFlow(0f)
-    val stageTransProgress = MutableStateFlow(0f)
+    private val stageTransProgress = MutableStateFlow(0f)
 
 
     fun addColorToCache(index: Int, color: MainColors) = colorCache.put(index, color)
@@ -79,7 +86,8 @@ class MainViewModel @Inject constructor(
         isFabDragging.value = isDragging
     }
 
-    fun setSheetState(transProgress: Float, mainProgress: Float) {
+    fun setSheetState(state: SheetValue, transProgress: Float, mainProgress: Float) {
+        if (stageSheetValue.value != state) stageSheetValue.value = state
         stageTransProgress.value = transProgress
         stageSheetProgress.value = mainProgress
     }
@@ -97,6 +105,18 @@ class MainViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            currentSongIndex.collect { index ->
+                colorCache[index]?.let { colorFlow.value = it }
+                var i = 0
+                do {
+                    i++
+                    delay(200)
+                    colorCache[index]?.let { colorFlow.value = it }
+                } while (colorCache[index] == null && i < 10)
+            }
+        }
+
+        viewModelScope.launch {
             combine(isFabExpanded, isFabDragging, preferences.playStateFlow, stageTransProgress)
             { expand, drag, playState, progress -> FabState(expand, drag, playState, progress) }
                 .catch { it.message?.let { m -> Log.i(TAG, m) } }
@@ -104,9 +124,10 @@ class MainViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            combine(preferences.playStateFlow, currentSongIndex, queue)
-            { playState, i, queue -> StageState(true, playState, i, queue, colorCache[i] ?: DefaultMainColors) }
-                .catch { it.message?.let { m -> Log.i(TAG, m) } }.collect { _stageState.value = it }
+            combine(preferences.playStateFlow, currentSongIndex, queue, stageSheetValue, colorFlow)
+            { playState, i, queue, value, color ->
+                StageState(true, playState, i, queue, value != SheetValue.Collapsed, color)
+            }.catch { it.message?.let { m -> Log.i(TAG, m) } }.collect { _stageState.value = it }
         }
 
         viewModelScope.launch {

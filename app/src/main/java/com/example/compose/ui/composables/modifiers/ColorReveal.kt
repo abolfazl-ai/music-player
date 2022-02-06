@@ -3,7 +3,6 @@ package com.example.compose.ui.composables.modifiers
 import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
@@ -22,26 +21,29 @@ import kotlinx.coroutines.launch
 import kotlin.math.hypot
 import kotlin.math.max
 
-fun Modifier.reveal(color: Color, y: Dp, startRadius: Dp = 0.dp, duration: Int = 750) = composed {
+fun Modifier.reveal(animate: Boolean, color: Color, y: Dp, startRadius: Dp = 0.dp, duration: Int = 750) = composed {
 
     val colors = remember { mutableStateListOf(color to Animatable(1f)) }
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(color) {
-        launch {
-            (color to Animatable(0f)).let {
+        if (color != colors.last().first) launch {
+            if (animate) (color to Animatable(0f)).let {
                 colors.add(it)
                 scope.launch {
                     it.second.animateTo(1f, tween(duration, easing = FastOutLinearInEasing))
                 }.invokeOnCompletion {
                     if (colors.size > 1 && colors[1].second.value == 1f) colors.removeFirst()
                 }
+            } else {
+                colors.add(color to Animatable(1f))
+                if (colors.size > 1 && colors[1].second.value == 1f) colors.removeFirst()
             }
         }
     }
 
-    clipToBounds()
-    drawBehind {
+    clipToBounds().drawBehind {
+        drawRect(colors.first().first)
         colors.forEach {
             drawCircle(
                 color = it.first,

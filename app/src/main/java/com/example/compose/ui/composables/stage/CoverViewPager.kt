@@ -1,10 +1,8 @@
-package com.example.compose.ui.composables.player_screen
+package com.example.compose.ui.composables.stage
 
-import android.util.Log
 import android.util.Size
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
@@ -17,7 +15,6 @@ import com.example.compose.utils.default_pictures.SongAndSize
 import com.example.compose.utils.kotlin_extensions.PALETTE_TARGET_PRIMARY
 import com.example.compose.utils.kotlin_extensions.PALETTE_TARGET_SECONDARY
 import com.example.compose.utils.kotlin_extensions.getAccurateColor
-import com.example.compose.utils.resources.TAG
 import com.example.compose.utils.util_classes.MainColors
 import com.google.accompanist.pager.*
 import com.skydoves.landscapist.glide.GlideImage
@@ -30,20 +27,15 @@ fun CoverViewPager(
     onPageChanged: (Int) -> Unit, onPageCreated: (Int, MainColors) -> Unit,
     pagerState: PagerState = rememberPagerState(remember { currentIndex }),
 ) {
-    var tempIndex by remember { mutableStateOf(currentIndex) }
 
-    LaunchedEffect(currentIndex, queue) {
-        if (currentIndex != tempIndex)
-            if (0 <= currentIndex && currentIndex < pagerState.pageCount) {
-                tempIndex = currentIndex
+    LaunchedEffect(currentIndex) {
+        if (currentIndex != pagerState.currentPage)
+            if (0 <= currentIndex && currentIndex < pagerState.pageCount)
                 pagerState.animateScrollToPage(currentIndex)
-            }
     }
+
     LaunchedEffect(pagerState.currentPage) {
-        if (pagerState.currentPage != tempIndex) {
-            tempIndex = pagerState.currentPage
-            onPageChanged(pagerState.currentPage)
-        }
+        onPageChanged(pagerState.currentPage)
     }
 
     HorizontalPager(modifier = modifier, state = pagerState, count = queue.size, key = { queue[it].id }) { page ->

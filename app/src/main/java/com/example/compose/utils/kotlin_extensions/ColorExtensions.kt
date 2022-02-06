@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.luminance
 import androidx.palette.graphics.Palette
 import androidx.palette.graphics.Target
+import com.example.compose.utils.util_classes.DefaultMainColors
 import com.example.compose.utils.util_classes.MainColors
 
 val PALETTE_TARGET_PRIMARY = Target.Builder()
@@ -39,7 +40,7 @@ fun Palette?.getAccurateColor(): MainColors {
         }
 
     }
-    return MainColors(Color.Black, Color.White)
+    return DefaultMainColors
 }
 
 fun Float.getMidColor(start: Color, end: Color): Color {
