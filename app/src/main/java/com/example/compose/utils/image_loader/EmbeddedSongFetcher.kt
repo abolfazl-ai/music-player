@@ -17,7 +17,6 @@ import com.bumptech.glide.signature.ObjectKey
 import com.example.compose.local.model.Song
 import com.example.compose.utils.default_pictures.getDefaultCover
 
-
 class EmbeddedSongGlideLoader(val context: Context) : ModelLoader<Song, Bitmap> {
 
     override fun buildLoadData(

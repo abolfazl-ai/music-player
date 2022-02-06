@@ -1,5 +1,6 @@
 package com.example.compose.ui.composables.modifiers
 
+import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -16,11 +17,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.compose.utils.resources.TAG
 import kotlinx.coroutines.launch
 import kotlin.math.hypot
 import kotlin.math.max
 
-fun Modifier.reveal(color: Color, y: Dp, duration: Int = 600, startRadius: Dp = 0.dp) = composed {
+fun Modifier.reveal(color: Color, y: Dp, startRadius: Dp = 0.dp, duration: Int = 750) = composed {
+    Log.e(TAG, "reveal Recreated")
 
     val colors = remember { mutableStateListOf(color to Animatable(1f)) }
     val scope = rememberCoroutineScope()

@@ -3,11 +3,11 @@ package com.example.compose.viewmodel
 import android.util.Log
 import androidx.collection.LruCache
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.compose.local.model.Song
 import com.example.compose.local.preferences.AppPreferences
+import com.example.compose.utils.kotlin_extensions.compIn
 import com.example.compose.utils.util_classes.DefaultMainColors
 import com.example.compose.utils.util_classes.MainColors
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,16 +23,12 @@ data class FabState(
     val fabTransProgress: Float = 0f,
 )
 
-data class MiniPlayerState(
+data class StageState(
+    val initialized: Boolean = false,
     val isPlaying: Boolean = false,
-    val song: Song? = null,
-    val sheetProgress: Float = 0f
-)
-
-data class PlayScreenState(
-    val song: Song? = null,
-    val color: MainColors = DefaultMainColors,
-    val sheetProgress: Float = 0f
+    val currentIndex: Int = 0,
+    val queue: List<Song> = emptyList(),
+    val color: MainColors = DefaultMainColors
 )
 
 data class MainScaffoldState(
@@ -56,13 +52,11 @@ class MainViewModel @Inject constructor(
 
     //Playback related
 
-    val queue: Flow<List<Song>> = repository.allSongs
-    private val _currentSongIndex = MutableStateFlow(0)
-    val currentSongIndex: StateFlow<Int> get() = _currentSongIndex
+    private val queue = repository.allSongs
+    private val currentSongIndex = preferences.currentIndexFlow
 
-    fun updateCurrentSongIndex(index: Int) {
-        _currentSongIndex.value = index
-    }
+    suspend fun updateCurrentSongIndex(index: Int) = preferences.updateCurrentIndex(index)
+
 
     //UI related
 
@@ -71,8 +65,8 @@ class MainViewModel @Inject constructor(
     private val isFabExpanded = MutableStateFlow(false)
     private val isFabDragging = MutableStateFlow(false)
 
-    private val mainSheetProgress = MutableStateFlow(0f)
-    private val mainSheetTransProgress = MutableStateFlow(0f)
+    val stageSheetProgress = MutableStateFlow(0f)
+    val stageTransProgress = MutableStateFlow(0f)
 
 
     fun addColorToCache(index: Int, color: MainColors) = colorCache.put(index, color)
@@ -86,19 +80,16 @@ class MainViewModel @Inject constructor(
     }
 
     fun setSheetState(transProgress: Float, mainProgress: Float) {
-        mainSheetTransProgress.value = transProgress
-        mainSheetProgress.value = mainProgress
+        stageTransProgress.value = transProgress
+        stageSheetProgress.value = mainProgress
     }
 
 
     private val _fabState = MutableStateFlow(FabState())
     val fabState: StateFlow<FabState> get() = _fabState
 
-    private val _playerScreenState = MutableStateFlow(PlayScreenState())
-    val playerScreenState: StateFlow<PlayScreenState> get() = _playerScreenState
-
-    private val _miniPlayerState = MutableStateFlow(MiniPlayerState())
-    val miniPlayerState: StateFlow<MiniPlayerState> get() = _miniPlayerState
+    private val _stageState = MutableStateFlow(StageState())
+    val stageState: StateFlow<StageState> get() = _stageState
 
     private val _mainScaffoldState = MutableStateFlow(MainScaffoldState())
     val mainScaffoldState: StateFlow<MainScaffoldState> get() = _mainScaffoldState
@@ -106,35 +97,24 @@ class MainViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            combine(isFabExpanded, isFabDragging, preferences.playStateFlow, mainSheetTransProgress)
+            combine(isFabExpanded, isFabDragging, preferences.playStateFlow, stageTransProgress)
             { expand, drag, playState, progress -> FabState(expand, drag, playState, progress) }
-                .catch { throwable -> throwable.message?.let { Log.i(TAG, it) } }
+                .catch { it.message?.let { m -> Log.i(TAG, m) } }
                 .collect { _fabState.value = it }
         }
 
         viewModelScope.launch {
-            combine(currentSongIndex, queue, mainSheetProgress)
-            { i, queue, progress ->
-                PlayScreenState(queue[i], colorCache[i] ?: DefaultMainColors, progress)
-            }.catch { throwable -> throwable.message?.let { Log.i(TAG, it) } }.collect {
-                _playerScreenState.value = it
-            }
-        }
-
-        viewModelScope.launch {
-            combine(preferences.playStateFlow, currentSongIndex, queue, mainSheetProgress)
-            { playState, i, q, progress -> MiniPlayerState(playState, q[i], progress) }
-                .catch { throwable -> throwable.message?.let { Log.i(TAG, it) } }
-                .collect { _miniPlayerState.value = it }
+            combine(preferences.playStateFlow, currentSongIndex, queue)
+            { playState, i, queue -> StageState(true, playState, i, queue, colorCache[i] ?: DefaultMainColors) }
+                .catch { it.message?.let { m -> Log.i(TAG, m) } }.collect { _stageState.value = it }
         }
 
         viewModelScope.launch {
             combine(
-                isFabExpanded, isFabDragging, mainSheetProgress,
-                mainSheetTransProgress, preferences.playStateFlow
-            ) { expand, drag, p, t, play -> MainScaffoldState(expand, drag, p, t, play) }
-                .catch { throwable -> throwable.message?.let { Log.i(TAG, it) } }
-                .collect { _mainScaffoldState.value = it }
+                isFabExpanded, isFabDragging, stageSheetProgress,
+                stageTransProgress, preferences.playStateFlow
+            ) { expand, drag, progress, trans, play -> MainScaffoldState(expand, drag, progress, trans, play) }
+                .catch { it.message?.let { m -> Log.i(TAG, m) } }.collect { _mainScaffoldState.value = it }
         }
     }
 }

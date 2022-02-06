@@ -1,49 +1,57 @@
 package com.example.compose.ui.composables.player_screen
 
+import android.util.Log
+import android.util.Size
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.core.graphics.drawable.toBitmap
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.palette.graphics.Palette
+import com.example.compose.local.model.Song
 import com.example.compose.ui.composables.modifiers.crossFade
+import com.example.compose.utils.default_pictures.SongAndSize
 import com.example.compose.utils.kotlin_extensions.PALETTE_TARGET_PRIMARY
 import com.example.compose.utils.kotlin_extensions.PALETTE_TARGET_SECONDARY
 import com.example.compose.utils.kotlin_extensions.getAccurateColor
+import com.example.compose.utils.resources.TAG
 import com.example.compose.utils.util_classes.MainColors
-import com.example.compose.viewmodel.MainViewModel
 import com.google.accompanist.pager.*
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.launch
 
-@ExperimentalMaterialApi
-@ExperimentalPagerApi
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun CoverViewPager(
-    modifier: Modifier = Modifier,
-    pagerState: PagerState = rememberPagerState(),
-    viewModel: MainViewModel = hiltViewModel()
+    modifier: Modifier = Modifier, size: Size, queue: List<Song>, currentIndex: Int,
+    onPageChanged: (Int) -> Unit, onPageCreated: (Int, MainColors) -> Unit,
+    pagerState: PagerState = rememberPagerState(remember { currentIndex }),
 ) {
+    Log.e(TAG, "CoverViewPager Recreated")
+    var tempIndex by remember { mutableStateOf(currentIndex) }
 
-    val songList by viewModel.queue.collectAsState(initial = emptyList())
-
+    LaunchedEffect(currentIndex, queue) {
+        if (currentIndex != tempIndex)
+            if (0 <= currentIndex && currentIndex < pagerState.pageCount) {
+                tempIndex = currentIndex
+                pagerState.animateScrollToPage(currentIndex)
+            }
+    }
     LaunchedEffect(pagerState.currentPage) {
-        viewModel.updateCurrentSongIndex(pagerState.currentPage)
+        if (pagerState.currentPage != tempIndex) {
+            tempIndex = pagerState.currentPage
+            onPageChanged(pagerState.currentPage)
+        }
     }
 
-    HorizontalPager(modifier = modifier, state = pagerState, count = songList.size) { page ->
+    HorizontalPager(modifier = modifier, state = pagerState, count = queue.size, key = { queue[it].id }) { page ->
 
         GlideImage(
             modifier = Modifier.crossFade(calculateCurrentOffsetForPage(page)),
-            imageModel = songList[page],
+            imageModel = SongAndSize(queue[page], size),
             success = { success ->
                 if (success.drawable != null) {
                     LaunchedEffect(success) {
@@ -51,7 +59,7 @@ fun CoverViewPager(
                             Palette.Builder(success.drawable!!.toBitmap())
                                 .addTarget(PALETTE_TARGET_PRIMARY)
                                 .addTarget(PALETTE_TARGET_SECONDARY)
-                                .generate { viewModel.addColorToCache(page, it.getAccurateColor()) }
+                                .generate { onPageCreated(page, it.getAccurateColor()) }
                         }
                     }
 

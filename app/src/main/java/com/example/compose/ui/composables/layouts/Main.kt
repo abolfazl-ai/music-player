@@ -1,7 +1,5 @@
 package com.example.compose.ui.composables.layouts
 
-import android.util.Log
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -9,13 +7,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalDrawer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -24,9 +20,8 @@ import androidx.navigation.compose.*
 import com.example.compose.ui.Screen
 import com.example.compose.ui.composables.DraggableFab
 import com.example.compose.ui.composables.library_screens.*
-import com.example.compose.ui.composables.player_screen.PlayerScreen
+import com.example.compose.ui.composables.player_screen.Stage
 import com.example.compose.ui.screens
-import com.example.compose.utils.resources.TAG
 import com.example.compose.viewmodel.MainViewModel
 import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -63,7 +58,7 @@ fun Home(viewModel: MainViewModel = hiltViewModel()) {
     val navController = rememberNavController()
 
     SheetScaffold(
-        stageContent = { PlayerScreen() },
+        stageContent = { Stage() },
         queueContent = {},
         bottomNav = {
             Column {

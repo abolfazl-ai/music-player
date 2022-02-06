@@ -1,5 +1,7 @@
 package com.example.compose.ui.composables.player_screen
 
+import android.util.Log
+import android.util.Size
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
@@ -9,7 +11,6 @@ import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
@@ -22,82 +23,87 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.compose.R
+import com.example.compose.local.model.Song
 import com.example.compose.ui.composables.modifiers.reveal
 import com.example.compose.utils.kotlin_extensions.compIn
 import com.example.compose.utils.resources.*
 import com.example.compose.viewmodel.MainViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
 
-@ExperimentalMaterialApi
-@ExperimentalAnimationGraphicsApi
-@ExperimentalPagerApi
+@OptIn(ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
 @Composable
-fun PlayerScreen(
-    modifier: Modifier = Modifier,
-    viewModel: MainViewModel = hiltViewModel()
-) = BoxWithConstraints(modifier.fillMaxSize()) {
+fun Stage(modifier: Modifier = Modifier, viewModel: MainViewModel = hiltViewModel()) = BoxWithConstraints(modifier.fillMaxSize()) {
 
-    val state by viewModel.playerScreenState.collectAsState()
+    val state by viewModel.stageState.collectAsState()
+    val scope = rememberCoroutineScope()
 
-    val pageState = rememberPagerState()
+    val size = remember { Size(constraints.maxWidth / 3, constraints.maxWidth / 3) }
 
-    CompositionLocalProvider(
-        LocalContentColor provides animateColorAsState(state.color.front, tween(1000)).value,
-        LocalContentAlpha provides 1f
-    ) {
-        Column(
-            Modifier.reveal(
-                state.color.back,
-                maxWidth + TimeLineHeight + FabSize / 2 + StageSpacing, startRadius = 28.dp
-            ),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+    Log.e(TAG, "Stage Recreated")
 
-            CoverViewPager(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1f)
-                    .background(Color.Black),
-            )
+    if (state.initialized)
+        CompositionLocalProvider(LocalContentColor provides animateColorAsState(state.color.front, tween(1000)).value) {
+            Column(
+                Modifier.reveal(state.color.back, remember(maxWidth) { maxWidth + TimeLineHeight + FabSize / 2 + StageSpacing }, 28.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
-            Spacer(
-                modifier = Modifier
-                    .padding(bottom = StageSpacing)
-                    .alpha(0.5f)
-                    .fillMaxWidth()
-                    .height(TimeLineHeight)
-                    .background(LocalContentColor.current)
-            )
+                CoverViewPager(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
+                        .background(Color.Black),
+                    size = size, queue = state.queue, currentIndex = state.currentIndex,
+                    onPageChanged = { scope.launch { viewModel.updateCurrentSongIndex(it) } },
+                    onPageCreated = { page, colors -> viewModel.addColorToCache(page, colors) }
+                )
 
-            PlaybackController(alpha = state.sheetProgress.compIn(0.75f, 0.9f))
+                Spacer(
+                    modifier = Modifier
+                        .padding(bottom = StageSpacing)
+                        .alpha(0.5f)
+                        .fillMaxWidth()
+                        .height(TimeLineHeight)
+                        .background(LocalContentColor.current)
+                )
+
+                PlaybackController(
+                    onPrevious = { scope.launch { viewModel.updateCurrentSongIndex(state.currentIndex - 1) } },
+                    onNext = { scope.launch { viewModel.updateCurrentSongIndex(state.currentIndex + 1) } }
+                )
+            }
         }
-    }
 
-    MiniPlayer()
+    MiniStage(
+        song = state.queue.getOrNull(state.currentIndex), isPlaying = state.isPlaying,
+        onPrevious = { scope.launch { viewModel.updateCurrentSongIndex(state.currentIndex - 1) } },
+        onPlay = { scope.launch { viewModel.preferences.updatePlayingState(!state.isPlaying) } },
+        onNext = { scope.launch { viewModel.updateCurrentSongIndex(state.currentIndex + 1) } }
+    )
 }
 
 
-@OptIn(ExperimentalMaterialApi::class)
-@ExperimentalAnimationGraphicsApi
+@OptIn(ExperimentalAnimationGraphicsApi::class, ExperimentalMaterialApi::class)
 @Composable
-fun MiniPlayer(modifier: Modifier = Modifier, viewModel: MainViewModel = hiltViewModel()) {
+fun MiniStage(
+    modifier: Modifier = Modifier, song: Song?, isPlaying: Boolean, onPrevious: () -> Unit = {},
+    onPlay: () -> Unit = {}, onNext: () -> Unit = {}, viewModel: MainViewModel = hiltViewModel()
+) {
+    Log.e(TAG, "MiniStage Recreated")
 
-    val state by viewModel.miniPlayerState.collectAsState()
-    val scope = rememberCoroutineScope()
+    val sheetProgress by viewModel.stageSheetProgress.collectAsState()
 
-    if (state.sheetProgress < 1) Surface(
+    if (sheetProgress < 1) Surface(
         modifier
             .fillMaxSize()
-            .alpha(1 - state.sheetProgress.compIn(0.2f, 0.3f)),
-        color = MaterialTheme.colorScheme.primaryContainer,
+            .alpha(1 - sheetProgress.compIn(0.2f, 0.3f)), color = MaterialTheme.colorScheme.primaryContainer,
         contentColor = MaterialTheme.colorScheme.onPrimaryContainer
     ) {
         Box {
             Row(
                 modifier = Modifier
-                    .alpha(1 - state.sheetProgress.compIn(end = 0.05f))
+                    .alpha(1 - sheetProgress.compIn(end = 0.05f))
                     .padding(start = 16.dp, end = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -106,37 +112,35 @@ fun MiniPlayer(modifier: Modifier = Modifier, viewModel: MainViewModel = hiltVie
                     verticalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     Text(
-                        text = state.song?.title ?: "No song is playing",
+                        text = song?.title ?: "No song is playing",
                         style = MaterialTheme.typography.titleMedium,
                         maxLines = 1, overflow = TextOverflow.Ellipsis
                     )
                     Text(
-                        text = state.song?.artist ?: "Select a song to play",
+                        text = song?.artist ?: "Select a song to play",
                         style = MaterialTheme.typography.labelSmall,
                         maxLines = 1, overflow = TextOverflow.Ellipsis
                     )
                 }
-                IconButton(modifier = Modifier.size(56.dp), onClick = { /*TODO*/ }) {
+                IconButton(modifier = Modifier.size(56.dp), onClick = onPrevious) {
                     Icon(
                         imageVector = Icons.Rounded.SkipPrevious,
                         contentDescription = null,
                     )
                 }
                 val a = AnimatedImageVector.animatedVectorResource(R.drawable.play_to_pause)
-                IconButton(modifier = Modifier
-                    .height(56.dp)
-                    .width(32.dp),
-                    onClick = {
-                        scope.launch {
-                            viewModel.preferences.updatePlayingState(!state.isPlaying)
-                        }
-                    }) {
+                IconButton(
+                    modifier = Modifier
+                        .height(56.dp)
+                        .width(32.dp),
+                    onClick = onPlay
+                ) {
                     Icon(
-                        painter = rememberAnimatedVectorPainter(a, state.isPlaying),
+                        painter = rememberAnimatedVectorPainter(a, isPlaying),
                         contentDescription = "PlayButton",
                     )
                 }
-                IconButton(modifier = Modifier.size(56.dp), onClick = { /*TODO*/ }) {
+                IconButton(modifier = Modifier.size(56.dp), onClick = onNext) {
                     Icon(
                         imageVector = Icons.Rounded.SkipNext,
                         contentDescription = null,

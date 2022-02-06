@@ -70,10 +70,12 @@ fun SheetScaffold(
         appBar = appBar, bottomNav = bottomNav, fab = fab,
         drawerContent = drawerContent, drawerBackground = drawerBackground,
         stageContent = {
-            Surface(stageSwipeable.fillMaxSize(), shadowElevation = SheetElevation, color = stageBackground) {
-                stageContent()
-                if (stageSheetState.isCollapsed) Spacer(modifier = Modifier.clickable { scope.launch { stageSheetState.expand() } })
-            }
+            Surface(
+                stageSwipeable
+                    .fillMaxSize()
+                    .clickable(stageSheetState.isCollapsed) { scope.launch { stageSheetState.expand() } },
+                shadowElevation = SheetElevation, color = stageBackground, content = stageContent
+            )
         },
         stagePeekHeight = realPeekHeight, stageSheetState = stageSheetState,
         queueContent = {

@@ -18,7 +18,6 @@ import com.example.compose.utils.resources.TAG
 import com.example.compose.utils.default_pictures.SongAndSize
 import com.example.compose.utils.default_pictures.getDefaultCover
 
-
 class SongGlideLoader(val context: Context) : ModelLoader<SongAndSize, Bitmap> {
 
     override fun buildLoadData(
@@ -28,7 +27,7 @@ class SongGlideLoader(val context: Context) : ModelLoader<SongAndSize, Bitmap> {
         options: Options
     ): ModelLoader.LoadData<Bitmap> =
         ModelLoader.LoadData(
-            ObjectKey(model.song.id),
+            ObjectKey(model.song.path + model.size.width),
             SongFetcher(context, model)
         )
 
