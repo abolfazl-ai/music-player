@@ -23,7 +23,6 @@ import kotlin.math.hypot
 import kotlin.math.max
 
 fun Modifier.reveal(color: Color, y: Dp, startRadius: Dp = 0.dp, duration: Int = 750) = composed {
-    Log.e(TAG, "reveal Recreated")
 
     val colors = remember { mutableStateListOf(color to Animatable(1f)) }
     val scope = rememberCoroutineScope()

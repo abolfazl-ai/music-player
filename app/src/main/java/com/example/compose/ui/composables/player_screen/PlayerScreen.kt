@@ -40,8 +40,6 @@ fun Stage(modifier: Modifier = Modifier, viewModel: MainViewModel = hiltViewMode
 
     val size = remember { Size(constraints.maxWidth / 3, constraints.maxWidth / 3) }
 
-    Log.e(TAG, "Stage Recreated")
-
     if (state.initialized)
         CompositionLocalProvider(LocalContentColor provides animateColorAsState(state.color.front, tween(1000)).value) {
             Column(
@@ -90,8 +88,6 @@ fun MiniStage(
     modifier: Modifier = Modifier, song: Song?, isPlaying: Boolean, onPrevious: () -> Unit = {},
     onPlay: () -> Unit = {}, onNext: () -> Unit = {}, viewModel: MainViewModel = hiltViewModel()
 ) {
-    Log.e(TAG, "MiniStage Recreated")
-
     val sheetProgress by viewModel.stageSheetProgress.collectAsState()
 
     if (sheetProgress < 1) Surface(

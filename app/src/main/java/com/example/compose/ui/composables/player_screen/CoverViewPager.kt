@@ -30,7 +30,6 @@ fun CoverViewPager(
     onPageChanged: (Int) -> Unit, onPageCreated: (Int, MainColors) -> Unit,
     pagerState: PagerState = rememberPagerState(remember { currentIndex }),
 ) {
-    Log.e(TAG, "CoverViewPager Recreated")
     var tempIndex by remember { mutableStateOf(currentIndex) }
 
     LaunchedEffect(currentIndex, queue) {

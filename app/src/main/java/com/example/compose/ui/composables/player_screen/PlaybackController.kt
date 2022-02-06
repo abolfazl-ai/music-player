@@ -55,8 +55,6 @@ fun PlaybackController(
     viewModel: MainViewModel = hiltViewModel()
 ) {
 
-    Log.e(TAG, "PlaybackController")
-
     val sheetProgress by viewModel.stageSheetProgress.collectAsState()
     val scope = rememberCoroutineScope()
     var active by remember { mutableStateOf(true) }
