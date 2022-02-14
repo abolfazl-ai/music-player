@@ -71,7 +71,7 @@ private fun FoldersLibrary(
                 title = folder.title,
                 subtitle = "Contains ${folder.tracksNumber} tracks",
                 description = folder.totalDuration.toTimeFormat(),
-                picture = { _, _ ->
+                picture = {
                     Icon(
                         modifier = Modifier
                             .fillMaxSize()

@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -44,7 +45,7 @@ fun LinearItemPrev() {
     LinearItem(title = "There Must Be A Sweeter Place We Ca",
         subtitle = "Selena Gomez",
         description = "2:31",
-        picture = { _, _ ->
+        picture = {
             Spacer(
                 modifier = Modifier
                     .fillMaxSize()
@@ -60,7 +61,7 @@ fun LinearItem(
     title: String,
     subtitle: String,
     description: String = "",
-    picture: @Composable BoxScope.(shape: Shape, size: Size) -> Unit,
+    picture: @Composable BoxScope.() -> Unit,
     expanded: Boolean = false,
     itemOptions: @Composable BoxScope.() -> Unit = { ItemOptions() },
     itemOptionsHeight: Dp = IconOptionsHeight,
@@ -125,7 +126,7 @@ internal fun LinearItemCard(
     title: String,
     subtitle: String,
     description: String = "",
-    picture: @Composable BoxScope.(shape: Shape, size: Size) -> Unit,
+    picture: @Composable BoxScope.() -> Unit,
     selected: Boolean = false,
     onClick: () -> Unit = {},
     onSelect: () -> Unit = {},
@@ -137,9 +138,7 @@ internal fun LinearItemCard(
     val clipShape =
         remember { RoundedCornerShape(max(LinearItemCornerRadius - LinearItemPadding, 4.dp)) }
     val size = with(LocalDensity.current) {
-        remember {
-            (LinearItemHeight - LinearItemPadding.times(2)).roundToPx().let { Size(it, it) }
-        }
+        remember { (LinearItemHeight - LinearItemPadding.times(2)).roundToPx().let { Size(it, it) } }
     }
 
     Surface(
@@ -162,9 +161,10 @@ internal fun LinearItemCard(
                     Modifier
                         .scale(1 - selectAnimator / 15)
                         .clip(clipShape)
+                        .clipToBounds()
                         .selectable(selected)
                         .clickable(onClick = onSelect)
-                ) { picture(clipShape, size) }
+                ) { picture() }
 
                 Text(
                     text = title,

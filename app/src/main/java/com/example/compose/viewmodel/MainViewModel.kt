@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.compose.local.model.Song
 import com.example.compose.local.preferences.AppPreferences
-import com.example.compose.ui.composables.layouts.SheetState
 import com.example.compose.ui.composables.layouts.SheetValue
 import com.example.compose.utils.kotlin_extensions.compIn
 import com.example.compose.utils.util_classes.DefaultMainColors
@@ -33,7 +32,16 @@ data class StageState(
     val currentIndex: Int = 0,
     val queue: List<Song> = emptyList(),
     val animateColor: Boolean = false,
-    val color: MainColors = DefaultMainColors,
+)
+
+data class MiniStageState(
+    val show: Boolean = false,
+    val alpha: Float = 1f,
+    val contentAlpha: Float = 1f,
+    val isPlaying: Boolean = false,
+    val currentIndex: Int = 0,
+    val queue: List<Song> = emptyList(),
+    val sheetProgress: Float = 0f,
 )
 
 data class MainScaffoldState(
@@ -42,6 +50,13 @@ data class MainScaffoldState(
     val progress: Float = 0f,
     val transProgress: Float = 0f,
     val showBottomNav: Boolean = true
+)
+
+data class PlaybackControlsState(
+    val show: Boolean = false,
+    val timeLineAlpha: Float = 0f,
+    val buttonsAlpha: Float = 0f,
+    val color: Color = DefaultMainColors.front
 )
 
 @OptIn(InternalCoroutinesApi::class)
@@ -65,14 +80,14 @@ class MainViewModel @Inject constructor(
 
     //UI related
 
+    val colorFlow = MutableStateFlow(DefaultMainColors)
     private val colorCache = LruCache<Int, MainColors>(100)
-    private val colorFlow = MutableStateFlow(DefaultMainColors)
 
     private val isFabExpanded = MutableStateFlow(false)
     private val isFabDragging = MutableStateFlow(false)
 
     private val stageSheetValue = MutableStateFlow(SheetValue.Collapsed)
-    val stageSheetProgress = MutableStateFlow(0f)
+    private val stageSheetProgress = MutableStateFlow(0f)
     private val stageTransProgress = MutableStateFlow(0f)
 
 
@@ -99,6 +114,12 @@ class MainViewModel @Inject constructor(
     private val _stageState = MutableStateFlow(StageState())
     val stageState: StateFlow<StageState> get() = _stageState
 
+    private val _miniStageState = MutableStateFlow(MiniStageState())
+    val miniStageState: StateFlow<MiniStageState> get() = _miniStageState
+
+    private val _playbackControlsState = MutableStateFlow(PlaybackControlsState())
+    val playbackControlsState: StateFlow<PlaybackControlsState> get() = _playbackControlsState
+
     private val _mainScaffoldState = MutableStateFlow(MainScaffoldState())
     val mainScaffoldState: StateFlow<MainScaffoldState> get() = _mainScaffoldState
 
@@ -124,17 +145,33 @@ class MainViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            combine(preferences.playStateFlow, currentSongIndex, queue, stageSheetValue, colorFlow)
-            { playState, i, queue, value, color ->
-                StageState(true, playState, i, queue, value != SheetValue.Collapsed, color)
+            combine(preferences.playStateFlow, currentSongIndex, queue, stageSheetValue)
+            { playState, i, queue, value ->
+                StageState(true, playState, i, queue, value != SheetValue.Collapsed)
             }.catch { it.message?.let { m -> Log.i(TAG, m) } }.collect { _stageState.value = it }
+        }
+
+        viewModelScope.launch {
+            combine(preferences.playStateFlow, currentSongIndex, queue, stageSheetProgress)
+            { playState, i, queue, progress ->
+                MiniStageState(
+                    show = progress < 1, alpha = (1 - progress.compIn(0.05f, 0.15f)),
+                    contentAlpha = 1 - progress.compIn(end = 0.05f), playState, i, queue, progress
+                )
+            }.catch { it.message?.let { m -> Log.i(TAG, m) } }.collect { _miniStageState.value = it }
+        }
+
+        viewModelScope.launch {
+            combine(stageSheetProgress, colorFlow)
+            { p, color -> PlaybackControlsState(p > 0f, p.compIn(0.75f, 0.8f), p.compIn(0.8f, 0.9f), color.front) }
+                .catch { it.message?.let { m -> Log.i(TAG, m) } }.collect { _playbackControlsState.value = it }
         }
 
         viewModelScope.launch {
             combine(
                 isFabExpanded, isFabDragging, stageSheetProgress,
                 stageTransProgress, preferences.playStateFlow
-            ) { expand, drag, progress, trans, play -> MainScaffoldState(expand, drag, progress, trans, play) }
+            ) { expand, drag, progress, trans, play -> MainScaffoldState(expand, drag, progress, trans, !play) }
                 .catch { it.message?.let { m -> Log.i(TAG, m) } }.collect { _mainScaffoldState.value = it }
         }
     }

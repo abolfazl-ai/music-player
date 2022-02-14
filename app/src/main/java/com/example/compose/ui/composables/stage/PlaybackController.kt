@@ -1,5 +1,8 @@
 package com.example.compose.ui.composables.stage
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -11,14 +14,18 @@ import androidx.compose.material.icons.rounded.Repeat
 import androidx.compose.material.icons.rounded.Shuffle
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Icon
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.compose.utils.kotlin_extensions.compIn
+import com.example.compose.utils.resources.StageSpacing
+import com.example.compose.utils.resources.TimeLineHeight
 import com.example.compose.viewmodel.MainViewModel
 
 @Composable
@@ -49,16 +56,28 @@ fun PlaybackController(
     viewModel: MainViewModel = hiltViewModel()
 ) {
 
-    val sheetProgress by viewModel.stageSheetProgress.collectAsState()
+    val state by viewModel.playbackControlsState.collectAsState()
+    val color by animateColorAsState(state.color, tween(750))
 
-    Row(Modifier.alpha(sheetProgress.compIn(0.75f, 0.9f)), verticalAlignment = Alignment.CenterVertically) {
+    Spacer(
+        modifier = Modifier
+            .padding(bottom = StageSpacing)
+            .fillMaxWidth()
+            .height(TimeLineHeight)
+            .alpha(state.timeLineAlpha)
+            .alpha(0.5f)
+            .background(color)
+
+    )
+
+    Row(Modifier.alpha(state.buttonsAlpha), verticalAlignment = Alignment.CenterVertically) {
         IconButton(onClick = onRepeat) {
             Icon(
                 modifier = Modifier
                     .size(56.dp)
                     .padding(16.dp),
                 imageVector = Icons.Rounded.Repeat,
-                contentDescription = null,
+                contentDescription = null, tint = color
             )
         }
         IconButton(onClick = onPrev) {
@@ -67,7 +86,7 @@ fun PlaybackController(
                     .size(56.dp)
                     .padding(12.dp),
                 imageVector = Icons.Rounded.ChevronLeft,
-                contentDescription = null,
+                contentDescription = null, tint = color
             )
         }
         Spacer(modifier = Modifier.size(60.dp))
@@ -77,7 +96,7 @@ fun PlaybackController(
                     .size(56.dp)
                     .padding(12.dp),
                 imageVector = Icons.Rounded.ChevronRight,
-                contentDescription = null,
+                contentDescription = null, tint = color
             )
         }
         IconButton(onClick = onShuffle) {
@@ -86,7 +105,7 @@ fun PlaybackController(
                     .size(56.dp)
                     .padding(16.dp),
                 imageVector = Icons.Rounded.Shuffle,
-                contentDescription = null,
+                contentDescription = null, tint = color
             )
         }
     }

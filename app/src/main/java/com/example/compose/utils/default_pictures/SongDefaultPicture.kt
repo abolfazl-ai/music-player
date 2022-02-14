@@ -1,9 +1,7 @@
 package com.example.compose.utils.default_pictures
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Typeface
+import android.graphics.*
 import android.util.Size
 import com.example.compose.R
 import com.example.compose.local.model.Song
@@ -32,10 +30,10 @@ fun SongAndSize.getDefaultCover(c: Context): Bitmap {
 
         rotate(-45f, bitmap.width / 2f, bitmap.height / 2f)
 
-        val paint = android.graphics.Paint().apply {
+        val paint = Paint().apply {
             isAntiAlias = true
             textSize = bitmap.width / 12f
-            color = android.graphics.Color.WHITE
+            color = Color.WHITE
             typeface = Typeface.DEFAULT_BOLD
         }
 
@@ -53,9 +51,7 @@ fun SongAndSize.getDefaultCover(c: Context): Bitmap {
         drawText("by", bitmap.width / 4.5f, bitmap.height / 1.65f, paint)
 
     }
-
     return bitmap
 }
 
-fun Song.getDefaultCover(c: Context): Bitmap =
-    SongAndSize(this, Size(1000, 1000)).getDefaultCover(c)
+fun Song.getDefaultCover(c: Context): Bitmap = SongAndSize(this, Size(1000, 1000)).getDefaultCover(c)

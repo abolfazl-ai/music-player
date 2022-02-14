@@ -70,30 +70,3 @@ class AlbumFetcher(val context: Context, val model: AlbumAndSize) :
     override fun cancel() {}
 
 }
-
-
-/*internal class CoilFetcher(val context: Context) : Fetcher<Song> {
-
-    private val mmr = MediaMetadataRetriever()
-
-    override fun handles(data: Song) = true
-
-    override fun key(data: Song) = data.path
-
-    override suspend fun fetch(
-        pool: BitmapPool,
-        data: Song,
-        size: Size,
-        options: coil.decode.Options
-    ): FetchResult {
-        mmr.setDataSource(data.path)
-        val src = ByteArrayInputStream(mmr.embeddedPicture ?: context.getDefaultCover(data))
-
-        return SourceResult(
-            source = src.source().buffer(),
-            mimeType = MimeTypes.BASE_TYPE_IMAGE,
-            dataSource = coil.decode.DataSource.DISK
-        )
-    }
-
-}*/

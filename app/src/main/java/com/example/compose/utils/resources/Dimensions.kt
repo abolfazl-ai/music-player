@@ -10,7 +10,7 @@ val FabSize = 56.dp
 val MiniFabSize = 48.dp
 val FabMargin = 16.dp
 
-val StageSpacing = 24.dp
+val StageSpacing = 28.dp
 val TimeLineHeight = 20.dp
 
 val SheetElevation = 12.dp

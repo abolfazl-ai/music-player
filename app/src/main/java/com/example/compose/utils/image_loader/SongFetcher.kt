@@ -6,6 +6,13 @@ import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.core.graphics.drawable.toDrawable
+import coil.bitmap.BitmapPool
+import coil.fetch.DrawableResult
+import coil.fetch.FetchResult
+import coil.fetch.Fetcher
+import coil.size.PixelSize
+import coil.size.Size
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.Options
@@ -14,9 +21,10 @@ import com.bumptech.glide.load.model.ModelLoader
 import com.bumptech.glide.load.model.ModelLoaderFactory
 import com.bumptech.glide.load.model.MultiModelLoaderFactory
 import com.bumptech.glide.signature.ObjectKey
-import com.example.compose.utils.resources.TAG
+import com.example.compose.local.model.Song
 import com.example.compose.utils.default_pictures.SongAndSize
 import com.example.compose.utils.default_pictures.getDefaultCover
+import com.example.compose.utils.resources.TAG
 
 class SongGlideLoader(val context: Context) : ModelLoader<SongAndSize, Bitmap> {
 
@@ -47,6 +55,7 @@ class SongFetcher(val context: Context, val model: SongAndSize) :
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun loadData(priority: Priority, callback: DataFetcher.DataCallback<in Bitmap>) {
+        Log.e(TAG, "Glide fetch: ${model.song.title}")
         val bitmap: Bitmap = try {
             val uri = Uri.parse("content://media/external/audio/media/" + model.song.id)
             context.contentResolver.loadThumbnail(uri, model.size, null)
@@ -66,31 +75,3 @@ class SongFetcher(val context: Context, val model: SongAndSize) :
     override fun cancel() {}
 
 }
-
-
-
-/*internal class CoilFetcher(val context: Context) : Fetcher<Song> {
-
-    private val mmr = MediaMetadataRetriever()
-
-    override fun handles(data: Song) = true
-
-    override fun key(data: Song) = data.path
-
-    override suspend fun fetch(
-        pool: BitmapPool,
-        data: Song,
-        size: Size,
-        options: coil.decode.Options
-    ): FetchResult {
-        mmr.setDataSource(data.path)
-        val src = ByteArrayInputStream(mmr.embeddedPicture ?: context.getDefaultCover(data))
-
-        return SourceResult(
-            source = src.source().buffer(),
-            mimeType = MimeTypes.BASE_TYPE_IMAGE,
-            dataSource = coil.decode.DataSource.DISK
-        )
-    }
-
-}*/

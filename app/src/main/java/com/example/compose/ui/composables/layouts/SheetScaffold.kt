@@ -81,7 +81,7 @@ fun SheetScaffold(
         queueContent = {
             Surface(
                 modifier = queueSwipeable
-                    .alpha(stageSheetState.myProgress.compIn(0.8f))
+                    .alpha(stageSheetState.myProgress.compIn(0.9f))
                     .fillMaxSize()
                     .padding(horizontal = QueueMargin),
                 shadowElevation = SheetElevation, color = queueBackground,

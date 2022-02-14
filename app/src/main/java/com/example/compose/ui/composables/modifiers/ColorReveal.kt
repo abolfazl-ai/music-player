@@ -1,27 +1,23 @@
 package com.example.compose.ui.composables.modifiers
 
-import android.util.Log
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.Canvas
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.compose.utils.resources.TAG
 import kotlinx.coroutines.launch
 import kotlin.math.hypot
 import kotlin.math.max
 
-fun Modifier.reveal(animate: Boolean, color: Color, y: Dp, startRadius: Dp = 0.dp, duration: Int = 750) = composed {
+fun Modifier.reveal(animate: Boolean, color: Color, size: Size, y: Dp, startRadius: Dp = 0.dp, duration: Int = 750) = composed {
 
     val colors = remember { mutableStateListOf(color to Animatable(1f)) }
     val scope = rememberCoroutineScope()
@@ -32,7 +28,6 @@ fun Modifier.reveal(animate: Boolean, color: Color, y: Dp, startRadius: Dp = 0.d
                 colors.add(it)
                 scope.launch {
                     it.second.animateTo(1f, tween(duration, easing = FastOutLinearInEasing))
-                }.invokeOnCompletion {
                     if (colors.size > 1 && colors[1].second.value == 1f) colors.removeFirst()
                 }
             } else {
@@ -42,17 +37,55 @@ fun Modifier.reveal(animate: Boolean, color: Color, y: Dp, startRadius: Dp = 0.d
         }
     }
 
+    val maxRadius = with(LocalDensity.current) { remember { hypot(size.width / 2f, max((size.height - y.toPx()), y.toPx())) } }
+
     clipToBounds().drawBehind {
         drawRect(colors.first().first)
         colors.forEach {
             drawCircle(
-                color = it.first,
-                radius = it.second.value * hypot(
-                    center.x,
-                    max((size.height - y.toPx()), y.toPx())
-                ) + startRadius.toPx(),
-                center = Offset(center.x, y.toPx()),
+                color = it.first, center = Offset(center.x, y.toPx()),
+                radius = it.second.value * maxRadius + startRadius.toPx(),
             )
         }
     }
+}
+
+@Composable
+fun CircularReveal(
+    modifier: Modifier = Modifier, animate: Boolean, color: Color,
+    size: Size, y: Dp, startRadius: Dp = 0.dp, duration: Int = 600
+) = with(LocalDensity.current) {
+
+    val scope = rememberCoroutineScope()
+    val maxRadius = remember { hypot(size.width / 2f, max((size.height - y.toPx()), y.toPx())) }
+
+    var main: Color by remember { mutableStateOf(color) }
+    val colors = remember { mutableStateListOf<Color>() }
+    val animators = remember { mutableStateMapOf<Int, Float>() }
+
+    LaunchedEffect(color) {
+        if (color != colors.lastOrNull()) scope.launch {
+            if (animate) {
+                colors.add(color)
+                colors.lastIndex.let {
+                    animate(
+                        startRadius.toPx(), maxRadius,
+                        animationSpec = tween(duration, easing = CubicBezierEasing(0.5f, 0f, 1f, 1f))
+                    ) { value, _ ->
+                        animators[it] = value
+                    }
+                }
+            }
+            main = color
+            if (animators[colors.lastIndex] == maxRadius) colors.clear(); animators.clear()
+        }
+    }
+
+    Canvas(modifier) {
+        drawRect(main)
+        colors.forEachIndexed { index, color ->
+            drawCircle(color = color, radius = animators[index] ?: startRadius.toPx(), center = Offset(center.x, y.toPx()))
+        }
+    }
+
 }

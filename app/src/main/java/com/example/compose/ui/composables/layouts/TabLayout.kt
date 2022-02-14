@@ -91,7 +91,7 @@ private val Float.transX
 fun TabLayout(
     modifier: Modifier = Modifier,
     screens: List<Screen> = emptyList(),
-    pagerState: PagerState = rememberPagerState(),
+    pagerState: PagerState = rememberPagerState(0),
     horPadding: Dp = 24.dp,
     fabExpanded: Boolean = false,
     color: Color = MaterialTheme.colors.surface,

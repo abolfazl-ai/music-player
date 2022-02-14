@@ -24,83 +24,48 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.compose.R
-import com.example.compose.local.model.Song
-import com.example.compose.utils.kotlin_extensions.compIn
 import com.example.compose.viewmodel.MainViewModel
-
 
 @OptIn(ExperimentalAnimationGraphicsApi::class, ExperimentalMaterialApi::class, ExperimentalAnimationApi::class)
 @Composable
-fun MiniStage(
-    modifier: Modifier = Modifier, queue: List<Song>, index: Int, isPlaying: Boolean, onPrev: () -> Unit = {},
-    onPlay: () -> Unit = {}, onNext: () -> Unit = {}, viewModel: MainViewModel = hiltViewModel()
-) {
-    val sheetProgress by viewModel.stageSheetProgress.collectAsState()
+fun MiniStage(onPrev: () -> Unit = {}, onPlay: () -> Unit = {}, onNext: () -> Unit = {}, viewModel: MainViewModel = hiltViewModel()) {
+    val state by viewModel.miniStageState.collectAsState()
 
-    if (sheetProgress < 1) Surface(
-        modifier
-            .fillMaxSize()
-            .alpha(1 - sheetProgress.compIn(0.2f, 0.3f)), color = MaterialTheme.colorScheme.primaryContainer,
+    if (state.show) Surface(
+        Modifier.alpha(state.alpha), color = MaterialTheme.colorScheme.primaryContainer,
         contentColor = MaterialTheme.colorScheme.onPrimaryContainer
     ) {
         Box {
-            Row(
-                modifier = Modifier
-                    .alpha(1 - sheetProgress.compIn(end = 0.05f))
-                    .padding(start = 16.dp, end = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                AnimatedContent(modifier = Modifier.weight(1f), targetState = index,
+            Row(Modifier.padding(start = 16.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                AnimatedContent(modifier = Modifier.weight(1f), targetState = state.currentIndex,
                     transitionSpec = {
-                        if (targetState > initialState) {
-                            slideInHorizontally { width -> width / 4 } + fadeIn() with slideOutHorizontally { width -> -width / 4 } + fadeOut()
-                        } else {
-                            slideInHorizontally { width -> -width / 4 } + fadeIn() with slideOutHorizontally { width -> width / 4 } + fadeOut()
-                        }.using(
-                            SizeTransform(clip = false)
-                        )
+                        (if (targetState > initialState) slideInHorizontally { width -> width / 4 } + fadeIn()
+                                with slideOutHorizontally { width -> -width / 4 } + fadeOut()
+                        else slideInHorizontally { width -> -width / 4 } + fadeIn() with slideOutHorizontally { width -> width / 4 } + fadeOut()
+                                ).using(SizeTransform(clip = false))
                     }
                 ) {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(2.dp)
-                    ) {
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         Text(
-                            text = queue.getOrNull(it)?.title ?: "No song is playing",
+                            text = state.queue.getOrNull(it)?.title ?: "No song is playing",
                             style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            text = queue.getOrNull(it)?.artist ?: "Select a song to play",
-                            style = MaterialTheme.typography.labelSmall,
-                            maxLines = 1, overflow = TextOverflow.Ellipsis
+                            text = state.queue.getOrNull(it)?.artist ?: "Select a song to play",
+                            style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
 
                 IconButton(modifier = Modifier.size(56.dp), onClick = onPrev) {
-                    Icon(
-                        imageVector = Icons.Rounded.SkipPrevious,
-                        contentDescription = null,
-                    )
+                    Icon(imageVector = Icons.Rounded.SkipPrevious, contentDescription = "Previous")
                 }
-
-                val a = AnimatedImageVector.animatedVectorResource(R.drawable.play_to_pause)
-                IconButton(
-                    modifier = Modifier
-                        .height(56.dp)
-                        .width(32.dp),
-                    onClick = onPlay
-                ) {
-                    Icon(
-                        painter = rememberAnimatedVectorPainter(a, isPlaying),
-                        contentDescription = "PlayButton",
-                    )
+                IconButton(modifier = Modifier.size(56.dp, 32.dp), onClick = onPlay) {
+                    val a = AnimatedImageVector.animatedVectorResource(R.drawable.play_to_pause)
+                    Icon(painter = rememberAnimatedVectorPainter(a, state.isPlaying), contentDescription = "Play")
                 }
-
                 IconButton(modifier = Modifier.size(56.dp), onClick = onNext) {
-                    Icon(
-                        imageVector = Icons.Rounded.SkipNext,
-                        contentDescription = null,
-                    )
+                    Icon(imageVector = Icons.Rounded.SkipNext, contentDescription = "Next")
                 }
             }
         }
