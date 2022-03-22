@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.compose.local.model.Song
 import com.example.compose.local.preferences.AppPreferences
+import com.example.compose.ui.composables.fab.EmoFabMode
 import com.example.compose.ui.composables.layouts.SheetValue
 import com.example.compose.utils.kotlin_extensions.compIn
 import com.example.compose.utils.util_classes.DefaultMainColors
@@ -20,10 +21,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class FabState(
-    val isFabExpanded: Boolean = false,
-    val isFabDragging: Boolean = false,
+    val isMenuOpen: Boolean = false,
+    val isDragging: Boolean = false,
     val isPlaying: Boolean = false,
-    val fabTransProgress: Float = 0f,
+    val fabMode: EmoFabMode = EmoFabMode.Menu,
 )
 
 data class StageState(
@@ -91,13 +92,12 @@ class MainViewModel @Inject constructor(
     private val stageTransProgress = MutableStateFlow(0f)
 
 
-    fun addColorToCache(index: Int, color: MainColors) = colorCache.put(index, color)
+    fun addColorToCache(index: Int, color: MainColors) {
+        if (colorCache[index] == null) colorCache.put(index, color)
+    }
 
-    fun setFabState(
-        isExpanded: Boolean = isFabExpanded.value,
-        isDragging: Boolean = isFabDragging.value,
-    ) {
-        isFabExpanded.value = isExpanded
+    fun setFabState(isMenuOpen: Boolean = isFabExpanded.value, isDragging: Boolean = isFabDragging.value) {
+        isFabExpanded.value = isMenuOpen
         isFabDragging.value = isDragging
     }
 
@@ -139,9 +139,14 @@ class MainViewModel @Inject constructor(
 
         viewModelScope.launch {
             combine(isFabExpanded, isFabDragging, preferences.playStateFlow, stageTransProgress)
-            { expand, drag, playState, progress -> FabState(expand, drag, playState, progress) }
-                .catch { it.message?.let { m -> Log.i(TAG, m) } }
-                .collect { _fabState.value = it }
+            { expand, drag, playState, progress ->
+                val fabMode = when (progress) {
+                    0f -> EmoFabMode.Menu
+                    1f -> EmoFabMode.Playback
+                    else -> EmoFabMode.Menu2Playback(progress)
+                }
+                FabState(expand, drag, playState, fabMode)
+            }.catch { it.message?.let { m -> Log.i(TAG, m) } }.collect { _fabState.value = it }
         }
 
         viewModelScope.launch {
@@ -155,7 +160,7 @@ class MainViewModel @Inject constructor(
             combine(preferences.playStateFlow, currentSongIndex, queue, stageSheetProgress)
             { playState, i, queue, progress ->
                 MiniStageState(
-                    show = progress < 1, alpha = (1 - progress.compIn(0.05f, 0.15f)),
+                    show = progress < 1, alpha = (1 - progress.compIn(0.05f, 0.2f)),
                     contentAlpha = 1 - progress.compIn(end = 0.05f), playState, i, queue, progress
                 )
             }.catch { it.message?.let { m -> Log.i(TAG, m) } }.collect { _miniStageState.value = it }

@@ -7,7 +7,9 @@ val BottomNavHeight = 56.dp
 val AppBarHeight = 56.dp
 
 val FabSize = 56.dp
-val MiniFabSize = 48.dp
+val FabElevation = 6.dp
+val MenuFabSize = 48.dp
+val MenuFabSpacing = 8.dp
 val FabMargin = 16.dp
 
 val StageSpacing = 28.dp

@@ -32,11 +32,11 @@ fun MiniStage(onPrev: () -> Unit = {}, onPlay: () -> Unit = {}, onNext: () -> Un
     val state by viewModel.miniStageState.collectAsState()
 
     if (state.show) Surface(
-        Modifier.alpha(state.alpha), color = MaterialTheme.colorScheme.primaryContainer,
+        Modifier.fillMaxSize().alpha(state.alpha), color = MaterialTheme.colorScheme.primaryContainer,
         contentColor = MaterialTheme.colorScheme.onPrimaryContainer
     ) {
         Box {
-            Row(Modifier.padding(start = 16.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.alpha(state.contentAlpha).padding(start = 16.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                 AnimatedContent(modifier = Modifier.weight(1f), targetState = state.currentIndex,
                     transitionSpec = {
                         (if (targetState > initialState) slideInHorizontally { width -> width / 4 } + fadeIn()

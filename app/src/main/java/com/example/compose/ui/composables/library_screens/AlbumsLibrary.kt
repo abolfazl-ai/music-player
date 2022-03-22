@@ -5,12 +5,13 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.annotation.ExperimentalCoilApi
@@ -38,13 +39,20 @@ fun AlbumsLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = hilt
         contentPadding = PaddingValues(6.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
-        cells = GridCells.Fixed(2)
+        columns = GridCells.Fixed(2)
     ) {
         itemsIndexed(albums) { index, album ->
             GridItem(
                 title = album.name.trim(),
                 subtitle = album.artist.trim(),
-                picture = { Image(rememberImagePainter(album) { fetcher(CoilAlbumFetcher) }, contentDescription = album.name) },
+                picture = {
+                    Image(
+                        rememberImagePainter(album) { fetcher(CoilAlbumFetcher) },
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                        contentDescription = album.name
+                    )
+                },
                 selected = selectList.contains(index),
                 onSelect = { onSelect(index) }
             ) { if (selectList.isNotEmpty()) onSelect(index) }

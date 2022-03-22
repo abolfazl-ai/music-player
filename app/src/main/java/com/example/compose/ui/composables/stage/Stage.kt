@@ -6,6 +6,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
@@ -40,21 +41,21 @@ fun Stage(modifier: Modifier = Modifier, viewModel: MainViewModel = hiltViewMode
                     .fillMaxWidth()
                     .aspectRatio(1f)
                     .background(Color.Black),
-                queue = state.queue, currentIndex = state.currentIndex,
+                queue = state.queue, currentIndex = temp,
                 onPageChanged = { scope.launch { temp = it;if (it != state.currentIndex) viewModel.updateCurrentIndex(it) } },
                 onPageCreated = { page, colors -> viewModel.addColorToCache(page, colors) }
             )
 
             PlaybackController(
-                onPrev = { scope.launch { if (temp == state.currentIndex) viewModel.updateCurrentIndex(state.currentIndex - 1) } },
-                onNext = { scope.launch { if (temp == state.currentIndex) viewModel.updateCurrentIndex(state.currentIndex + 1) } }
+                onPrev = { scope.launch { if (temp == state.currentIndex) temp = state.currentIndex - 1 } },
+                onNext = { scope.launch { if (temp == state.currentIndex) temp = state.currentIndex + 1 } }
             )
         }
 
         MiniStage(
-            onPrev = { scope.launch { if (temp == state.currentIndex) viewModel.updateCurrentIndex(state.currentIndex - 1) } },
+            onPrev = { scope.launch { if (temp == state.currentIndex) temp = state.currentIndex - 1 } },
             onPlay = { scope.launch { viewModel.preferences.updatePlayingState(!state.isPlaying) } },
-            onNext = { scope.launch { if (temp == state.currentIndex) viewModel.updateCurrentIndex(state.currentIndex + 1) } }
+            onNext = { scope.launch { if (temp == state.currentIndex) temp = state.currentIndex + 1 } }
         )
     }
 }

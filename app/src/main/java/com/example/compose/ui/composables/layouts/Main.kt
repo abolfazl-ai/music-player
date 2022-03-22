@@ -18,7 +18,7 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.*
 import com.example.compose.ui.Screen
-import com.example.compose.ui.composables.DraggableFab
+import com.example.compose.ui.composables.fab.EmoFab
 import com.example.compose.ui.composables.library_screens.*
 import com.example.compose.ui.composables.stage.Stage
 import com.example.compose.ui.screens
@@ -120,7 +120,7 @@ fun Home(viewModel: MainViewModel = hiltViewModel()) {
                     )
                 }
             }
-        }, fab = { DraggableFab() }
+        }, fab = { EmoFab() }
     ) {
         SwipeRefresh(
             state = rememberSwipeRefreshState(viewModel.preferences.isScanning.collectAsState(initial = false).value),

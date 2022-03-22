@@ -1,59 +1,67 @@
 package com.example.compose.ui.composables.modifiers
 
+import android.util.Log
 import androidx.compose.animation.core.*
+import androidx.compose.animation.core.Spring.StiffnessVeryLow
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.compose.utils.resources.TAG
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.hypot
 import kotlin.math.max
 
 fun Modifier.reveal(animate: Boolean, color: Color, size: Size, y: Dp, startRadius: Dp = 0.dp, duration: Int = 750) = composed {
 
-    val colors = remember { mutableStateListOf(color to Animatable(1f)) }
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(color) {
-        if (color != colors.last().first) launch {
-            if (animate) (color to Animatable(0f)).let {
-                colors.add(it)
-                scope.launch {
-                    it.second.animateTo(1f, tween(duration, easing = FastOutLinearInEasing))
-                    if (colors.size > 1 && colors[1].second.value == 1f) colors.removeFirst()
+    var main: Color by remember { mutableStateOf(color) }
+    val colors = remember { mutableStateListOf<Color>() }
+    val animators = remember { mutableStateMapOf<Int, Float>() }
+
+    with(LocalDensity.current) {
+        val maxRadius = remember { hypot(size.width / 2f, max((size.height - y.toPx()), y.toPx())) }
+        LaunchedEffect(color) {
+            if (color != colors.lastOrNull()) scope.launch {
+                if (animate) {
+                    colors.add(color)
+                    val index = colors.lastIndex
+                    animate(startRadius.toPx(), maxRadius, animationSpec = spring(stiffness = 25f)) { v, _ ->
+                        animators[index] = v
+                    }
                 }
-            } else {
-                colors.add(color to Animatable(1f))
-                if (colors.size > 1 && colors[1].second.value == 1f) colors.removeFirst()
+                main = color
+                if (animators[colors.lastIndex] == maxRadius) colors.clear(); animators.clear()
             }
         }
     }
 
-    val maxRadius = with(LocalDensity.current) { remember { hypot(size.width / 2f, max((size.height - y.toPx()), y.toPx())) } }
-
     clipToBounds().drawBehind {
-        drawRect(colors.first().first)
-        colors.forEach {
-            drawCircle(
-                color = it.first, center = Offset(center.x, y.toPx()),
-                radius = it.second.value * maxRadius + startRadius.toPx(),
-            )
-        }
+        drawRect(main)
+        colors.forEachIndexed { i, color -> drawCircle(color, animators[i] ?: startRadius.toPx(), Offset(center.x, y.toPx())) }
     }
 }
 
 @Composable
 fun CircularReveal(
     modifier: Modifier = Modifier, animate: Boolean, color: Color,
-    size: Size, y: Dp, startRadius: Dp = 0.dp, duration: Int = 600
+    size: Size, y: Dp, startRadius: Dp = 0.dp, duration: Int = 700
 ) = with(LocalDensity.current) {
 
     val scope = rememberCoroutineScope()
@@ -64,17 +72,12 @@ fun CircularReveal(
     val animators = remember { mutableStateMapOf<Int, Float>() }
 
     LaunchedEffect(color) {
+        delay(50)
         if (color != colors.lastOrNull()) scope.launch {
             if (animate) {
                 colors.add(color)
-                colors.lastIndex.let {
-                    animate(
-                        startRadius.toPx(), maxRadius,
-                        animationSpec = tween(duration, easing = CubicBezierEasing(0.5f, 0f, 1f, 1f))
-                    ) { value, _ ->
-                        animators[it] = value
-                    }
-                }
+                val index = colors.lastIndex
+                animate(startRadius.toPx(), maxRadius, animationSpec = spring(stiffness = 30f)) { v, _ -> animators[index] = v }
             }
             main = color
             if (animators[colors.lastIndex] == maxRadius) colors.clear(); animators.clear()
@@ -83,9 +86,6 @@ fun CircularReveal(
 
     Canvas(modifier) {
         drawRect(main)
-        colors.forEachIndexed { index, color ->
-            drawCircle(color = color, radius = animators[index] ?: startRadius.toPx(), center = Offset(center.x, y.toPx()))
-        }
+        colors.forEachIndexed { i, color -> drawCircle(color, animators[i] ?: startRadius.toPx(), Offset(center.x, y.toPx())) }
     }
-
 }

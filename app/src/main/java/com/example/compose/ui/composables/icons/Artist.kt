@@ -7,7 +7,6 @@ import androidx.compose.material.icons.materialPath
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.graphics.translationMatrix
 
 val Icons.Filled.Artist: ImageVector
     get() {

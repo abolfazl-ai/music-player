@@ -120,7 +120,7 @@ private fun SheetScaffoldStack(
                         .coerceIn(-stagePeekHeight - fabRange.roundToPx(), -stagePeekHeight) +
                             stagePeekHeight) / fabRange.toPx()).coerceIn(0f, 1f)
 
-                    viewModel.setSheetState(stageSheetState.currentValue,transferProgress, stageSheetState.myProgress)
+                    viewModel.setSheetState(stageSheetState.currentValue, transferProgress, stageSheetState.myProgress)
                 }
             }
         }
