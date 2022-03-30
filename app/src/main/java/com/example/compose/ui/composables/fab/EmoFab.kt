@@ -44,7 +44,6 @@ sealed class EmoFabMode(val progress: Float) {
     object Play : EmoFabMode(1f)
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun EmoFab(viewModel: MainViewModel = viewModel()) {
 
