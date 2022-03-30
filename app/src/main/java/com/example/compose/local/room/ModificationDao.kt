@@ -1,8 +1,10 @@
 package com.example.compose.local.room
 
 import androidx.room.*
-import androidx.room.Dao
-import com.example.compose.local.model.*
+import com.example.compose.local.model.Album
+import com.example.compose.local.model.Artist
+import com.example.compose.local.model.Folder
+import com.example.compose.local.model.Song
 
 @Dao
 interface ModificationDao {

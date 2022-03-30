@@ -1,8 +1,6 @@
 package com.example.compose.utils.kotlin_extensions
 
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.graphics.luminance
 import androidx.palette.graphics.Palette
 import androidx.palette.graphics.Target
 import com.example.compose.utils.util_classes.DefaultMainColors

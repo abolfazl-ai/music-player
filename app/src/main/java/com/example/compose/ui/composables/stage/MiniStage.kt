@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.compose.R
+import com.example.compose.ui.composables.util_composables.EmoIconButton
 import com.example.compose.viewmodel.MainViewModel
 
 @OptIn(ExperimentalAnimationGraphicsApi::class, ExperimentalMaterialApi::class, ExperimentalAnimationApi::class)
@@ -57,14 +58,14 @@ fun MiniStage(onPrev: () -> Unit = {}, onPlay: () -> Unit = {}, onNext: () -> Un
                     }
                 }
 
-                IconButton(modifier = Modifier.size(56.dp), onClick = onPrev) {
+                EmoIconButton(modifier = Modifier.size(56.dp), onClick = onPrev) {
                     Icon(imageVector = Icons.Rounded.SkipPrevious, contentDescription = "Previous")
                 }
-                IconButton(modifier = Modifier.size(56.dp, 32.dp), onClick = onPlay) {
+                EmoIconButton(modifier = Modifier.size(56.dp, 32.dp), onClick = onPlay) {
                     val a = AnimatedImageVector.animatedVectorResource(R.drawable.play_to_pause)
                     Icon(painter = rememberAnimatedVectorPainter(a, state.isPlaying), contentDescription = "Play")
                 }
-                IconButton(modifier = Modifier.size(56.dp), onClick = onNext) {
+                EmoIconButton(modifier = Modifier.size(56.dp), onClick = onNext) {
                     Icon(imageVector = Icons.Rounded.SkipNext, contentDescription = "Next")
                 }
             }

@@ -3,8 +3,11 @@ package com.example.compose.utils.resources
 import androidx.compose.ui.unit.dp
 
 val BottomNavHeight = 56.dp
+val BottomNavElevation = 12.dp
+val BottomNavRipple = 48.dp
 
 val AppBarHeight = 56.dp
+val AppBarElevation = 12.dp
 
 val FabSize = 56.dp
 val FabElevation = 6.dp

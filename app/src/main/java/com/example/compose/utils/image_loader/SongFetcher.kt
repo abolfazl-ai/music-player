@@ -6,13 +6,6 @@ import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.core.graphics.drawable.toDrawable
-import coil.bitmap.BitmapPool
-import coil.fetch.DrawableResult
-import coil.fetch.FetchResult
-import coil.fetch.Fetcher
-import coil.size.PixelSize
-import coil.size.Size
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.Options
@@ -21,7 +14,6 @@ import com.bumptech.glide.load.model.ModelLoader
 import com.bumptech.glide.load.model.ModelLoaderFactory
 import com.bumptech.glide.load.model.MultiModelLoaderFactory
 import com.bumptech.glide.signature.ObjectKey
-import com.example.compose.local.model.Song
 import com.example.compose.utils.default_pictures.SongAndSize
 import com.example.compose.utils.default_pictures.getDefaultCover
 import com.example.compose.utils.resources.TAG

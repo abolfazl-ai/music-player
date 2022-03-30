@@ -3,10 +3,6 @@ package com.example.compose.local.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.compose.local.preferences.SortOrder
-import com.example.compose.local.preferences.SortOrder.*
-import com.example.compose.local.room.SongDao
-import kotlinx.coroutines.flow.Flow
 
 @Entity(tableName = "SONGS")
 data class Song(

@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
+import com.example.compose.ui.composables.layouts.SheetValue.*
 
 enum class SheetValue { Collapsed, Expanded }
 
@@ -23,21 +24,22 @@ class SheetState(
     confirmStateChange = confirmStateChange
 ) {
 
-    val isExpanded: Boolean get() = currentValue == SheetValue.Expanded
+    val isExpanded: Boolean get() = realProgress == 1f
 
-    val isCollapsed: Boolean get() = currentValue == SheetValue.Collapsed
+    val isCollapsed: Boolean get() = realProgress == 0f
 
-    suspend fun expand() = animateTo(SheetValue.Expanded)
+    suspend fun expand() = animateTo(Expanded)
 
-    suspend fun collapse() = animateTo(SheetValue.Collapsed)
+    suspend fun collapse() = animateTo(Collapsed)
 
-    val myProgress: Float
-        get() {
-            return if (progress.from == progress.to) {
-                if (progress.from == SheetValue.Expanded) 1f else 0f
-            } else if (progress.fraction != 1f && progress.fraction != 0f) {
-                if (progress.from == SheetValue.Collapsed) progress.fraction else (1 - progress.fraction)
-            } else if (isCollapsed) 0f else 1f
+    val realProgress: Float
+        get() = progress.run {
+            when {
+                from == Collapsed && to == Collapsed -> 0f
+                from == Expanded && to == Expanded -> 1f
+                from == Collapsed && to == Expanded -> fraction
+                else -> 1f - fraction
+            }
         }
 
     companion object {

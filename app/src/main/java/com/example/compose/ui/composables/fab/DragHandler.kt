@@ -27,8 +27,11 @@ import androidx.compose.ui.unit.dp
 import com.example.compose.ui.composables.icons.E
 import com.example.compose.ui.composables.icons.M
 import com.example.compose.ui.composables.icons.O
+import com.example.compose.ui.composables.modifiers.singleClickable
 import com.example.compose.utils.kotlin_extensions.coerceAtLeast
 import com.example.compose.utils.kotlin_extensions.toIntOffset
+import com.example.compose.utils.util_classes.MultipleEventsCutter
+import com.example.compose.utils.util_classes.get
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -102,6 +105,7 @@ fun DragHandler(
         ) { Icon(modifier = Modifier.padding(10.dp), imageVector = icon, contentDescription = null) }
     }
 
+    val multipleEventsCutter = remember { MultipleEventsCutter.get() }
     Surface(
         modifier = Modifier
             .offset {
@@ -109,7 +113,8 @@ fun DragHandler(
                     .coerceAtLeast(minDistance)
                     .toIntOffset()
             }
-            .size(size), onClick = { if (mainOffset.value.getDistance() < minDistance) onClick() }, color = color,
-        contentColor = contentColor, shape = shape, shadowElevation = elevation
+            .size(size),
+        color = color, contentColor = contentColor, shape = shape, shadowElevation = elevation,
+        onClick = { multipleEventsCutter.processEvent { if (mainOffset.value.getDistance() < minDistance) onClick() } },
     ) { Spacer(modifier = if (active) dragModifier else Modifier.fillMaxSize()); icon() }
 }

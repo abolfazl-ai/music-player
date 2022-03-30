@@ -1,6 +1,7 @@
 package com.example.compose.ui.composables.fab
 
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
@@ -13,7 +14,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
@@ -25,7 +29,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.compose.R
 import com.example.compose.ui.composables.fab.EmoFabMode.*
 import com.example.compose.utils.kotlin_extensions.getMidColor
-import com.example.compose.utils.resources.*
+import com.example.compose.utils.resources.FabElevation
+import com.example.compose.utils.resources.FabSize
+import com.example.compose.utils.resources.MenuFabSize
+import com.example.compose.utils.resources.MenuFabSpacing
 import com.example.compose.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 
@@ -51,7 +58,15 @@ fun EmoFab(viewModel: MainViewModel = viewModel()) {
         showMenu = state.fabMode is Menu,
         isMenuOpen = state.isMenuOpen, menuItems = DummyMenuItems, onMenuClicked = {},
         color = color.first, contentColor = color.second,
-        onClick = { scope.launch { viewModel.setFabState(isMenuOpen = !state.isMenuOpen) } }
+        onClick = {
+            scope.launch {
+                when (state.fabMode) {
+                    is Menu -> viewModel.setFabState(isMenuOpen = !state.isMenuOpen)
+                    is Playback -> viewModel.preferences.updatePlayingState(!state.isPlaying)
+                    is Play -> Unit
+                }
+            }
+        }
     ) { state.run { GetIcon(fabMode, isPlaying, isMenuOpen) } }
 }
 

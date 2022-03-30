@@ -65,8 +65,9 @@ fun SongList(
         contentPadding = PaddingValues(6.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        itemsIndexed(songs) { index, song ->
+        itemsIndexed(songs, key = { _, item -> item.id }) { index, song ->
             SongItem(
+                modifier = Modifier.animateItemPlacement(),
                 song = song,
                 itemOptions = options,
                 expanded = expandIndex == index,
@@ -85,6 +86,7 @@ fun SongList(
 @ExperimentalFoundationApi
 @Composable
 fun SongItem(
+    modifier: Modifier,
     song: Song,
     itemOptions: @Composable BoxScope.() -> Unit = { ItemOptions() },
     itemOptionsHeight: Dp = IconOptionsHeight,
@@ -99,7 +101,7 @@ fun SongItem(
     picture = {
         LoadSongCover(song = song, placeHolder = {
             Icon(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.tertiary)
                     .padding(8.dp),

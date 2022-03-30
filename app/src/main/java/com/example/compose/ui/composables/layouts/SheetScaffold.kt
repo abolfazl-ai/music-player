@@ -81,7 +81,7 @@ fun SheetScaffold(
         queueContent = {
             Surface(
                 modifier = queueSwipeable
-                    .alpha(stageSheetState.myProgress.compIn(0.9f))
+                    .alpha(stageSheetState.realProgress.compIn(0.9f))
                     .fillMaxSize()
                     .padding(horizontal = QueueMargin),
                 shadowElevation = SheetElevation, color = queueBackground,
@@ -113,14 +113,14 @@ private fun SheetScaffoldStack(
     val fabRange = remember(width) { width + FabSize + FabMargin + StageSpacing + TimeLineHeight }
 
     with(LocalDensity.current) {
-        LaunchedEffect(stageSheetState.myProgress) {
+        LaunchedEffect(stageSheetState.realProgress) {
             if (showNav == state.showBottomNav) {
                 launch {
                     val transferProgress = (-(stageSheetState.offset.value.roundToInt()
                         .coerceIn(-stagePeekHeight - fabRange.roundToPx(), -stagePeekHeight) +
                             stagePeekHeight) / fabRange.toPx()).coerceIn(0f, 1f)
 
-                    viewModel.setSheetState(stageSheetState.currentValue, transferProgress, stageSheetState.myProgress)
+                    viewModel.setSheetState(transferProgress, stageSheetState.realProgress)
                 }
             }
         }
@@ -129,20 +129,20 @@ private fun SheetScaffoldStack(
     val fabShadowAnimator by animateFloatAsState(if (state.isFabExpanded) 0.5f else 0f)
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     ModalDrawer(
-        drawerShape = RectangleShape, gesturesEnabled = !state.isFabDragging && stageSheetState.myProgress == 0f,
+        drawerShape = RectangleShape, gesturesEnabled = !state.isFabDragging && stageSheetState.realProgress == 0f,
         drawerBackgroundColor = drawerBackground, drawerContent = drawerContent, drawerState = drawerState
     ) {
         BackHandler(
-            (stageSheetState.myProgress > 0) ||
-                    (queueSheetState.myProgress > 0) ||
+            (stageSheetState.realProgress > 0) ||
+                    (queueSheetState.realProgress > 0) ||
                     state.isFabExpanded ||
                     drawerState.isOpen
         ) {
             scope.launch {
                 if (drawerState.isOpen) drawerState.close()
                 else if (state.isFabExpanded) viewModel.setFabState(false)
-                else if (queueSheetState.myProgress > 0) queueSheetState.collapse()
-                else if (stageSheetState.myProgress > 0)
+                else if (queueSheetState.realProgress > 0) queueSheetState.collapse()
+                else if (stageSheetState.realProgress > 0)
                     stageSheetState.animateTo(SheetValue.Collapsed, spring(DampingRatioNoBouncy, StiffnessMediumLow))
             }
         }

@@ -2,7 +2,6 @@ package com.example.compose.utils.image_loader
 
 import android.content.ContentUris
 import android.net.Uri
-import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
 import android.util.Size

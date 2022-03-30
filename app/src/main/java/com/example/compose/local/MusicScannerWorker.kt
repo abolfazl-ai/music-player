@@ -15,12 +15,9 @@ import com.example.compose.local.model.Artist
 import com.example.compose.local.model.Folder
 import com.example.compose.local.model.Song
 import com.example.compose.local.preferences.AppPreferences
-import com.example.compose.local.room.DataBase
 import com.example.compose.local.room.ModificationDao
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import java.io.File
-import javax.inject.Inject
 import kotlin.system.measureTimeMillis
 
 @HiltWorker

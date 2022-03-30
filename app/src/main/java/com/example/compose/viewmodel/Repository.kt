@@ -10,10 +10,8 @@ import com.example.compose.local.model.Artist
 import com.example.compose.local.model.Folder
 import com.example.compose.local.model.Song
 import com.example.compose.local.preferences.AppPreferences
-import com.example.compose.local.preferences.SortOrders
 import com.example.compose.local.room.DataBase
 import com.example.compose.local.room.getBySortOrder
-import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapMerge

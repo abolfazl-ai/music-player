@@ -8,15 +8,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.compose.local.model.Song
 import com.example.compose.local.preferences.AppPreferences
+import com.example.compose.ui.Page
 import com.example.compose.ui.composables.fab.EmoFabMode
-import com.example.compose.ui.composables.layouts.SheetValue
 import com.example.compose.utils.kotlin_extensions.compIn
 import com.example.compose.utils.util_classes.DefaultMainColors
 import com.example.compose.utils.util_classes.MainColors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -60,8 +63,6 @@ data class PlaybackControlsState(
     val color: Color = DefaultMainColors.front
 )
 
-@OptIn(InternalCoroutinesApi::class)
-@ExperimentalMaterialApi
 @HiltViewModel
 class MainViewModel @Inject constructor(
     val repository: Repository,
@@ -87,7 +88,6 @@ class MainViewModel @Inject constructor(
     private val isFabExpanded = MutableStateFlow(false)
     private val isFabDragging = MutableStateFlow(false)
 
-    private val stageSheetValue = MutableStateFlow(SheetValue.Collapsed)
     private val stageSheetProgress = MutableStateFlow(0f)
     private val stageTransProgress = MutableStateFlow(0f)
 
@@ -101,12 +101,18 @@ class MainViewModel @Inject constructor(
         isFabDragging.value = isDragging
     }
 
-    fun setSheetState(state: SheetValue, transProgress: Float, mainProgress: Float) {
-        if (stageSheetValue.value != state) stageSheetValue.value = state
+    fun setSheetState(transProgress: Float, mainProgress: Float) {
         stageTransProgress.value = transProgress
         stageSheetProgress.value = mainProgress
     }
 
+    fun setCurrentPage(page: Page) {
+        if (_currentPage != page) _currentPage.value = page
+    }
+
+
+    private val _currentPage = MutableStateFlow<Page>(Page.Libraries.HomePage)
+    val currentPage: StateFlow<Page> get() = _currentPage
 
     private val _fabState = MutableStateFlow(FabState())
     val fabState: StateFlow<FabState> get() = _fabState
@@ -150,9 +156,9 @@ class MainViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            combine(preferences.playStateFlow, currentSongIndex, queue, stageSheetValue)
-            { playState, i, queue, value ->
-                StageState(true, playState, i, queue, value != SheetValue.Collapsed)
+            combine(preferences.playStateFlow, currentSongIndex, queue, stageSheetProgress)
+            { playState, i, queue, progress ->
+                StageState(true, playState, i, queue, progress != 0f)
             }.catch { it.message?.let { m -> Log.i(TAG, m) } }.collect { _stageState.value = it }
         }
 

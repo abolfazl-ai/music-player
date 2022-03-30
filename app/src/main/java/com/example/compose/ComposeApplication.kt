@@ -1,7 +1,6 @@
 package com.example.compose
 
 import android.app.Application
-import android.content.Intent
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import dagger.hilt.android.HiltAndroidApp

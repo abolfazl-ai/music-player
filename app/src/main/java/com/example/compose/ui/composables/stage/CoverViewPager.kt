@@ -17,7 +17,6 @@ import com.example.compose.utils.util_classes.MainColors
 import com.google.accompanist.pager.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 

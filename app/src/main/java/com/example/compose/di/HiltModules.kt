@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
-import androidx.work.WorkManager
 import com.example.compose.local.preferences.AppPreferences
 import com.example.compose.local.preferences.dataStore
 import com.example.compose.local.room.DataBase
