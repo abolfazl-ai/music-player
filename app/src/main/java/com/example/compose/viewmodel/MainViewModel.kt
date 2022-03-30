@@ -2,7 +2,6 @@ package com.example.compose.viewmodel
 
 import android.util.Log
 import androidx.collection.LruCache
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,7 +13,6 @@ import com.example.compose.utils.kotlin_extensions.compIn
 import com.example.compose.utils.util_classes.DefaultMainColors
 import com.example.compose.utils.util_classes.MainColors
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,19 +31,14 @@ data class FabState(
 data class StageState(
     val initialized: Boolean = false,
     val isPlaying: Boolean = false,
-    val currentIndex: Int = 0,
+    val index: Int = 0,
     val queue: List<Song> = emptyList(),
+    val color: MainColors = DefaultMainColors,
     val animateColor: Boolean = false,
-)
-
-data class MiniStageState(
-    val show: Boolean = false,
-    val alpha: Float = 1f,
-    val contentAlpha: Float = 1f,
-    val isPlaying: Boolean = false,
-    val currentIndex: Int = 0,
-    val queue: List<Song> = emptyList(),
-    val sheetProgress: Float = 0f,
+    val stageAlpha: Float = 0f,
+    val timelineAlpha: Float = 0f,
+    val buttonsAlpha: Float = 0f,
+    val miniStageAlpha: Float = 1f,
 )
 
 data class MainScaffoldState(
@@ -54,13 +47,6 @@ data class MainScaffoldState(
     val progress: Float = 0f,
     val transProgress: Float = 0f,
     val showBottomNav: Boolean = true
-)
-
-data class PlaybackControlsState(
-    val show: Boolean = false,
-    val timeLineAlpha: Float = 0f,
-    val buttonsAlpha: Float = 0f,
-    val color: Color = DefaultMainColors.front
 )
 
 @HiltViewModel
@@ -120,12 +106,6 @@ class MainViewModel @Inject constructor(
     private val _stageState = MutableStateFlow(StageState())
     val stageState: StateFlow<StageState> get() = _stageState
 
-    private val _miniStageState = MutableStateFlow(MiniStageState())
-    val miniStageState: StateFlow<MiniStageState> get() = _miniStageState
-
-    private val _playbackControlsState = MutableStateFlow(PlaybackControlsState())
-    val playbackControlsState: StateFlow<PlaybackControlsState> get() = _playbackControlsState
-
     private val _mainScaffoldState = MutableStateFlow(MainScaffoldState())
     val mainScaffoldState: StateFlow<MainScaffoldState> get() = _mainScaffoldState
 
@@ -156,26 +136,21 @@ class MainViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            combine(preferences.playStateFlow, currentSongIndex, queue, stageSheetProgress)
-            { playState, i, queue, progress ->
-                StageState(true, playState, i, queue, progress != 0f)
-            }.catch { it.message?.let { m -> Log.i(TAG, m) } }.collect { _stageState.value = it }
-        }
-
-        viewModelScope.launch {
-            combine(preferences.playStateFlow, currentSongIndex, queue, stageSheetProgress)
-            { playState, i, queue, progress ->
-                MiniStageState(
-                    show = progress < 1, alpha = (1 - progress.compIn(0.05f, 0.2f)),
-                    contentAlpha = 1 - progress.compIn(end = 0.05f), playState, i, queue, progress
+            combine(preferences.playStateFlow, currentSongIndex, queue, colorFlow, stageSheetProgress)
+            { playState, i, queue, color, progress ->
+                StageState(
+                    initialized = true,
+                    isPlaying = playState,
+                    index = i,
+                    queue = queue,
+                    color = color,
+                    animateColor = progress != 0f,
+                    stageAlpha = progress.compIn(0.05f, 0.2f),
+                    timelineAlpha = progress.compIn(0.75f, 0.8f),
+                    buttonsAlpha = progress.compIn(0.8f, 0.9f),
+                    miniStageAlpha = 1 - progress.compIn(end = 0.05f),
                 )
-            }.catch { it.message?.let { m -> Log.i(TAG, m) } }.collect { _miniStageState.value = it }
-        }
-
-        viewModelScope.launch {
-            combine(stageSheetProgress, colorFlow)
-            { p, color -> PlaybackControlsState(p > 0f, p.compIn(0.75f, 0.8f), p.compIn(0.8f, 0.9f), color.front) }
-                .catch { it.message?.let { m -> Log.i(TAG, m) } }.collect { _playbackControlsState.value = it }
+            }.catch { it.message?.let { m -> Log.i(TAG, m) } }.collect { _stageState.value = it }
         }
 
         viewModelScope.launch {

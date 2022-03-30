@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 import kotlin.math.hypot
 import kotlin.math.max
 
-fun Modifier.reveal(animate: Boolean, color: Color, size: Size, y: Dp, startRadius: Dp = 0.dp, duration: Int = 750) = composed {
+fun Modifier.reveal(animate: Boolean, color: Color, size: Size, y: Dp, startRadius: Dp = 0.dp, duration: Int = 700) = composed {
 
     val scope = rememberCoroutineScope()
 
@@ -30,13 +30,12 @@ fun Modifier.reveal(animate: Boolean, color: Color, size: Size, y: Dp, startRadi
     with(LocalDensity.current) {
         val maxRadius = remember { hypot(size.width / 2f, max((size.height - y.toPx()), y.toPx())) }
         LaunchedEffect(color) {
+            delay(50)
             if (color != colors.lastOrNull()) scope.launch {
                 if (animate) {
                     colors.add(color)
                     val index = colors.lastIndex
-                    animate(startRadius.toPx(), maxRadius, animationSpec = spring(stiffness = 25f)) { v, _ ->
-                        animators[index] = v
-                    }
+                    animate(startRadius.toPx(), maxRadius, animationSpec = spring(stiffness = 30f)) { v, _ -> animators[index] = v }
                 }
                 main = color
                 if (animators[colors.lastIndex] == maxRadius) colors.clear(); animators.clear()

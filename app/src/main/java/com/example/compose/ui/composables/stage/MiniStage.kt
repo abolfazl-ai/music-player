@@ -6,15 +6,12 @@ import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.SkipNext
 import androidx.compose.material.icons.rounded.SkipPrevious
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -24,21 +21,19 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.compose.R
+import com.example.compose.local.model.Song
 import com.example.compose.ui.composables.util_composables.EmoIconButton
+import com.example.compose.utils.util_classes.PlaybackAction
 import com.example.compose.viewmodel.MainViewModel
 
-@OptIn(ExperimentalAnimationGraphicsApi::class, ExperimentalMaterialApi::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationGraphicsApi::class, ExperimentalAnimationApi::class)
 @Composable
-fun MiniStage(onPrev: () -> Unit = {}, onPlay: () -> Unit = {}, onNext: () -> Unit = {}, viewModel: MainViewModel = hiltViewModel()) {
-    val state by viewModel.miniStageState.collectAsState()
+fun MiniStage(song: Song, index: Int, isPlaying: Boolean, alpha: Float, onAction: (PlaybackAction) -> Unit = {}) {
 
-    if (state.show) Surface(
-        Modifier.fillMaxSize().alpha(state.alpha), color = MaterialTheme.colorScheme.primaryContainer,
-        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-    ) {
-        Box {
-            Row(Modifier.alpha(state.contentAlpha).padding(start = 16.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                AnimatedContent(modifier = Modifier.weight(1f), targetState = state.currentIndex,
+    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onPrimaryContainer) {
+        Box(Modifier.alpha(alpha)) {
+            Row(Modifier.padding(start = 16.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                AnimatedContent(modifier = Modifier.weight(1f), targetState = index,
                     transitionSpec = {
                         (if (targetState > initialState) slideInHorizontally { width -> width / 4 } + fadeIn()
                                 with slideOutHorizontally { width -> -width / 4 } + fadeOut()
@@ -47,25 +42,19 @@ fun MiniStage(onPrev: () -> Unit = {}, onPlay: () -> Unit = {}, onNext: () -> Un
                     }
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                        Text(
-                            text = state.queue.getOrNull(it)?.title ?: "No song is playing",
-                            style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis
-                        )
-                        Text(
-                            text = state.queue.getOrNull(it)?.artist ?: "Select a song to play",
-                            style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis
-                        )
+                        Text(song.title, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(song.artist, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                 }
 
-                EmoIconButton(modifier = Modifier.size(56.dp), onClick = onPrev) {
+                EmoIconButton(modifier = Modifier.size(56.dp), onClick = { onAction(PlaybackAction.PREVIOUS) }) {
                     Icon(imageVector = Icons.Rounded.SkipPrevious, contentDescription = "Previous")
                 }
-                EmoIconButton(modifier = Modifier.size(56.dp, 32.dp), onClick = onPlay) {
+                EmoIconButton(modifier = Modifier.size(56.dp, 32.dp), onClick = { onAction(PlaybackAction.PREVIOUS) }) {
                     val a = AnimatedImageVector.animatedVectorResource(R.drawable.play_to_pause)
-                    Icon(painter = rememberAnimatedVectorPainter(a, state.isPlaying), contentDescription = "Play")
+                    Icon(painter = rememberAnimatedVectorPainter(a, isPlaying), contentDescription = "Play")
                 }
-                EmoIconButton(modifier = Modifier.size(56.dp), onClick = onNext) {
+                EmoIconButton(modifier = Modifier.size(56.dp), onClick = { onAction(PlaybackAction.PREVIOUS) }) {
                     Icon(imageVector = Icons.Rounded.SkipNext, contentDescription = "Next")
                 }
             }

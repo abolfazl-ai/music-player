@@ -20,13 +20,14 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-@OptIn(ExperimentalPagerApi::class, ExperimentalCoilApi::class, ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun CoverViewPager(
     modifier: Modifier = Modifier, queue: List<Song>, currentIndex: Int, onPageChanged: (Int) -> Unit,
-    onPageCreated: (Int, MainColors) -> Unit, pagerState: PagerState = rememberPagerState(remember { currentIndex }),
+    onPageCreated: (Int, MainColors) -> Unit,
 ) = BoxWithConstraints(modifier) {
 
+    val pagerState: PagerState = rememberPagerState(remember { currentIndex })
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(currentIndex) {

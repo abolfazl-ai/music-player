@@ -43,13 +43,10 @@ import kotlin.math.roundToInt
 @Composable
 fun SheetScaffold(
     modifier: Modifier = Modifier, viewModel: MainViewModel = hiltViewModel(),
-    backgroundColor: Color = MaterialTheme.colorScheme.background,
     appBar: @Composable () -> Unit, bottomNav: @Composable () -> Unit, fab: @Composable () -> Unit,
-    drawerContent: @Composable ColumnScope.() -> Unit = {}, drawerBackground: Color = MaterialTheme.colorScheme.primaryContainer,
-    stageContent: @Composable () -> Unit, stageBackground: Color = MaterialTheme.colorScheme.primaryContainer,
+    drawerContent: @Composable ColumnScope.() -> Unit = {}, stageContent: @Composable () -> Unit,
     stageSheetState: SheetState = rememberSheetState(SheetValue.Collapsed, spring(1f, 750f)),
-    queueContent: @Composable () -> Unit, queueBackground: Color = MaterialTheme.colorScheme.surface,
-    queueSheetState: SheetState = rememberSheetState(SheetValue.Collapsed),
+    queueContent: @Composable () -> Unit, queueSheetState: SheetState = rememberSheetState(SheetValue.Collapsed),
     content: @Composable () -> Unit
 ) = BoxWithConstraints(modifier.fillMaxSize()) {
 
@@ -68,13 +65,13 @@ fun SheetScaffold(
     SheetScaffoldStack(
         viewModel = viewModel, state = state, width = maxWidth,
         appBar = appBar, bottomNav = bottomNav, fab = fab,
-        drawerContent = drawerContent, drawerBackground = drawerBackground,
+        drawerContent = drawerContent,
         stageContent = {
             Surface(
                 stageSwipeable
                     .fillMaxSize()
                     .clickable(stageSheetState.isCollapsed) { scope.launch { stageSheetState.expand() } },
-                shadowElevation = SheetElevation, color = stageBackground, content = stageContent
+                shadowElevation = SheetElevation, color = MaterialTheme.colorScheme.primaryContainer, content = stageContent
             )
         },
         stagePeekHeight = realPeekHeight, stageSheetState = stageSheetState,
@@ -84,13 +81,13 @@ fun SheetScaffold(
                     .alpha(stageSheetState.realProgress.compIn(0.9f))
                     .fillMaxSize()
                     .padding(horizontal = QueueMargin),
-                shadowElevation = SheetElevation, color = queueBackground,
+                shadowElevation = SheetElevation, color = MaterialTheme.colorScheme.surface,
                 shape = RoundedCornerShape(QueueRadius, QueueRadius, 0.dp, 0.dp),
                 content = queueContent
             )
         },
         queueSheetState = queueSheetState,
-    ) { Surface(color = backgroundColor, content = content) }
+    ) { Surface(color = MaterialTheme.colorScheme.background, content = content) }
 }
 
 
@@ -98,12 +95,10 @@ fun SheetScaffold(
 @ExperimentalComposeUiApi
 @Composable
 private fun SheetScaffoldStack(
-    viewModel: MainViewModel, state: MainScaffoldState, width: Dp,
-    appBar: @Composable () -> Unit, bottomNav: @Composable () -> Unit, fab: @Composable () -> Unit,
-    drawerContent: @Composable ColumnScope.() -> Unit, drawerBackground: Color,
+    viewModel: MainViewModel, state: MainScaffoldState, width: Dp, appBar: @Composable () -> Unit,
+    bottomNav: @Composable () -> Unit, fab: @Composable () -> Unit, drawerContent: @Composable ColumnScope.() -> Unit,
     stageContent: @Composable () -> Unit, stagePeekHeight: Int, stageSheetState: SheetState,
-    queueContent: @Composable () -> Unit, queueSheetState: SheetState,
-    body: @Composable () -> Unit,
+    queueContent: @Composable () -> Unit, queueSheetState: SheetState, body: @Composable () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
 
@@ -130,7 +125,8 @@ private fun SheetScaffoldStack(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     ModalDrawer(
         drawerShape = RectangleShape, gesturesEnabled = !state.isFabDragging && stageSheetState.realProgress == 0f,
-        drawerBackgroundColor = drawerBackground, drawerContent = drawerContent, drawerState = drawerState
+        drawerBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
+        drawerContent = drawerContent, drawerState = drawerState
     ) {
         BackHandler(
             (stageSheetState.realProgress > 0) ||
