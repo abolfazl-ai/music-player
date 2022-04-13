@@ -124,7 +124,7 @@ private fun SheetScaffoldStack(
     val fabShadowAnimator by animateFloatAsState(if (state.isFabExpanded) 0.5f else 0f)
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     ModalDrawer(
-        drawerShape = RectangleShape, gesturesEnabled = !state.isFabDragging && stageSheetState.realProgress == 0f,
+        drawerShape = RectangleShape, gesturesEnabled = stageSheetState.realProgress == 0f,
         drawerBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
         drawerContent = drawerContent, drawerState = drawerState
     ) {

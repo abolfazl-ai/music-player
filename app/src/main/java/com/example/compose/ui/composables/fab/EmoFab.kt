@@ -9,7 +9,6 @@ import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Icon
@@ -53,11 +52,10 @@ fun EmoFab(viewModel: MainViewModel = viewModel()) {
 
     EmoFab(
         draggable = state.fabMode is Menu && !state.isMenuOpen,
-        onDrag = { scope.launch { viewModel.setFabState(isDragging = it) } },
         showMenu = state.fabMode is Menu,
-        isMenuOpen = state.isMenuOpen, menuItems = DummyMenuItems, onMenuClicked = {},
-        color = color.first, contentColor = color.second,
-        onClick = {
+        isMenuOpen = state.isMenuOpen,
+        color = color.first, contentColor = color.second, menuItems = DummyMenuItems,
+        onMenuClicked = {}, onClick = {
             scope.launch {
                 when (state.fabMode) {
                     is Menu -> viewModel.setFabState(isMenuOpen = !state.isMenuOpen)
@@ -82,18 +80,14 @@ internal fun GetIcon(mode: EmoFabMode, isPlaying: Boolean, isMenuOpen: Boolean) 
     if (mode is Playback || mode is Menu2Playback) {
         val a = AnimatedImageVector.animatedVectorResource(R.drawable.play_to_pause)
         Icon(
-            modifier = Modifier
-                .alpha(2 * (mode.progress.coerceIn(0.5f, 1f) - 0.5f))
-                .padding(16.dp),
+            modifier = Modifier.alpha(2 * (mode.progress.coerceIn(0.5f, 1f) - 0.5f)).padding(16.dp),
             painter = rememberAnimatedVectorPainter(a, isPlaying), contentDescription = "PlayButton",
         )
     }
 
     if (mode is Menu || mode is Menu2Playback)
         Icon(
-            modifier = Modifier
-                .alpha(1 - 2 * mode.progress.coerceIn(0f, 0.5f))
-                .padding(12.dp)
+            modifier = Modifier.alpha(1 - 2 * mode.progress.coerceIn(0f, 0.5f)).padding(12.dp)
                 .rotate(animateFloatAsState(if (isMenuOpen) 135f else 0f, spring(0.5f)).value),
             imageVector = Icons.Rounded.Add, contentDescription = "Fab"
         )
@@ -101,11 +95,11 @@ internal fun GetIcon(mode: EmoFabMode, isPlaying: Boolean, isMenuOpen: Boolean) 
 
 @Composable
 internal fun EmoFab(
-    draggable: Boolean, showMenu: Boolean, isMenuOpen: Boolean, onDrag: (isDragging: Boolean) -> Unit,
-    color: Color, contentColor: Color, size: Dp = FabSize, shape: Shape = CircleShape, elevation: Dp = FabElevation,
-    menuItems: List<MenuItem>, onMenuClicked: (id: Int) -> Unit, menuSize: Dp = MenuFabSize, menuSpacing: Dp = MenuFabSpacing,
-    onClick: () -> Unit, icon: @Composable () -> Unit
+    draggable: Boolean, showMenu: Boolean, isMenuOpen: Boolean, color: Color, contentColor: Color,
+    size: Dp = FabSize, shape: Shape = CircleShape, elevation: Dp = FabElevation, menuItems: List<MenuItem>,
+    onMenuClicked: (id: Int) -> Unit, menuSize: Dp = MenuFabSize, menuSpacing: Dp = MenuFabSpacing, onClick: () -> Unit,
+    icon: @Composable () -> Unit
 ) = Box {
     if (showMenu) MenuHandler(isMenuOpen, menuItems, onMenuClicked, shape, color, contentColor, menuSize, menuSpacing)
-    DragHandler(draggable, onClick, elevation, shape, size, color, contentColor, onDrag, icon)
+    DragHandler(draggable, onClick, elevation, shape, size, color, contentColor, icon)
 }

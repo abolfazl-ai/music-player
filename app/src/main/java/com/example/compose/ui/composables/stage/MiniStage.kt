@@ -50,11 +50,11 @@ fun MiniStage(song: Song, index: Int, isPlaying: Boolean, alpha: Float, onAction
                 EmoIconButton(modifier = Modifier.size(56.dp), onClick = { onAction(PlaybackAction.PREVIOUS) }) {
                     Icon(imageVector = Icons.Rounded.SkipPrevious, contentDescription = "Previous")
                 }
-                EmoIconButton(modifier = Modifier.size(56.dp, 32.dp), onClick = { onAction(PlaybackAction.PREVIOUS) }) {
+                EmoIconButton(modifier = Modifier.size(56.dp, 32.dp), onClick = { onAction(PlaybackAction.PLAY) }) {
                     val a = AnimatedImageVector.animatedVectorResource(R.drawable.play_to_pause)
                     Icon(painter = rememberAnimatedVectorPainter(a, isPlaying), contentDescription = "Play")
                 }
-                EmoIconButton(modifier = Modifier.size(56.dp), onClick = { onAction(PlaybackAction.PREVIOUS) }) {
+                EmoIconButton(modifier = Modifier.size(56.dp), onClick = { onAction(PlaybackAction.NEXT) }) {
                     Icon(imageVector = Icons.Rounded.SkipNext, contentDescription = "Next")
                 }
             }
