@@ -44,27 +44,23 @@ sealed class EmoFabMode(val progress: Float) {
 }
 
 @Composable
-fun EmoFab(viewModel: MainViewModel = viewModel()) {
+fun EmoFab(progress: Float, isMenuOpen: Boolean, isPlaying: Boolean, onClick: () -> Unit) {
 
-    val state by viewModel.fabState.collectAsState()
-    val scope = rememberCoroutineScope()
-    val color = MaterialTheme.colorScheme.run { getColor(secondary, onSecondary, surface, onSurface, state.fabMode) }
+    val fabMode = when (progress) {
+        0f -> Menu
+        1f -> Playback
+        else -> Menu2Playback(progress)
+    }
+
+    val color = MaterialTheme.colorScheme.run { getColor(secondary, onSecondary, surface, onSurface, fabMode) }
 
     EmoFab(
-        draggable = state.fabMode is Menu && !state.isMenuOpen,
-        showMenu = state.fabMode is Menu,
-        isMenuOpen = state.isMenuOpen,
+        draggable = fabMode is Menu && !isMenuOpen,
+        showMenu = fabMode is Menu,
+        isMenuOpen = isMenuOpen,
         color = color.first, contentColor = color.second, menuItems = DummyMenuItems,
-        onMenuClicked = {}, onClick = {
-            scope.launch {
-                when (state.fabMode) {
-                    is Menu -> viewModel.setFabState(isMenuOpen = !state.isMenuOpen)
-                    is Playback -> viewModel.preferences.updatePlayingState(!state.isPlaying)
-                    is Play -> Unit
-                }
-            }
-        }
-    ) { state.run { GetIcon(fabMode, isPlaying, isMenuOpen) } }
+        onMenuClicked = {}, onClick = onClick
+    ) { GetIcon(fabMode, isPlaying, isMenuOpen) }
 }
 
 internal fun getColor(mColor: Color, mOnColor: Color, pColor: Color, pOnColor: Color, mode: EmoFabMode) = when (mode) {

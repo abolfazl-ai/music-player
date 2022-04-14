@@ -34,19 +34,19 @@ import kotlin.math.roundToInt
 
 private object LayoutId {
     const val AppBar = 0
-    const val BottomNav = 0
-    const val Fab = 0
-    const val FabShadow = 0
-    const val FabDismisser = 0
-    const val Stage = 0
-    const val StageShadow = 0
-    const val Queue = 0
-    const val Body = 0
+    const val BottomNav = 1
+    const val Fab = 2
+    const val FabShadow = 3
+    const val FabDismisser = 4
+    const val Stage = 5
+    const val StageShadow = 6
+    const val Queue = 7
+    const val Body = 8
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SheetScaffold2(
+fun NeoScaffold(
     modifier: Modifier = Modifier,
     onSheetStateChange: (progress: Float, fabProgress: Float) -> Unit = { _, _ -> },
     backgroundColor: Color = MaterialTheme.colorScheme.background,
@@ -70,7 +70,7 @@ fun SheetScaffold2(
     stageSheetState: SheetState = rememberSheetState(SheetValue.Collapsed/*, spring(1f, 750f)*/),
     //Queue Attributes
     queueContent: @Composable () -> Unit,
-    queueBackgroundColor: Color = MaterialTheme.colorScheme.primaryContainer,
+    queueBackgroundColor: Color = MaterialTheme.colorScheme.surface,
     queueSheetState: SheetState = rememberSheetState(SheetValue.Collapsed),
     content: @Composable BoxScope.() -> Unit
 ) = BoxWithConstraints(modifier.fillMaxSize()) {
@@ -119,12 +119,12 @@ fun SheetScaffold2(
                     else if (stageSheetState.realProgress > 0) stageSheetState.animateTo(SheetValue.Collapsed, spring(1f, 400f))
                 }
             }
-            SheetScaffoldStack(
+            ScaffoldStack(
                 stageProgress = stageSheetState.realProgress, fabProgress = transProgress,
                 stageOffset = stageSheetState.offset.value.roundToInt(),
                 queueOffset = queueSheetState.offset.value.roundToInt(),
                 peekHeight = peekHeight, fabRange = fabRange,
-                showBottomNav = showBottomNav, showDismisser = showFabDismisser,
+                showBottomNav = showBottomNav, showDismisser = fabShadowAnimator > 0,
             ) {
                 Box(Modifier.layoutId(LayoutId.Body), content = content)
                 Shadow(Modifier.layoutId(LayoutId.FabShadow), alpha = fabShadowAnimator, color = backgroundColor)
@@ -152,7 +152,7 @@ fun SheetScaffold2(
 
 
 @Composable
-private fun SheetScaffoldStack(
+private fun ScaffoldStack(
     stageProgress: Float, fabProgress: Float,
     stageOffset: Int, queueOffset: Int,
     peekHeight: Int, fabRange: Dp,
@@ -163,33 +163,39 @@ private fun SheetScaffoldStack(
 
     Layout(content = content) { m, c ->
 
-        val appBarPlaceable = m.first { it.layoutId == LayoutId.AppBar }.measure(c)
-        val bodyPlaceable = m.first { it.layoutId == LayoutId.Body }
-            .measure(c.copy(minHeight = 0, maxHeight = c.maxHeight - appBarPlaceable.height - peekHeight))
-        val fabShadowPlaceable = m.first { it.layoutId == LayoutId.FabShadow }.measure(c)
-        val stageShadowPlaceable = m.first { it.layoutId == LayoutId.StageShadow }.measure(c)
-        val stagePlaceable = m.first { it.layoutId == LayoutId.Stage }.measure(c.copy(minHeight = c.maxHeight, maxHeight = c.maxHeight))
-        val bottomNavPlaceable = m.first { it.layoutId == LayoutId.BottomNav }.measure(c)
-        val queuePlaceable = m.first { it.layoutId == LayoutId.Queue }.measure(c)
-        val fabPlaceable = FabSize.roundToPx().let { s -> m.first { it.layoutId == LayoutId.Fab }.measure(c.copy(s, s, s, s)) }
+        val appBar = m.first { it.layoutId == LayoutId.AppBar }.measure(c)
+
+        val bottomNav = m.first { it.layoutId == LayoutId.BottomNav }.measure(c)
+
+        val fab = FabSize.roundToPx().let { s -> m.first { it.layoutId == LayoutId.Fab }.measure(c.copy(s, s, s, s)) }
+        val fabShadow = m.first { it.layoutId == LayoutId.FabShadow }.measure(c)
+        val fabDismisser = m.first { it.layoutId == LayoutId.FabDismisser }.measure(c.copy(c.maxWidth, minHeight = c.maxHeight))
+
+        val stageShadow = m.first { it.layoutId == LayoutId.StageShadow }.measure(c)
+        val stage = m.first { it.layoutId == LayoutId.Stage }.measure(c.copy(minHeight = c.maxHeight, maxHeight = c.maxHeight))
+
+        val queue = m.first { it.layoutId == LayoutId.Queue }.measure(c)
+
+        val body =
+            m.first { it.layoutId == LayoutId.Body }.measure(c.copy(minHeight = 0, maxHeight = c.maxHeight - appBar.height - peekHeight))
+
 
         with(c) {
             layout(maxWidth, maxHeight) {
 
-                bodyPlaceable.place(0, (appBarPlaceable.height * (1 - stageProgress)).toInt())
-                if (showDismisser) fabShadowPlaceable.place(0, 0)
-                appBarPlaceable.place(0, -(appBarPlaceable.height * stageProgress).toInt())
-                if (stageProgress > 0) stageShadowPlaceable.place(0, 0)
-                stagePlaceable.place(0, maxHeight + stageOffset)
-                bottomNavPlaceable.place(0, (maxHeight - navAnimator * bottomNavPlaceable.height * (1 - fabProgress)).toInt())
-//                if (showDismisser) m.first { it.layoutId == LayoutId.FabDismisser }.measure(c.copy(minWidth = maxWidth, minHeight = maxHeight)).place(0, 0)
-                fabPlaceable.place(
-                    (maxWidth - fabPlaceable.width) / 2 +
-                            ((1 - fabProgress) * (maxWidth / 2 - fabPlaceable.width / 2 - FabMargin.toPx())).toInt(),
+                body.place(0, (appBar.height * (1 - stageProgress)).toInt())
+                if (showDismisser) fabShadow.place(0, 0)
+                appBar.place(0, -(appBar.height * stageProgress).toInt())
+                if (stageProgress > 0) stageShadow.place(0, 0)
+                stage.place(0, maxHeight + stageOffset)
+                bottomNav.place(0, (maxHeight - navAnimator * bottomNav.height * (1 - fabProgress)).toInt())
+                if (showDismisser) fabDismisser.place(0, 0)
+                fab.place(
+                    (maxWidth - fab.width) / 2 + ((1 - fabProgress) * (maxWidth / 2 - fab.width / 2 - FabMargin.toPx())).toInt(),
                     maxHeight + stageOffset.coerceAtMost(-(peekHeight + fabRange.roundToPx()))
                             + maxWidth + (StageSpacing + TimeLineHeight).roundToPx()
                 )
-                queuePlaceable.place(0, maxHeight + stageOffset + queueOffset)
+                queue.place(0, maxHeight + stageOffset + queueOffset)
             }
         }
     }
