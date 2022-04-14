@@ -29,27 +29,16 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 
-@ExperimentalMaterial3Api
-@ExperimentalPermissionsApi
-@ExperimentalFoundationApi
-@ExperimentalPagerApi
-@ExperimentalComposeUiApi
-@ExperimentalAnimationGraphicsApi
-@ExperimentalMaterialApi
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun Main() {
     PermissionRequest(modifier = Modifier.fillMaxSize(),
         requestScreen = { RequestScreen(it) }) {
-        Home()
+        Home2()
     }
 }
 
-@ExperimentalMaterial3Api
-@ExperimentalFoundationApi
-@ExperimentalPagerApi
-@ExperimentalComposeUiApi
-@ExperimentalAnimationGraphicsApi
-@ExperimentalMaterialApi
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun Home(viewModel: MainViewModel = hiltViewModel()) {
 
@@ -62,6 +51,35 @@ fun Home(viewModel: MainViewModel = hiltViewModel()) {
         bottomNav = { EmoBottomNav(Modifier.navigationBarsPadding(), Libraries, navController) { viewModel.setCurrentPage(it) } },
         appBar = { EmoAppBar(Modifier.statusBarsPadding()) },
         fab = { EmoFab() }
+    ) {
+        SwipeRefresh(
+            state = rememberSwipeRefreshState(viewModel.preferences.isScanning.collectAsState(initial = false).value),
+            onRefresh = { scope.launch { viewModel.repository.scan() } }) {
+            NavHost(navController = navController, startDestination = Page.Libraries.HomePage.route) {
+                composable(Page.Libraries.HomePage.route) { HomeLibrary() }
+                composable(Page.Libraries.Songs.route) { SongsLibrary() }
+                navigation("folders", Page.Libraries.Folders.route) { foldersLibrary(viewModel, navController) }
+                composable(Page.Libraries.Artists.route) { ArtistsLibrary() }
+                composable(Page.Libraries.Albums.route) { AlbumsLibrary() }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
+@Composable
+fun Home2(viewModel: MainViewModel = hiltViewModel()) {
+
+    val scope = rememberCoroutineScope()
+    val navController = rememberNavController()
+
+    SheetScaffold2(
+        appBar = { EmoAppBar(Modifier.statusBarsPadding()) },
+        fab = { EmoFab() },
+        bottomNav = { EmoBottomNav(Modifier.navigationBarsPadding(), Libraries, navController) { viewModel.setCurrentPage(it) } },
+        drawerContent = {},
+        stageContent = { Stage() },
+        queueContent = {},
     ) {
         SwipeRefresh(
             state = rememberSwipeRefreshState(viewModel.preferences.isScanning.collectAsState(initial = false).value),
