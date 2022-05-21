@@ -47,7 +47,7 @@ fun AlbumsLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = hilt
                 subtitle = album.artist.trim(),
                 picture = {
                     Image(
-                        rememberImagePainter(album) { fetcher(CoilAlbumFetcher) },
+                        rememberImagePainter(album) { fetcher(CoilAlbumFetcher); size(it); crossfade(true) },
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
                         contentDescription = album.name

@@ -9,6 +9,7 @@ import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Icon
@@ -92,7 +93,7 @@ internal fun GetIcon(mode: EmoFabMode, isPlaying: Boolean, isMenuOpen: Boolean) 
 @Composable
 internal fun EmoFab(
     draggable: Boolean, showMenu: Boolean, isMenuOpen: Boolean, color: Color, contentColor: Color,
-    size: Dp = FabSize, shape: Shape = CircleShape, elevation: Dp = FabElevation, menuItems: List<MenuItem>,
+    size: Dp = FabSize, shape: Shape = RoundedCornerShape(16.dp), elevation: Dp = FabElevation, menuItems: List<MenuItem>,
     onMenuClicked: (id: Int) -> Unit, menuSize: Dp = MenuFabSize, menuSpacing: Dp = MenuFabSpacing, onClick: () -> Unit,
     icon: @Composable () -> Unit
 ) = Box {

@@ -1,12 +1,17 @@
 package com.example.compose.ui.composables.layouts
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.compose.*
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
+import androidx.navigation.compose.rememberNavController
 import com.example.compose.ui.Libraries
 import com.example.compose.ui.Page
 import com.example.compose.ui.composables.app_bar.EmoAppBar
@@ -15,7 +20,6 @@ import com.example.compose.ui.composables.fab.EmoFab
 import com.example.compose.ui.composables.library_screens.*
 import com.example.compose.ui.composables.stage.Stage
 import com.example.compose.viewmodel.MainViewModel
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch

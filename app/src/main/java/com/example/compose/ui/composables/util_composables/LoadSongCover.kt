@@ -2,6 +2,7 @@ package com.example.compose.ui.composables.util_composables
 
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
@@ -20,30 +21,23 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalPagerApi::class)
 @Composable
 fun LoadSongCover(
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier, size: PixelSize,
     song: Song, memoryCacheKey: String = song.path,
     placeHolder: @Composable () -> Unit = {},
     onSuccess: suspend (Drawable) -> Unit = {}
-) = BoxWithConstraints(modifier) {
+) = Box(modifier) {
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val imageLoader = LocalImageLoader.current
 
-    val request = ImageRequest.Builder(context).size(PixelSize(constraints.maxWidth, constraints.maxHeight)).data(song)
-        .memoryCacheKey(memoryCacheKey).fetcher(CoilSongFetcher).build()
+    val request = ImageRequest.Builder(context).size(size).data(song).memoryCacheKey(memoryCacheKey).fetcher(CoilSongFetcher).build()
     var drawable by remember(request) { mutableStateOf<Drawable?>(null) }
 
     LaunchedEffect(request) {
-        launch {
-            imageLoader.enqueue(request.newBuilder(context).target {
-                scope.launch { onSuccess(it) }
-                drawable = it
-            }.build())
-        }
+        launch { imageLoader.enqueue(request.newBuilder(context).target { scope.launch { onSuccess(it) }; drawable = it }.build()) }
     }
 
     if (drawable == null) placeHolder.invoke()

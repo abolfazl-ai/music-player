@@ -1,24 +1,24 @@
 package com.example.compose.ui.composables.stage
 
-import android.util.Log
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.core.graphics.drawable.toBitmap
 import androidx.palette.graphics.Palette
-import coil.annotation.ExperimentalCoilApi
+import coil.size.PixelSize
 import com.example.compose.local.model.Song
 import com.example.compose.ui.composables.modifiers.crossFade
 import com.example.compose.ui.composables.util_composables.LoadSongCover
 import com.example.compose.utils.kotlin_extensions.PALETTE_TARGET_PRIMARY
 import com.example.compose.utils.kotlin_extensions.PALETTE_TARGET_SECONDARY
 import com.example.compose.utils.kotlin_extensions.getAccurateColor
-import com.example.compose.utils.resources.TAG
 import com.example.compose.utils.util_classes.MainColors
 import com.google.accompanist.pager.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -46,8 +46,8 @@ fun CoverViewPager(
 
     HorizontalPager(modifier = Modifier.fillMaxSize(), state = pagerState, count = queue.size, key = { queue[it].id }) { page ->
         LoadSongCover(
-            modifier = Modifier.crossFade(calculateCurrentOffsetForPage(page)),
-            song = queue[page], memoryCacheKey = queue[page].path + " Stage"
+            modifier = Modifier.crossFade(calculateCurrentOffsetForPage(page)), song = queue[page],
+            size = PixelSize(constraints.maxWidth, constraints.minHeight), memoryCacheKey = queue[page].path + " Stage"
         ) {
             withContext(Dispatchers.Default) {
                 Palette.Builder(it.toBitmap())

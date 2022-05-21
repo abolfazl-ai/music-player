@@ -8,14 +8,14 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MusicNote
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.size.PixelSize
 import com.example.compose.local.model.Song
 import com.example.compose.ui.composables.list_items.ItemOptions
 import com.example.compose.ui.composables.list_items.LinearItem
@@ -33,9 +33,7 @@ fun SongsLibrary(
 ) {
 
     val selectList = remember { mutableStateListOf<Int>() }
-    val onSelect: (Int) -> Unit = remember {
-        { if (selectList.contains(it)) selectList.remove(it) else selectList.add(it) }
-    }
+    val onSelect: (Int) -> Unit = remember { { if (selectList.contains(it)) selectList.remove(it) else selectList.add(it) } }
 
     val songs by viewModel.repository.allSongs.collectAsState(initial = emptyList())
 
@@ -67,15 +65,11 @@ fun SongList(
     ) {
         itemsIndexed(songs, key = { _, item -> item.id }) { index, song ->
             SongItem(
-                modifier = Modifier.animateItemPlacement(),
                 song = song,
                 itemOptions = options,
                 expanded = expandIndex == index,
                 selected = selectList.contains(index),
-                onExpand = {
-                    if (it) expandIndex = index
-                    else if (expandIndex == index) expandIndex = -1
-                },
+                onExpand = { if (it) expandIndex = index else if (expandIndex == index) expandIndex = -1 },
                 onSelect = { onSelect(index) },
                 onClick = { onItemClick(index) }
             )
@@ -86,7 +80,7 @@ fun SongList(
 @ExperimentalFoundationApi
 @Composable
 fun SongItem(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     song: Song,
     itemOptions: @Composable BoxScope.() -> Unit = { ItemOptions() },
     itemOptionsHeight: Dp = IconOptionsHeight,
@@ -99,15 +93,10 @@ fun SongItem(
     title = song.title, subtitle = song.artist.replace(";", " & "),
     description = song.duration.toTimeFormat(),
     picture = {
-        LoadSongCover(song = song, placeHolder = {
+        LoadSongCover(song = song, size = it, placeHolder = {
             Icon(
-                modifier = modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.tertiary)
-                    .padding(8.dp),
-                imageVector = Icons.Default.MusicNote,
-                tint = MaterialTheme.colorScheme.onTertiary,
-                contentDescription = null
+                modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.tertiary).padding(8.dp),
+                imageVector = Icons.Default.MusicNote, tint = MaterialTheme.colorScheme.onTertiary, contentDescription = "Song Icon"
             )
         })
     },

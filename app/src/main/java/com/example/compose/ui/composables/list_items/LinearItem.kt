@@ -1,9 +1,7 @@
 package com.example.compose.ui.composables.list_items
 
-import android.util.Size
 import android.view.animation.OvershootInterpolator
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -20,8 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.Layout
@@ -33,24 +29,17 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.times
+import coil.size.PixelSize
 import com.example.compose.ui.composables.icons.animated.ArrowToX
-import com.example.compose.ui.composables.modifiers.selectable
+import com.example.compose.ui.composables.modifiers.Selectable2
 import com.example.compose.utils.resources.*
 
 @ExperimentalFoundationApi
 @Preview
 @Composable
 fun LinearItemPrev() {
-    LinearItem(title = "There Must Be A Sweeter Place We Ca",
-        subtitle = "Selena Gomez",
-        description = "2:31",
-        picture = {
-            Spacer(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.secondary)
-            )
-        })
+    LinearItem(title = "There Must Be A Sweeter Place We Ca", subtitle = "Selena Gomez", description = "2:31",
+        picture = { Spacer(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.secondary)) })
 }
 
 @ExperimentalFoundationApi
@@ -60,7 +49,7 @@ fun LinearItem(
     title: String,
     subtitle: String,
     description: String = "",
-    picture: @Composable BoxScope.() -> Unit,
+    picture: @Composable BoxScope.(PixelSize) -> Unit,
     expanded: Boolean = false,
     itemOptions: @Composable BoxScope.() -> Unit = { ItemOptions() },
     itemOptionsHeight: Dp = IconOptionsHeight,
@@ -69,53 +58,24 @@ fun LinearItem(
     onSelect: () -> Unit = {},
     onClick: () -> Unit = {},
 ) {
-    val expandAnimator by animateFloatAsState(
-        targetValue = if (expanded) 1f else 0f,
-//        spring(if (expanded) 0.4f else 1f,if (expanded) 1500f else Spring.StiffnessHigh )
-        tween(
-            if (expanded) 250 else 200,
-            easing = { OvershootInterpolator(3f).getInterpolation(it) })
-    )
+    val expandAnimator by animateFloatAsState(if (expanded) 1f else 0f,
+        tween(if (expanded) 250 else 200) { OvershootInterpolator(3f).getInterpolation(it) })
 
     Box(modifier) {
 
-        if (expandAnimator > 0)
-            Layout(modifier = Modifier
-                .height((LinearItemHeight + expandAnimator * itemOptionsHeight))
-                .clip(RoundedCornerShape(LinearItemCornerRadius)), content = {
-                Box(
-                    modifier = Modifier
-                        .border(
-                            4.dp,
-                            MaterialTheme.colorScheme.surface,
-                            RoundedCornerShape(6.dp)
-                        )
-                        .padding(top = LinearItemHeight),
-                    contentAlignment = Alignment.BottomCenter, content = itemOptions
-                )
-            }) { m, c ->
-                val placeables = m.map {
-                    it.measure(
-                        c.copy(
-                            minHeight = 0,
-                            maxHeight = (itemOptionsHeight + LinearItemHeight).roundToPx()
-                        )
-                    )
-                }
-                layout(c.maxWidth, c.maxHeight) {
-                    placeables.forEach { it.place(0, c.maxHeight - it.height) }
-                }
-            }
-
-        LinearItemCard(
-            title, subtitle, description, picture,
-            selected, onClick, onSelect, elevation = { (4 * expandAnimator).dp }
-        ) {
-            ArrowToX(modifier = it
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-                .clickable { onExpand(!expanded) }
-                .padding(8.dp), x = expanded)
+        if (expandAnimator > 0) Layout(modifier = Modifier.height((LinearItemHeight + expandAnimator * itemOptionsHeight))
+            .clip(RoundedCornerShape(LinearItemCornerRadius)), content = {
+            Box(
+                Modifier.border(4.dp, MaterialTheme.colorScheme.surface, RoundedCornerShape(6.dp)).padding(top = LinearItemHeight),
+                Alignment.BottomCenter, false, itemOptions
+            )
+        }) { m, c ->
+            val placeables = m.map { it.measure(c.copy(minHeight = 0, maxHeight = (itemOptionsHeight + LinearItemHeight).roundToPx())) }
+            layout(c.maxWidth, c.maxHeight) { placeables.forEach { it.place(0, c.maxHeight - it.height) } }
         }
+
+        LinearItemCard(title, subtitle, description, picture, selected, onClick, onSelect, elevation = { (4 * expandAnimator).dp })
+        { ArrowToX(it.background(MaterialTheme.colorScheme.surfaceVariant).clickable { onExpand(!expanded) }.padding(8.dp), expanded) }
     }
 }
 
@@ -125,7 +85,7 @@ internal fun LinearItemCard(
     title: String,
     subtitle: String,
     description: String = "",
-    picture: @Composable BoxScope.() -> Unit,
+    picture: @Composable BoxScope.(PixelSize) -> Unit,
     selected: Boolean = false,
     onClick: () -> Unit = {},
     onSelect: () -> Unit = {},
@@ -133,12 +93,9 @@ internal fun LinearItemCard(
     expandIcon: @Composable (modifier: Modifier) -> Unit = {}
 ) {
 
-    val selectAnimator by animateFloatAsState(if (selected) 1.1f else -0.1f, spring(0.5f))
-    val clipShape =
-        remember { RoundedCornerShape(max(LinearItemCornerRadius - LinearItemPadding, 4.dp)) }
-    val size = with(LocalDensity.current) {
-        remember { (LinearItemHeight - LinearItemPadding.times(2)).roundToPx().let { Size(it, it) } }
-    }
+    val selectAnimator by animateFloatAsState(if (selected) 1.1f else -0.1f, tween(250))
+    val clipShape = remember { RoundedCornerShape(max(LinearItemCornerRadius - LinearItemPadding, 4.dp)) }
+    val size = with(LocalDensity.current) { remember { (LinearItemHeight - 2 * LinearItemPadding).roundToPx().let { PixelSize(it, it) } } }
 
     Surface(
         modifier = Modifier.height(LinearItemHeight),
@@ -146,51 +103,15 @@ internal fun LinearItemCard(
         color = MaterialTheme.colorScheme.surface,
         shape = remember { RoundedCornerShape(LinearItemCornerRadius) },
         shadowElevation = elevation(), border = selectAnimator.let {
-            if (it > 0f)
-                BorderStroke((2.5 * it.coerceIn(0f, 1f)).dp, MaterialTheme.colorScheme.secondary)
-            else null
-        }
+            if (it > 0f) BorderStroke((2 * it.coerceIn(0f, 1f)).dp, MaterialTheme.colorScheme.secondary) else null }
     ) {
-        Layout(
-            modifier = Modifier
-                .combinedClickable(onLongClick = onSelect, onClick = onClick)
-                .padding(LinearItemPadding), content = {
-
-                Box(
-                    Modifier
-                        .scale(1 - selectAnimator / 15)
-                        .clip(clipShape)
-                        .clipToBounds()
-                        .selectable(selected)
-                        .clickable(onClick = onSelect)
-                ) { picture() }
-
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.labelLarge,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.labelSmall,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.labelSmall,
-                )
-
-                expandIcon(
-                    modifier = Modifier
-                        .scale(1 - selectAnimator / 15)
-                        .clip(clipShape)
-                )
-
-            }) { m, c ->
+        Layout(modifier = Modifier.combinedClickable(onLongClick = onSelect, onClick = onClick).padding(LinearItemPadding), content = {
+            Selectable2(selected, { onSelect() }, maxOf(LinearItemCornerRadius - LinearItemPadding, 4.dp)) { picture(size) }
+            Text(title, style = MaterialTheme.typography.labelLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(subtitle, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(description, style = MaterialTheme.typography.labelSmall)
+            expandIcon(modifier = Modifier/*.scale(1 - selectAnimator / 15)*/.clip(clipShape))
+        }) { m, c ->
 
             val pictureP: Placeable
             val expandP: Placeable
@@ -198,12 +119,8 @@ internal fun LinearItemCard(
             val subtitleP: Placeable
             val detailsP: Placeable
 
-            c.copy(
-                minWidth = size.width,
-                maxWidth = size.width,
-                minHeight = size.width,
-                maxHeight = size.height
-            ).let { pictureP = m[0].measure(it);expandP = m[4].measure(it) }
+            c.copy(minWidth = size.width, maxWidth = size.width, minHeight = size.width, maxHeight = size.height)
+                .let { pictureP = m[0].measure(it);expandP = m[4].measure(it) }
 
             with(c.copy(minWidth = 0, minHeight = 0)) {
                 val textWidth = maxWidth - 2 * size.width - 2 * LinearItemSpacing.roundToPx()
@@ -213,21 +130,16 @@ internal fun LinearItemCard(
             }
 
             layout(c.maxWidth, (LinearItemHeight - LinearItemPadding.times(2)).roundToPx()) {
-
                 pictureP.place(0, 0)
-
                 expandP.place(c.maxWidth - expandP.width, 0)
-
                 titleP.place(
                     pictureP.width + LinearItemSpacing.roundToPx(),
                     c.maxHeight / 2 - (titleP.height + subtitleP.height) / 2 - 2.dp.roundToPx()
                 )
-
                 subtitleP.place(
                     pictureP.width + LinearItemSpacing.roundToPx(),
                     c.maxHeight / 2 + titleP.height - (titleP.height + subtitleP.height) / 2 + 2.dp.roundToPx()
                 )
-
                 detailsP.place(
                     c.maxWidth - pictureP.width - LinearItemSpacing.roundToPx() - detailsP.width,
                     c.maxHeight / 2 + 4.dp.roundToPx()
@@ -239,9 +151,7 @@ internal fun LinearItemCard(
 
 @Composable
 fun ItemOptions() = Row(
-    modifier = Modifier
-        .fillMaxSize()
-        .padding(8.dp),
+    modifier = Modifier.fillMaxSize().padding(8.dp),
     verticalAlignment = Alignment.Bottom,
     horizontalArrangement = Arrangement.spacedBy(4.dp)
 )
@@ -264,15 +174,8 @@ fun OptionItem(
     padding: Dp = 8.dp
 ) {
     Icon(
-        modifier = modifier
-            .height(40.dp)
-            .clip(RoundedCornerShape(4.dp))
-            .background(MaterialTheme.colorScheme.surface)
-            .clickable { }
-            .padding(padding),
-        imageVector = imageVector,
-        contentDescription = null,
-        tint = tint
+        modifier = modifier.height(40.dp).clip(RoundedCornerShape(4.dp)).background(MaterialTheme.colorScheme.surface)
+            .clickable { }.padding(padding), imageVector = imageVector, contentDescription = null, tint = tint
     )
 }
 
@@ -314,10 +217,7 @@ fun LargeOptionItem(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically) {
         Icon(
-            modifier = Modifier
-                .fillMaxHeight()
-                .aspectRatio(1f)
-                .padding(padding),
+            modifier = Modifier.fillMaxHeight().aspectRatio(1f).padding(padding),
             imageVector = imageVector,
             contentDescription = null,
             tint = tint
