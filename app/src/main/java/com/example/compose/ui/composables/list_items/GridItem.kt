@@ -19,7 +19,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil.size.PixelSize
+import coil.size.Size
 import com.example.compose.ui.composables.icons.Play
 import com.example.compose.ui.composables.modifiers.selectable
 
@@ -28,14 +28,14 @@ import com.example.compose.ui.composables.modifiers.selectable
 fun GridItem(
     title: String,
     subtitle: String,
-    picture: @Composable BoxScope.(size: PixelSize) -> Unit = {},
+    picture: @Composable BoxScope.(size: Size) -> Unit = {},
     padding: Dp = 5.dp,
     selected: Boolean = false,
     onSelect: () -> Unit = {},
     onClick: () -> Unit = {}
 ) {
     val animator by animateFloatAsState(if (selected) 1.1f else -0.1f, spring(if (selected) 0.5f else 1f, if (selected) 600f else 1500f))
-    var size by remember { mutableStateOf(PixelSize(1, 1)) }
+    var size by remember { mutableStateOf(Size(1, 1)) }
 
     Surface(
         shape = remember { RoundedCornerShape(6.dp) }, color = MaterialTheme.colorScheme.surface,
@@ -48,11 +48,11 @@ fun GridItem(
         ) {
 
             Box(Modifier.padding(bottom = 6.dp).fillMaxWidth().aspectRatio(1f)
-                .onGloballyPositioned { size = PixelSize(it.size.width, it.size.height) }
+                .onGloballyPositioned { size = Size(it.size.width, it.size.height) }
                 .clip(remember { RoundedCornerShape(4.dp) })
             ) {
                 Spacer(Modifier.fillMaxSize().padding(0.2.dp).clip(RoundedCornerShape(4.dp)).background(MaterialTheme.colorScheme.tertiary))
-                if (size.width > 1) picture(size)
+                if (size.width.hashCode() > 1) picture(size)
             }
 
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {

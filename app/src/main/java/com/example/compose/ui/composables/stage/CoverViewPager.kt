@@ -9,7 +9,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.core.graphics.drawable.toBitmap
 import androidx.palette.graphics.Palette
-import coil.size.PixelSize
+import coil.size.Size
 import com.example.compose.local.model.Song
 import com.example.compose.ui.composables.modifiers.crossFade
 import com.example.compose.ui.composables.util_composables.LoadSongCover
@@ -47,7 +47,7 @@ fun CoverViewPager(
     HorizontalPager(modifier = Modifier.fillMaxSize(), state = pagerState, count = queue.size, key = { queue[it].id }) { page ->
         LoadSongCover(
             modifier = Modifier.crossFade(calculateCurrentOffsetForPage(page)), song = queue[page],
-            size = PixelSize(constraints.maxWidth, constraints.minHeight), memoryCacheKey = queue[page].path + " Stage"
+            size = Size(constraints.maxWidth, constraints.minHeight), memoryCacheKey = queue[page].path + " Stage"
         ) {
             withContext(Dispatchers.Default) {
                 Palette.Builder(it.toBitmap())

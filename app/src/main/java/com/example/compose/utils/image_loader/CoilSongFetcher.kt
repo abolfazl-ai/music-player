@@ -7,30 +7,29 @@ import android.os.Build.VERSION.SDK_INT
 import android.util.Log
 import android.util.Size
 import androidx.core.graphics.drawable.toDrawable
-import coil.bitmap.BitmapPool
+import coil.ImageLoader
 import coil.decode.DataSource
+import coil.decode.ImageSource
 import coil.fetch.DrawableResult
 import coil.fetch.FetchResult
 import coil.fetch.Fetcher
 import coil.fetch.SourceResult
-import coil.size.PixelSize
+import coil.request.Options
 import com.example.compose.local.model.Song
 import com.example.compose.utils.default_pictures.SongAndSize
 import com.example.compose.utils.default_pictures.getDefaultCover
 import com.example.compose.utils.resources.TAG
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okio.buffer
 import okio.source
 import java.io.InputStream
 
-object CoilSongFetcher : Fetcher<Song> {
+class CoilSongFetcher(val data: Song, val options: Options) : Fetcher {
+    override suspend fun fetch(): FetchResult {
 
-    override fun handles(data: Song) = true
-
-    override fun key(data: Song) = data.path
-
-    override suspend fun fetch(pool: BitmapPool, data: Song, size: coil.size.Size, options: coil.decode.Options): FetchResult {
-
-        val actualSize = if (size is PixelSize) Size(size.width, size.height) else Size(500, 500)
+        val actualSize = options.size.run { if (width.hashCode() == 0) Size(width.hashCode(), height.hashCode()) else Size(500, 500) }
+        var stream: InputStream? = null
 
         try {
             if (SDK_INT >= Build.VERSION_CODES.Q) {
@@ -43,18 +42,19 @@ object CoilSongFetcher : Fetcher<Song> {
                 )
             } else {
                 val uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), data.albumId)
-                val stream: InputStream? = options.context.contentResolver.openInputStream(uri)
+                stream = options.context.contentResolver.openInputStream(uri)
                 stream?.let {
                     return SourceResult(
-                        source = it.source().buffer(),
+                        source = ImageSource(it.source().buffer(), options.context),
                         mimeType = options.context.contentResolver.getType(uri),
                         dataSource = DataSource.DISK
                     )
                 }
-                stream?.close()
             }
         } catch (e: Exception) {
             Log.i(TAG, e.message.toString())
+        } finally {
+            withContext(Dispatchers.IO) { stream?.close() }
         }
 
         return DrawableResult(
@@ -62,5 +62,9 @@ object CoilSongFetcher : Fetcher<Song> {
             isSampled = false,
             dataSource = DataSource.DISK
         )
+    }
+
+    object Factory : Fetcher.Factory<Song> {
+        override fun create(data: Song, options: Options, imageLoader: ImageLoader) = CoilSongFetcher(data, options)
     }
 }

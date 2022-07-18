@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.times
-import coil.size.PixelSize
+import coil.size.Size
 import com.example.compose.ui.composables.icons.animated.ArrowToX
 import com.example.compose.ui.composables.modifiers.Selectable2
 import com.example.compose.utils.resources.*
@@ -49,7 +49,7 @@ fun LinearItem(
     title: String,
     subtitle: String,
     description: String = "",
-    picture: @Composable BoxScope.(PixelSize) -> Unit,
+    picture: @Composable BoxScope.(Size) -> Unit,
     expanded: Boolean = false,
     itemOptions: @Composable BoxScope.() -> Unit = { ItemOptions() },
     itemOptionsHeight: Dp = IconOptionsHeight,
@@ -85,7 +85,7 @@ internal fun LinearItemCard(
     title: String,
     subtitle: String,
     description: String = "",
-    picture: @Composable BoxScope.(PixelSize) -> Unit,
+    picture: @Composable BoxScope.(Size) -> Unit,
     selected: Boolean = false,
     onClick: () -> Unit = {},
     onSelect: () -> Unit = {},
@@ -95,7 +95,7 @@ internal fun LinearItemCard(
 
     val selectAnimator by animateFloatAsState(if (selected) 1.1f else -0.1f, tween(250))
     val clipShape = remember { RoundedCornerShape(max(LinearItemCornerRadius - LinearItemPadding, 4.dp)) }
-    val size = with(LocalDensity.current) { remember { (LinearItemHeight - 2 * LinearItemPadding).roundToPx().let { PixelSize(it, it) } } }
+    val size = with(LocalDensity.current) { remember { (LinearItemHeight - 2 * LinearItemPadding).roundToPx().let { Size(it, it) } } }
 
     Surface(
         modifier = Modifier.height(LinearItemHeight),
@@ -103,7 +103,8 @@ internal fun LinearItemCard(
         color = MaterialTheme.colorScheme.surface,
         shape = remember { RoundedCornerShape(LinearItemCornerRadius) },
         shadowElevation = elevation(), border = selectAnimator.let {
-            if (it > 0f) BorderStroke((2 * it.coerceIn(0f, 1f)).dp, MaterialTheme.colorScheme.secondary) else null }
+            if (it > 0f) BorderStroke((2 * it.coerceIn(0f, 1f)).dp, MaterialTheme.colorScheme.secondary) else null
+        }
     ) {
         Layout(modifier = Modifier.combinedClickable(onLongClick = onSelect, onClick = onClick).padding(LinearItemPadding), content = {
             Selectable2(selected, { onSelect() }, maxOf(LinearItemCornerRadius - LinearItemPadding, 4.dp)) { picture(size) }
@@ -119,11 +120,17 @@ internal fun LinearItemCard(
             val subtitleP: Placeable
             val detailsP: Placeable
 
-            c.copy(minWidth = size.width, maxWidth = size.width, minHeight = size.width, maxHeight = size.height)
-                .let { pictureP = m[0].measure(it);expandP = m[4].measure(it) }
+            size.run {
+                c.copy(
+                    minWidth = width.hashCode(),
+                    maxWidth = width.hashCode(),
+                    minHeight = width.hashCode(),
+                    maxHeight = height.hashCode()
+                ).let { pictureP = m[0].measure(it);expandP = m[4].measure(it) }
+            }
 
             with(c.copy(minWidth = 0, minHeight = 0)) {
-                val textWidth = maxWidth - 2 * size.width - 2 * LinearItemSpacing.roundToPx()
+                val textWidth = maxWidth - 2 * size.width.hashCode() - 2 * LinearItemSpacing.roundToPx()
                 titleP = m[1].measure(copy(maxWidth = textWidth))
                 subtitleP = m[2].measure(copy(maxWidth = textWidth - 100.dp.roundToPx()))
                 detailsP = m[3].measure(copy(maxWidth = 100.dp.roundToPx()))

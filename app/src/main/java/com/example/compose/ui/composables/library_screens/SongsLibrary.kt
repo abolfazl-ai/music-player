@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.size.PixelSize
 import com.example.compose.local.model.Song
 import com.example.compose.ui.composables.list_items.ItemOptions
 import com.example.compose.ui.composables.list_items.LinearItem
@@ -27,10 +26,7 @@ import com.example.compose.viewmodel.MainViewModel
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
-fun SongsLibrary(
-    modifier: Modifier = Modifier,
-    viewModel: MainViewModel = hiltViewModel()
-) {
+fun SongsLibrary(modifier: Modifier = Modifier, viewModel: MainViewModel = hiltViewModel()) {
 
     val selectList = remember { mutableStateListOf<Int>() }
     val onSelect: (Int) -> Unit = remember { { if (selectList.contains(it)) selectList.remove(it) else selectList.add(it) } }

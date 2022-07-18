@@ -93,7 +93,7 @@ internal fun GetIcon(mode: EmoFabMode, isPlaying: Boolean, isMenuOpen: Boolean) 
 @Composable
 internal fun EmoFab(
     draggable: Boolean, showMenu: Boolean, isMenuOpen: Boolean, color: Color, contentColor: Color,
-    size: Dp = FabSize, shape: Shape = RoundedCornerShape(16.dp), elevation: Dp = FabElevation, menuItems: List<MenuItem>,
+    size: Dp = FabSize, shape: Shape = CircleShape, elevation: Dp = FabElevation, menuItems: List<MenuItem>,
     onMenuClicked: (id: Int) -> Unit, menuSize: Dp = MenuFabSize, menuSpacing: Dp = MenuFabSpacing, onClick: () -> Unit,
     icon: @Composable () -> Unit
 ) = Box {

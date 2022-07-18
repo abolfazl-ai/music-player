@@ -53,6 +53,7 @@ fun Stage(modifier: Modifier = Modifier, viewModel: MainViewModel = hiltViewMode
                     when (action) {
                         PlaybackAction.PREVIOUS -> if (temp == state.index) temp = state.index - 1
                         PlaybackAction.NEXT -> if (temp == state.index) temp = state.index + 1
+                        else -> {}
                     }
                 }
             }
@@ -64,6 +65,7 @@ fun Stage(modifier: Modifier = Modifier, viewModel: MainViewModel = hiltViewMode
                     PlaybackAction.PREVIOUS -> if (temp == state.index) temp = state.index - 1
                     PlaybackAction.PLAY -> viewModel.preferences.updatePlayingState(!state.isPlaying)
                     PlaybackAction.NEXT -> if (temp == state.index) temp = state.index + 1
+                    else -> {}
                 }
             }
         }
