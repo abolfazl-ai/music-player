@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.times
 import coil.size.Size
 import com.example.compose.ui.composables.icons.animated.ArrowToX
 import com.example.compose.ui.composables.modifiers.Selectable2
+import com.example.compose.ui.composables.modifiers.selectable
 import com.example.compose.utils.resources.*
 
 @ExperimentalFoundationApi
@@ -107,7 +108,8 @@ internal fun LinearItemCard(
         }
     ) {
         Layout(modifier = Modifier.combinedClickable(onLongClick = onSelect, onClick = onClick).padding(LinearItemPadding), content = {
-            Selectable2(selected, { onSelect() }, maxOf(LinearItemCornerRadius - LinearItemPadding, 4.dp)) { picture(size) }
+            Box(modifier = Modifier.clip(RoundedCornerShape(4.dp)).selectable(selected).clickable { onSelect() }) { picture(size) }
+//            Selectable2(selected, { onSelect() }, maxOf(LinearItemCornerRadius - LinearItemPadding, 4.dp)) { picture(size) }
             Text(title, style = MaterialTheme.typography.labelLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(subtitle, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(description, style = MaterialTheme.typography.labelSmall)
